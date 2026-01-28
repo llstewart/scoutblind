@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(Get-Content \"C:\\\\Users\\\\linco\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-linco-Documents-TrueSignal\\\\tasks\\\\b1a2f22.output\" -Tail 80)",
+      "Bash(taskkill:*)",
+      "Bash(powershell -Command:*)"
+    ]
+  }
+}
