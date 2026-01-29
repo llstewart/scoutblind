@@ -207,15 +207,33 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold tracking-tight text-black mb-3">
-          Locus
+      <div className="text-center mb-16">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-6">
+          Locus<span className="text-primary">.</span>
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Market intelligence for SEO agencies. Find businesses with high propensity to buy through Hidden Signals analysis.
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+          Market intelligence for SEO & Google Business Profile agencies. Identify high-propensity leads hidden in plain sight.
         </p>
+
+        {/* How it works - Easy to understand process */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-4xl mx-auto">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">1</div>
+            <span className="text-sm font-medium text-foreground">Target Niche</span>
+          </div>
+          <div className="hidden md:block w-16 h-[2px] bg-border" />
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">2</div>
+            <span className="text-sm font-medium text-foreground">Scan Market</span>
+          </div>
+          <div className="hidden md:block w-16 h-[2px] bg-border" />
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">3</div>
+            <span className="text-sm font-medium text-foreground">Find Signals</span>
+          </div>
+        </div>
       </div>
 
       {/* Search Form */}
@@ -225,7 +243,7 @@ export default function Home() {
 
       {/* Error State */}
       {error && (
-        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center">
+        <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-red-400 text-center">
           {error}
         </div>
       )}
@@ -237,20 +255,19 @@ export default function Home() {
 
       {/* Progress bar for streaming analysis */}
       {isAnalyzing && analyzeProgress && (
-        <div className={`mb-6 p-4 rounded-lg border transition-all ${
-          analyzeProgress.firstPageComplete
-            ? 'bg-green-50 border-green-200'
-            : 'bg-blue-50 border-blue-200'
-        }`}>
+        <div className={`mb-6 p-4 rounded-lg border transition-all ${analyzeProgress.firstPageComplete
+          ? 'bg-emerald-500/10 border-emerald-500/20'
+          : 'bg-primary/10 border-primary/20'
+          }`}>
           {/* First page complete banner */}
           {analyzeProgress.firstPageComplete && analyzeProgress.isBackground && (
-            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-green-200">
-              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-emerald-500/20">
+              <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-green-700">
+              <span className="text-sm font-medium text-emerald-400">
                 First page ready! You can start browsing while more results load.
               </span>
             </div>
@@ -262,25 +279,22 @@ export default function Home() {
               {[1, 2, 3].map((phase) => (
                 <div key={phase} className="flex items-center gap-1">
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
-                      phase < (analyzeProgress.phase || 0)
-                        ? 'bg-green-500 text-white'
-                        : phase === analyzeProgress.phase
-                        ? 'bg-blue-600 text-white animate-pulse'
-                        : 'bg-gray-200 text-gray-500'
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-all ${phase < (analyzeProgress.phase || 0)
+                      ? 'bg-emerald-500 text-white'
+                      : phase === analyzeProgress.phase
+                        ? 'bg-primary text-primary-foreground animate-pulse'
+                        : 'bg-muted text-muted-foreground'
+                      }`}
                   >
                     {phase < (analyzeProgress.phase || 0) ? '✓' : phase}
                   </div>
-                  <span className={`text-xs hidden sm:inline ${
-                    phase === analyzeProgress.phase ? 'text-blue-700 font-medium' : 'text-gray-500'
-                  }`}>
+                  <span className={`text-xs hidden sm:inline ${phase === analyzeProgress.phase ? 'text-primary font-medium' : 'text-muted-foreground'
+                    }`}>
                     {phase === 1 ? 'Visibility' : phase === 2 ? 'Reviews' : 'Analysis'}
                   </span>
                   {phase < 3 && (
-                    <div className={`w-8 h-0.5 ${
-                      phase < (analyzeProgress.phase || 0) ? 'bg-green-500' : 'bg-gray-200'
-                    }`} />
+                    <div className={`w-8 h-0.5 ${phase < (analyzeProgress.phase || 0) ? 'bg-emerald-500' : 'bg-muted'
+                      }`} />
                   )}
                 </div>
               ))}
@@ -288,37 +302,32 @@ export default function Home() {
           )}
 
           <div className="flex items-center justify-between mb-2">
-            <span className={`text-sm font-medium ${
-              analyzeProgress.firstPageComplete ? 'text-green-700' : 'text-blue-700'
-            }`}>
+            <span className={`text-sm font-medium ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-primary'
+              }`}>
               {analyzeProgress.message || 'Analyzing businesses for Hidden Signals...'}
             </span>
-            <span className={`text-sm ${
-              analyzeProgress.firstPageComplete ? 'text-green-600' : 'text-blue-600'
-            }`}>
+            <span className={`text-sm ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-primary'
+              }`}>
               {analyzeProgress.completed}/{analyzeProgress.total}
             </span>
           </div>
-          <div className={`w-full rounded-full h-2 ${
-            analyzeProgress.firstPageComplete ? 'bg-green-200' : 'bg-blue-200'
-          }`}>
+          <div className={`w-full rounded-full h-2 ${analyzeProgress.firstPageComplete ? 'bg-emerald-500/20' : 'bg-primary/20'
+            }`}>
             <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                analyzeProgress.firstPageComplete ? 'bg-green-500' : 'bg-blue-600'
-              }`}
+              className={`h-2 rounded-full transition-all duration-300 ${analyzeProgress.firstPageComplete ? 'bg-emerald-500' : 'bg-primary'
+                }`}
               style={{ width: `${(analyzeProgress.completed / analyzeProgress.total) * 100}%` }}
             />
           </div>
           <div className="flex items-center justify-between mt-2">
-            <p className={`text-xs ${
-              analyzeProgress.firstPageComplete ? 'text-green-600' : 'text-blue-600'
-            }`}>
+            <p className={`text-xs ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-primary'
+              }`}>
               {analyzeProgress.firstPageComplete
                 ? 'Background loading - results will appear automatically'
                 : 'Results appear as they complete - no need to wait!'}
             </p>
             {analyzeProgress.phase === 2 && !analyzeProgress.firstPageComplete && (
-              <p className="text-xs text-blue-500">
+              <p className="text-xs text-primary">
                 Fetching review data with retry protection...
               </p>
             )}
@@ -331,24 +340,22 @@ export default function Home() {
         <div>
           {/* Tab Navigation */}
           <div className="flex items-center justify-between mb-6">
-            <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
+            <div className="flex gap-1 p-1 bg-muted rounded-lg">
               <button
                 onClick={() => setActiveTab('general')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'general'
-                    ? 'bg-white text-black shadow-sm'
-                    : 'text-gray-600 hover:text-black'
-                }`}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === 'general'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 General List ({businesses.length})
               </button>
               <button
                 onClick={() => setActiveTab('upgraded')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'upgraded'
-                    ? 'bg-white text-black shadow-sm'
-                    : 'text-gray-600 hover:text-black'
-                }`}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === 'upgraded'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+                  }`}
               >
                 Upgraded List ({enrichedBusinesses.length})
               </button>
@@ -359,7 +366,7 @@ export default function Home() {
               <button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing}
-                className="px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 Analyze for Hidden Signals
               </button>
@@ -367,7 +374,7 @@ export default function Home() {
           </div>
 
           {/* Table Container */}
-          <div className="bg-white border border-gray-200 rounded-lg">
+          <div className="bg-card border border-border rounded-lg">
             {activeTab === 'general' ? (
               <GeneralListTable businesses={businesses} />
             ) : (
@@ -382,7 +389,7 @@ export default function Home() {
           </div>
 
           {/* Results Summary */}
-          <div className="mt-4 text-center text-sm text-gray-500">
+          <div className="mt-4 text-center text-sm text-muted-foreground">
             {activeTab === 'general' ? (
               <span>
                 Found {businesses.length} businesses for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
@@ -399,9 +406,9 @@ export default function Home() {
       {/* Empty State */}
       {!isSearching && !isAnalyzing && businesses.length === 0 && !error && (
         <div className="text-center py-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
             <svg
-              className="w-8 h-8 text-gray-400"
+              className="w-8 h-8 text-muted-foreground"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -414,10 +421,10 @@ export default function Home() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-foreground mb-2">
             Start Your Search
           </h3>
-          <p className="text-gray-500 max-w-sm mx-auto">
+          <p className="text-muted-foreground max-w-sm mx-auto">
             Enter a business niche and location to find leads with high propensity to buy SEO services.
           </p>
         </div>

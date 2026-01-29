@@ -9,18 +9,18 @@ export function LoadingState({ message = 'Loading...', progress }: LoadingStateP
   return (
     <div className="flex flex-col items-center justify-center py-12">
       <div className="relative">
-        <div className="w-12 h-12 border-4 border-gray-200 rounded-full animate-spin border-t-black" />
+        <div className="w-12 h-12 border-4 border-muted rounded-full animate-spin border-t-primary" />
       </div>
-      <p className="mt-4 text-sm text-gray-600">{message}</p>
+      <p className="mt-4 text-sm text-muted-foreground">{message}</p>
       {progress !== undefined && (
         <div className="w-64 mt-4">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-black transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="mt-1 text-xs text-gray-500 text-center">{progress}%</p>
+          <p className="mt-1 text-xs text-muted-foreground text-center">{progress}%</p>
         </div>
       )}
     </div>
@@ -36,7 +36,7 @@ export function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
   return (
     <div
-      className={`${sizeClasses[size]} border-gray-200 rounded-full animate-spin border-t-black`}
+      className={`${sizeClasses[size]} border-muted rounded-full animate-spin border-t-primary`}
     />
   );
 }

@@ -9,10 +9,10 @@ interface StatusTagProps {
 }
 
 const statusStyles: Record<StatusType, string> = {
-  success: 'bg-green-100 text-green-800 border-green-200',
-  warning: 'bg-orange-100 text-orange-800 border-orange-200',
-  error: 'bg-red-100 text-red-800 border-red-200',
-  neutral: 'bg-gray-100 text-gray-800 border-gray-200',
+  success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  error: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+  neutral: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
 };
 
 export function StatusTag({ status, children, className = '' }: StatusTagProps) {
@@ -31,10 +31,10 @@ interface StatusDotProps {
 
 export function StatusDot({ status }: StatusDotProps) {
   const dotColors: Record<StatusType, string> = {
-    success: 'bg-green-500',
-    warning: 'bg-orange-500',
-    error: 'bg-red-500',
-    neutral: 'bg-gray-500',
+    success: 'bg-emerald-500',
+    warning: 'bg-amber-500',
+    error: 'bg-rose-500',
+    neutral: 'bg-zinc-500',
   };
 
   return (
