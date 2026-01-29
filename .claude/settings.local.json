@@ -10,7 +10,8 @@
       "Bash(powershell -Command:*)",
       "Bash(npx tsc:*)",
       "Bash(npm uninstall:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

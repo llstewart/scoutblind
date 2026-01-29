@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { Business, EnrichedBusiness } from '@/lib/types';
 import { analyzeWebsite } from '@/lib/website-analyzer';
-import { batchCheckVisibility } from '@/lib/openai';
+import { batchCheckVisibility } from '@/lib/visibility';
 import { fetchBatchReviews, ReviewData } from '@/lib/outscraper';
 import { classifyLocationType } from '@/utils/address';
 import { cache, CACHE_TTL } from '@/lib/cache';

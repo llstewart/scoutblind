@@ -27,7 +27,6 @@ const US_STATES = [
   { code: 'WV', name: 'West Virginia' }, { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' }
 ];
 
-// Supported countries
 const COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'CA', name: 'Canada', flag: '🇨🇦' },
@@ -36,7 +35,6 @@ const COUNTRIES = [
   { code: 'OTHER', name: 'Other', flag: '🌍' },
 ];
 
-// Canadian Provinces
 const CA_PROVINCES = [
   { code: 'AB', name: 'Alberta' }, { code: 'BC', name: 'British Columbia' },
   { code: 'MB', name: 'Manitoba' }, { code: 'NB', name: 'New Brunswick' },
@@ -46,13 +44,11 @@ const CA_PROVINCES = [
   { code: 'QC', name: 'Quebec' }, { code: 'SK', name: 'Saskatchewan' }, { code: 'YT', name: 'Yukon' }
 ];
 
-// UK Regions
 const UK_REGIONS = [
   { code: 'ENG', name: 'England' }, { code: 'SCT', name: 'Scotland' },
   { code: 'WLS', name: 'Wales' }, { code: 'NIR', name: 'Northern Ireland' }
 ];
 
-// Australian States
 const AU_STATES = [
   { code: 'NSW', name: 'New South Wales' }, { code: 'VIC', name: 'Victoria' },
   { code: 'QLD', name: 'Queensland' }, { code: 'WA', name: 'Western Australia' },
@@ -110,9 +106,10 @@ interface SearchFormProps {
   isLoading: boolean;
   initialNiche?: string;
   initialLocation?: string;
+  compact?: boolean;
 }
 
-export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLocation = '' }: SearchFormProps) {
+export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLocation = '', compact = false }: SearchFormProps) {
   const [niche, setNiche] = useState(initialNiche);
   const [city, setCity] = useState('');
   const [region, setRegion] = useState('');
@@ -121,10 +118,12 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [recentNiches, setRecentNiches] = useState<string[]>([]);
   const [showNicheSuggestions, setShowNicheSuggestions] = useState(false);
-  const [activeField, setActiveField] = useState<'niche' | 'location' | null>(null);
+  const [showRegionPicker, setShowRegionPicker] = useState(false);
+  const [regionSearch, setRegionSearch] = useState('');
 
   const countryPickerRef = useRef<HTMLDivElement>(null);
   const nicheInputRef = useRef<HTMLDivElement>(null);
+  const regionPickerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -147,10 +146,6 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
     if (initialNiche) setNiche(initialNiche);
   }, [initialNiche]);
 
-  const [showRegionPicker, setShowRegionPicker] = useState(false);
-  const [regionSearch, setRegionSearch] = useState('');
-  const regionPickerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (countryPickerRef.current && !countryPickerRef.current.contains(event.target as Node)) {
@@ -161,10 +156,6 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
       }
       if (nicheInputRef.current && !nicheInputRef.current.contains(event.target as Node)) {
         setShowNicheSuggestions(false);
-      }
-      // Click outside form resets active field visual state
-      if (formRef.current && !formRef.current.contains(event.target as Node)) {
-        setActiveField(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -203,56 +194,226 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
     country === 'OTHER' ? freeformLocation.trim() : city.trim() && region
   );
 
-  return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className="w-full max-w-4xl mx-auto relative z-20"
-    >
-      <div className={`
-        relative flex flex-col md:flex-row items-stretch md:items-center
-        bg-[#18181b] border border-zinc-800
-        rounded-2xl transition-all duration-300
-        ${activeField ? 'shadow-2xl shadow-primary/5 border-primary/30 ring-1 ring-primary/30' : 'hover:border-zinc-700 shadow-xl shadow-black/20'}
-      `}>
+  // ============================================
+  // COMPACT MODE (for header)
+  // ============================================
+  if (compact) {
+    return (
+      <form ref={formRef} onSubmit={handleSubmit} className="w-full">
+        <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-700/50 rounded-full px-4 py-2 shadow-sm">
+          {/* Niche Section */}
+          <div ref={nicheInputRef} className="relative flex items-center gap-2">
+            <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={niche}
+              onChange={(e) => {
+                setNiche(e.target.value);
+                setShowNicheSuggestions(true);
+              }}
+              onFocus={() => setShowNicheSuggestions(true)}
+              placeholder="Business type"
+              className="w-24 sm:w-28 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
+              disabled={isLoading}
+              autoComplete="off"
+            />
+            {showNicheSuggestions && filteredNiches.length > 0 && (
+              <div className="absolute top-full left-0 mt-3 w-48 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 py-1 overflow-hidden">
+                {filteredNiches.map((item, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => {
+                      setNiche(item);
+                      setShowNicheSuggestions(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* Niche Section */}
-        <div
-          ref={nicheInputRef}
-          className="relative flex-1 group"
-        >
-          <div className="px-6 py-4 md:py-5 flex flex-col justify-center h-full rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none transition-colors">
-            <label className={`text-xs font-medium mb-1 block uppercase tracking-wider transition-colors ${activeField === 'niche' ? 'text-primary' : 'text-zinc-500'}`}>
-              Target Niche
-            </label>
-            <div className="flex items-center">
-              <svg className={`w-4 h-4 mr-3 transition-colors ${activeField === 'niche' ? 'text-primary' : 'text-zinc-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={niche}
-                onChange={(e) => {
-                  setNiche(e.target.value);
-                  setShowNicheSuggestions(true);
+          {/* Divider */}
+          <div className="w-px h-5 bg-zinc-700" />
+
+          {/* Location Section */}
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City"
+              className="w-20 sm:w-24 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
+              disabled={isLoading}
+            />
+
+            {/* Region Picker */}
+            <div ref={regionPickerRef} className="relative flex items-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRegionPicker(!showRegionPicker);
+                  setRegionSearch('');
                 }}
-                onFocus={() => {
-                  setActiveField('niche');
-                  setShowNicheSuggestions(true);
-                }}
-                placeholder="Ex. Dentist, Roofers..."
-                className="w-full bg-transparent outline-none text-zinc-100 placeholder:text-zinc-600 font-medium"
+                className="px-2 py-1 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-md flex items-center gap-1 transition-colors"
                 disabled={isLoading}
-                autoComplete="off"
-              />
+              >
+                <span className={`font-medium leading-none ${!region ? 'text-zinc-500' : 'text-white'}`}>
+                  {selectedRegion?.code || regionPlaceholder}
+                </span>
+                <svg className="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showRegionPicker && (
+                <div className="absolute top-full right-0 mt-3 w-52 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                  <div className="px-3 py-2 border-b border-zinc-800">
+                    <input
+                      autoFocus
+                      type="text"
+                      value={regionSearch}
+                      onChange={(e) => setRegionSearch(e.target.value)}
+                      placeholder={`Search ${regionPlaceholder.toLowerCase()}...`}
+                      className="w-full px-3 py-1.5 text-sm bg-zinc-800 text-zinc-200 rounded-lg outline-none placeholder:text-zinc-500"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                  <div className="max-h-48 overflow-y-auto py-1">
+                    {regions
+                      .filter(r => r.name.toLowerCase().includes(regionSearch.toLowerCase()) || r.code.toLowerCase().includes(regionSearch.toLowerCase()))
+                      .map((r) => (
+                        <button
+                          key={r.code}
+                          type="button"
+                          onClick={() => {
+                            setRegion(r.code);
+                            setShowRegionPicker(false);
+                            setRegionSearch('');
+                          }}
+                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                            region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                          }`}
+                        >
+                          {r.name}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Country Picker */}
+            <div ref={countryPickerRef} className="relative flex items-center">
+              <button
+                type="button"
+                onClick={() => setShowCountryPicker(!showCountryPicker)}
+                className="px-2 py-1 hover:bg-zinc-800 rounded-md transition-colors flex items-center gap-1"
+                title={selectedCountry?.name}
+              >
+                <span className="text-sm leading-none">{selectedCountry?.flag}</span>
+                <svg className="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showCountryPicker && (
+                <div className="absolute top-full right-0 mt-3 w-44 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 py-1 overflow-hidden">
+                  <div className="px-3 py-1.5 border-b border-zinc-800">
+                    <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Country</span>
+                  </div>
+                  {COUNTRIES.map((c) => (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => {
+                        setCountry(c.code);
+                        setRegion('');
+                        setShowCountryPicker(false);
+                      }}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${
+                        country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-base">{c.flag}</span>
+                      <span>{c.name}</span>
+                      {country === c.code && (
+                        <svg className="w-4 h-4 ml-auto text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Recent niches dropdown */}
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading || !isFormValid}
+            className={`ml-auto px-4 py-1.5 text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${
+              isFormValid
+                ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25'
+                : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+            }`}
+          >
+            {isLoading ? (
+              <LoadingSpinner size="sm" />
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span>Search</span>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  // ============================================
+  // FULL MODE (for landing page)
+  // ============================================
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="w-full max-w-lg mx-auto px-4 sm:px-0">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 sm:p-6 space-y-4">
+
+        {/* Niche Input */}
+        <div ref={nicheInputRef} className="relative">
+          <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wide">
+            Business Type
+          </label>
+          <input
+            type="text"
+            value={niche}
+            onChange={(e) => {
+              setNiche(e.target.value);
+              setShowNicheSuggestions(true);
+            }}
+            onFocus={() => setShowNicheSuggestions(true)}
+            placeholder="e.g. Dentist, Plumber, Lawyer"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800/50 border border-zinc-700/50 rounded-lg text-sm sm:text-base text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-violet-500/50 focus:bg-zinc-800 transition-all"
+            disabled={isLoading}
+            autoComplete="off"
+          />
+
           {showNicheSuggestions && filteredNiches.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="px-4 py-2 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
-                <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Recent Searches</span>
+            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-50 overflow-hidden">
+              <div className="px-3 py-2 border-b border-zinc-800 flex items-center justify-between">
+                <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Recent</span>
                 <button
                   type="button"
                   onClick={(e) => {
@@ -260,9 +421,9 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                     clearRecentItems(STORAGE_KEY_NICHES);
                     setRecentNiches([]);
                   }}
-                  className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors"
+                  className="text-[10px] text-zinc-600 hover:text-zinc-400"
                 >
-                  Clear History
+                  Clear
                 </button>
               </div>
               <div className="py-1">
@@ -274,13 +435,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                       setNiche(item);
                       setShowNicheSuggestions(false);
                     }}
-                    className="w-full px-4 py-3 text-left text-sm text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 flex items-center gap-3 transition-colors"
+                    className="w-full px-3 py-2 text-left text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-zinc-800/50 flex items-center justify-center text-zinc-600">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
                     {item}
                   </button>
                 ))}
@@ -289,185 +445,160 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
           )}
         </div>
 
-        {/* Divider */}
-        <div className="hidden md:block w-px h-12 bg-zinc-800" />
-        <div className="block md:hidden h-px w-full bg-zinc-800" />
-
         {/* Location Section */}
-        <div className="flex-1 flex flex-col md:flex-row md:items-center relative">
+        <div>
+          <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wide">
+            Location
+          </label>
 
-          {/* Country Trigger */}
-          <div ref={countryPickerRef} className="relative border-b md:border-b-0 md:border-r border-zinc-800 md:w-32">
-            <button
-              type="button"
-              onClick={() => setShowCountryPicker(!showCountryPicker)}
-              className="w-full h-full px-6 py-4 md:py-5 text-left flex flex-col justify-center transition-colors group"
-            >
-              <label className="text-xs font-medium text-zinc-500 mb-1 block uppercase tracking-wider group-hover:text-zinc-400 transition-colors">
-                Country
-              </label>
-              <div className="flex items-center gap-2 text-zinc-200">
-                <span className="text-sm font-medium">{selectedCountry?.code}</span>
-                <svg className={`w-3 h-3 text-zinc-600 ml-auto transition-transform ${showCountryPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </button>
+          {/* Mobile: Stack vertically, Desktop: Grid */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* City Input */}
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City"
+              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800/50 border border-zinc-700/50 rounded-lg text-sm sm:text-base text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-violet-500/50 focus:bg-zinc-800 transition-all"
+              disabled={isLoading}
+            />
 
-            {showCountryPicker && (
-              <div className="absolute left-0 top-full mt-2 w-64 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl shadow-black/50 py-1 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                {COUNTRIES.map((c) => (
-                  <button
-                    key={c.code}
-                    type="button"
-                    onClick={() => {
-                      setCountry(c.code);
-                      setRegion('');
-                      setShowCountryPicker(false);
-                    }}
-                    className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-colors ${country === c.code
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
-                      }`}
-                  >
-                    <span className="text-xl">{c.flag}</span>
-                    <span className="text-sm font-medium">{c.name}</span>
-                    {country === c.code && (
-                      <svg className="w-4 h-4 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* City/Region Inputs */}
-          <div className="flex-1 px-6 py-4 md:py-5 flex flex-col justify-center transition-colors">
-            <label className={`text-xs font-medium mb-1 block uppercase tracking-wider transition-colors ${activeField === 'location' ? 'text-primary' : 'text-zinc-500'}`}>
-              {country === 'OTHER' ? 'Full Address' : 'City & Region'}
-            </label>
-            <div className="flex items-center gap-2">
-              {country === 'OTHER' ? (
-                <input
-                  type="text"
-                  value={freeformLocation}
-                  onChange={(e) => setFreeformLocation(e.target.value)}
-                  onFocus={() => setActiveField('location')}
-                  placeholder="Enter detailed location..."
-                  className="w-full bg-transparent outline-none text-zinc-100 placeholder:text-zinc-600 font-medium"
+            {/* State & Country Row */}
+            <div className="flex gap-2">
+              {/* Region Picker */}
+              <div ref={regionPickerRef} className="relative flex-1 sm:flex-none">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRegionPicker(!showRegionPicker);
+                    setRegionSearch('');
+                  }}
+                  className="w-full sm:w-auto h-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sm:justify-start gap-2 bg-zinc-800/50 border border-zinc-700/50 rounded-lg hover:border-zinc-600 transition-colors min-w-[80px]"
                   disabled={isLoading}
-                />
-              ) : (
-                <div className="flex items-center gap-2 w-full">
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    onFocus={() => setActiveField('location')}
-                    placeholder="City Name"
-                    className="flex-1 min-w-0 bg-transparent outline-none text-zinc-100 placeholder:text-zinc-600 font-medium"
-                    disabled={isLoading}
-                  />
-                  <span className="text-zinc-700">/</span>
-                  <div className="relative min-w-[80px] md:min-w-[140px]" ref={regionPickerRef}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowRegionPicker(!showRegionPicker);
-                        setActiveField('location');
-                        setRegionSearch(''); // Reset search on open
-                      }}
-                      className="w-full text-left bg-transparent outline-none text-zinc-100 font-medium flex items-center gap-2"
-                      disabled={isLoading}
-                    >
-                      <span className={`truncate ${!region ? 'text-zinc-600' : 'text-zinc-100'}`}>
-                        {selectedRegion ? selectedRegion.code : `Select ${regionPlaceholder}`}
-                      </span>
-                      <svg className={`w-3 h-3 text-zinc-600 ml-auto flex-shrink-0 transition-transform ${showRegionPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
+                >
+                  <span className={`text-sm ${!region ? 'text-zinc-500' : 'text-zinc-100'}`}>
+                    {selectedRegion?.code || regionPlaceholder}
+                  </span>
+                  <svg className={`w-3 h-3 text-zinc-500 transition-transform ${showRegionPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-                    {showRegionPicker && (
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-[#18181b] border border-zinc-800 rounded-xl shadow-2xl shadow-black/50 py-1 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        {/* Search Input Sticky Header */}
-                        <div className="px-2 py-1 border-b border-zinc-800/50 mb-1">
-                          <input
-                            autoFocus
-                            type="text"
-                            value={regionSearch} // Ensure this state exists
-                            onChange={(e) => setRegionSearch(e.target.value)}
-                            placeholder={`Search ${regionPlaceholder}...`}
-                            className="w-full px-2 py-1.5 text-sm bg-zinc-900/50 text-zinc-200 rounded-lg outline-none placeholder:text-zinc-600 focus:bg-zinc-900 border border-transparent focus:border-zinc-800 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          />
+                {showRegionPicker && (
+                  <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-50 overflow-hidden">
+                    <div className="px-2 py-2 border-b border-zinc-800">
+                      <input
+                        autoFocus
+                        type="text"
+                        value={regionSearch}
+                        onChange={(e) => setRegionSearch(e.target.value)}
+                        placeholder={`Search ${regionPlaceholder.toLowerCase()}...`}
+                        className="w-full px-3 py-2 text-sm bg-zinc-800 text-zinc-200 rounded outline-none placeholder:text-zinc-500"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto py-1">
+                      {regions
+                        .filter(r => r.name.toLowerCase().includes(regionSearch.toLowerCase()) || r.code.toLowerCase().includes(regionSearch.toLowerCase()))
+                        .map((r) => (
+                          <button
+                            key={r.code}
+                            type="button"
+                            onClick={() => {
+                              setRegion(r.code);
+                              setShowRegionPicker(false);
+                              setRegionSearch('');
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                              region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                            }`}
+                          >
+                            {r.name}
+                          </button>
+                        ))}
+                      {regions.filter(r => r.name.toLowerCase().includes(regionSearch.toLowerCase())).length === 0 && (
+                        <div className="px-3 py-3 text-center text-xs text-zinc-500">
+                          No results
                         </div>
-
-                        <div className="max-h-64 overflow-y-auto custom-scrollbar">
-                          {regions
-                            .filter(r => r.name.toLowerCase().includes(regionSearch.toLowerCase()) || r.code.toLowerCase().includes(regionSearch.toLowerCase()))
-                            .map((r) => (
-                              <button
-                                key={r.code}
-                                type="button"
-                                onClick={() => {
-                                  setRegion(r.code);
-                                  setShowRegionPicker(false);
-                                  setRegionSearch('');
-                                }}
-                                className={`w-full px-4 py-2 text-left flex items-center justify-between text-sm transition-colors ${region === r.code
-                                  ? 'bg-primary/10 text-primary'
-                                  : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
-                                  }`}
-                              >
-                                <span>{r.name}</span>
-                                {region === r.code && (
-                                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                )}
-                              </button>
-                            ))}
-                          {regions.filter(r => r.name.toLowerCase().includes(regionSearch.toLowerCase()) || r.code.toLowerCase().includes(regionSearch.toLowerCase())).length === 0 && (
-                            <div className="px-4 py-3 text-center text-xs text-zinc-500">
-                              No {regionPlaceholder.toLowerCase()}s found
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+
+              {/* Country Picker */}
+              <div ref={countryPickerRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowCountryPicker(!showCountryPicker)}
+                  className="h-full px-3 py-2.5 sm:py-3 flex items-center gap-1.5 bg-zinc-800/50 border border-zinc-700/50 rounded-lg hover:border-zinc-600 hover:bg-zinc-800 transition-colors"
+                >
+                  <span className="text-base">{selectedCountry?.flag}</span>
+                  <svg className={`w-3 h-3 text-zinc-400 transition-transform ${showCountryPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showCountryPicker && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl z-50 py-1">
+                    <div className="px-3 py-1.5 border-b border-zinc-800">
+                      <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Country</span>
+                    </div>
+                    {COUNTRIES.map((c) => (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => {
+                          setCountry(c.code);
+                          setRegion('');
+                          setShowCountryPicker(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${
+                          country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        }`}
+                      >
+                        <span className="text-base">{c.flag}</span>
+                        <span>{c.name}</span>
+                        {country === c.code && (
+                          <svg className="w-3.5 h-3.5 ml-auto text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="p-2 md:pl-0">
+        {/* Submit Row - Button aligned right on desktop */}
+        <div className="flex justify-end pt-1">
           <button
             type="submit"
             disabled={isLoading || !isFormValid}
-            className={`
-              w-full md:w-auto h-14 md:h-full aspect-square rounded-xl flex items-center justify-center transition-all duration-300
-              ${!isFormValid
-                ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-                : 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 hover:scale-105 active:scale-95'
-              }
-            `}
+            className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${
+              isFormValid
+                ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25'
+                : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+            }`}
           >
             {isLoading ? (
-              <LoadingSpinner size="sm" className="text-current" />
+              <>
+                <LoadingSpinner size="sm" />
+                <span>Searching...</span>
+              </>
             ) : (
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span>Search</span>
+              </>
             )}
           </button>
         </div>
-
       </div>
     </form>
   );

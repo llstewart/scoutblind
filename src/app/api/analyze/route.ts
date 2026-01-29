@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AnalyzeRequest, AnalyzeResponse, EnrichedBusiness, Business } from '@/lib/types';
 import { analyzeWebsite } from '@/lib/website-analyzer';
-import { batchCheckVisibility } from '@/lib/openai';
+import { batchCheckVisibility } from '@/lib/visibility';
 import { classifyLocationType } from '@/utils/address';
 import { fetchBatchReviews, ReviewData } from '@/lib/outscraper';
 import { Semaphore, sleep } from '@/lib/rate-limiter';

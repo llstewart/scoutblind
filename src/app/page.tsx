@@ -7,7 +7,8 @@ import { GeneralListTable } from '@/components/GeneralListTable';
 import { UpgradedListTable } from '@/components/UpgradedListTable';
 import { LoadingState } from '@/components/LoadingState';
 import { PremiumGate } from '@/components/PremiumGate';
-import { Business, EnrichedBusiness, TableBusiness, PendingBusiness } from '@/lib/types';
+import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness } from '@/lib/types';
+import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
 
 type TabType = 'general' | 'upgraded';
 
@@ -21,16 +22,13 @@ interface SessionState {
   isPremium: boolean;
 }
 
-// Wrapper component with Suspense for useSearchParams
 export default function Home() {
   return (
     <Suspense fallback={
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 mb-4">
-            <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-          </div>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-zinc-500 text-sm">Loading...</p>
         </div>
       </div>
     }>
@@ -53,16 +51,15 @@ function HomeContent() {
   const [selectedBusinesses, setSelectedBusinesses] = useState<Set<number>>(new Set());
   const [isCached, setIsCached] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // Premium state - wire this up to your auth system later
   const [isPremium, setIsPremium] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  // AbortController refs to cancel pending requests
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
 
-  // Restore state from sessionStorage on mount
+  // Determine if we're in "results mode" (compact header) or "hero mode" (full landing)
+  const hasResults = businesses.length > 0;
+
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
@@ -80,10 +77,8 @@ function HomeContent() {
     setIsInitialized(true);
   }, []);
 
-  // Save state to sessionStorage when it changes
   useEffect(() => {
     if (!isInitialized) return;
-
     try {
       const state: SessionState = {
         businesses,
@@ -98,45 +93,35 @@ function HomeContent() {
     }
   }, [businesses, tableBusinesses, searchParams, activeTab, isPremium, isInitialized]);
 
-  // Update URL when search params change
   useEffect(() => {
     if (!isInitialized || !searchParams) return;
-
     const params = new URLSearchParams();
     params.set('niche', searchParams.niche);
     params.set('location', searchParams.location);
     params.set('tab', activeTab);
-
     const newUrl = `?${params.toString()}`;
     if (window.location.search !== newUrl) {
       router.replace(newUrl, { scroll: false });
     }
   }, [searchParams, activeTab, isInitialized, router]);
 
-  // Handle URL-based navigation (if user lands on page with URL params but no session)
   useEffect(() => {
     if (!isInitialized) return;
-
     const niche = urlSearchParams.get('niche');
     const location = urlSearchParams.get('location');
     const tab = urlSearchParams.get('tab') as TabType | null;
-
-    // If we have URL params but no data, trigger a search
     if (niche && location && businesses.length === 0 && !isSearching) {
       if (tab) setActiveTab(tab);
       handleSearchFromUrl(niche, location);
     }
   }, [isInitialized, urlSearchParams, businesses.length, isSearching]);
 
-  // Search triggered from URL params (no need to update URL)
   const handleSearchFromUrl = async (niche: string, location: string) => {
     if (searchControllerRef.current) {
       searchControllerRef.current.abort();
     }
-
     const controller = new AbortController();
     searchControllerRef.current = controller;
-
     setIsSearching(true);
     setError(null);
     setSearchParams({ niche, location });
@@ -148,19 +133,15 @@ function HomeContent() {
         body: JSON.stringify({ niche, location }),
         signal: controller.signal,
       });
-
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Search failed');
       }
-
       const data = await response.json();
       setBusinesses(data.businesses);
       setIsCached(data.cached || false);
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        return;
-      }
+      if (err instanceof Error && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsSearching(false);
@@ -168,20 +149,14 @@ function HomeContent() {
   };
 
   const handleSearch = async (niche: string, location: string) => {
-    // Cancel any pending search or analyze requests
-    if (searchControllerRef.current) {
-      searchControllerRef.current.abort();
-    }
-    if (analyzeControllerRef.current) {
-      analyzeControllerRef.current.abort();
-    }
+    if (searchControllerRef.current) searchControllerRef.current.abort();
+    if (analyzeControllerRef.current) analyzeControllerRef.current.abort();
 
-    // Create new abort controller for this request
     const controller = new AbortController();
     searchControllerRef.current = controller;
 
     setIsSearching(true);
-    setIsAnalyzing(false); // Stop any analyzing state
+    setIsAnalyzing(false);
     setError(null);
     setBusinesses([]);
     setTableBusinesses([]);
@@ -196,28 +171,22 @@ function HomeContent() {
         body: JSON.stringify({ niche, location }),
         signal: controller.signal,
       });
-
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Search failed');
       }
-
       const data = await response.json();
       setBusinesses(data.businesses);
       setIsCached(data.cached || false);
       setActiveTab('general');
     } catch (err) {
-      // Don't show error if request was aborted (user started new search)
-      if (err instanceof Error && err.name === 'AbortError') {
-        return;
-      }
+      if (err instanceof Error && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsSearching(false);
     }
   };
 
-  // Enhanced progress tracking with phases
   const [analyzeProgress, setAnalyzeProgress] = useState<{
     completed: number;
     total: number;
@@ -229,49 +198,36 @@ function HomeContent() {
   } | null>(null);
 
   const handleUpgradeClick = () => {
-    // For now, just toggle premium status for demo
-    // Replace this with actual payment flow (Stripe, etc.)
     setIsPremium(true);
     setShowUpgradeModal(false);
   };
 
   const handleAnalyze = async () => {
     if (!searchParams || businesses.length === 0) return;
-
-    // Check if user is premium
     if (!isPremium) {
-      setActiveTab('upgraded'); // Show the premium gate
+      setActiveTab('upgraded');
       return;
     }
 
-    // Determine which businesses to analyze
     const businessesToAnalyze = selectedBusinesses.size > 0
       ? Array.from(selectedBusinesses).map(i => businesses[i])
       : businesses;
 
-    // Cancel any pending analyze request
-    if (analyzeControllerRef.current) {
-      analyzeControllerRef.current.abort();
-    }
-
-    // Create new abort controller for this request
+    if (analyzeControllerRef.current) analyzeControllerRef.current.abort();
     const controller = new AbortController();
     analyzeControllerRef.current = controller;
 
     setIsAnalyzing(true);
     setError(null);
 
-    // Immediately populate table with pending businesses (shows spinners)
     const pendingBusinesses: PendingBusiness[] = businessesToAnalyze.map(b => ({
       ...b,
       isEnriching: true as const,
     }));
     setTableBusinesses(pendingBusinesses);
-
     setAnalyzeProgress({ completed: 0, total: businessesToAnalyze.length, phase: 1, totalPhases: 3, message: 'Starting analysis...' });
-    setActiveTab('upgraded'); // Switch to upgraded tab immediately to show table with spinners
+    setActiveTab('upgraded');
 
-    // Use different endpoint based on selection
     const endpoint = selectedBusinesses.size > 0 ? '/api/analyze-selected' : '/api/analyze-stream';
 
     try {
@@ -286,11 +242,8 @@ function HomeContent() {
         signal: controller.signal,
       });
 
-      if (!response.ok) {
-        throw new Error('Analysis failed');
-      }
+      if (!response.ok) throw new Error('Analysis failed');
 
-      // Read the SSE stream
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No response body');
 
@@ -302,10 +255,8 @@ function HomeContent() {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-
-        // Process complete SSE messages
         const lines = buffer.split('\n\n');
-        buffer = lines.pop() || ''; // Keep incomplete message in buffer
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
@@ -313,7 +264,6 @@ function HomeContent() {
               const data = JSON.parse(line.slice(6));
 
               if (data.type === 'status') {
-                // Update status message and phase
                 setAnalyzeProgress(prev => ({
                   completed: prev?.completed || 0,
                   total: prev?.total || businesses.length,
@@ -324,7 +274,6 @@ function HomeContent() {
                   firstPageComplete: prev?.firstPageComplete || false,
                 }));
               } else if (data.type === 'progress') {
-                // Update progress during review fetching
                 setAnalyzeProgress(prev => ({
                   completed: data.completed,
                   total: data.total,
@@ -335,7 +284,6 @@ function HomeContent() {
                   firstPageComplete: prev?.firstPageComplete || false,
                 }));
               } else if (data.type === 'first_page_complete') {
-                // First 20 results are ready - user can start browsing
                 setAnalyzeProgress(prev => ({
                   completed: data.count,
                   total: data.total,
@@ -346,20 +294,17 @@ function HomeContent() {
                   firstPageComplete: true,
                 }));
               } else if (data.type === 'business') {
-                // Replace pending business with enriched one
                 const enrichedBusiness: EnrichedBusiness = {
                   ...data.business,
                   isEnriching: false,
                 };
                 setTableBusinesses(prev => {
-                  // Find the pending business by name and replace it
                   const idx = prev.findIndex(b => b.name === enrichedBusiness.name);
                   if (idx !== -1) {
                     const updated = [...prev];
                     updated[idx] = enrichedBusiness;
                     return updated;
                   }
-                  // If not found, append (shouldn't happen normally)
                   return [...prev, enrichedBusiness];
                 });
                 setAnalyzeProgress(prev => ({
@@ -367,7 +312,7 @@ function HomeContent() {
                   total: data.progress.total,
                   phase: 3,
                   totalPhases: 3,
-                  message: `Enriching ${data.progress.completed}/${data.progress.total} businesses`,
+                  message: `Analyzing ${data.progress.completed}/${data.progress.total}`,
                   isBackground: prev?.isBackground || false,
                   firstPageComplete: prev?.firstPageComplete || false,
                 }));
@@ -383,10 +328,7 @@ function HomeContent() {
         }
       }
     } catch (err) {
-      // Don't show error if request was aborted (user started new search)
-      if (err instanceof Error && err.name === 'AbortError') {
-        return;
-      }
+      if (err instanceof Error && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsAnalyzing(false);
@@ -394,280 +336,314 @@ function HomeContent() {
     }
   };
 
-  return (
-    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-6">
-          Locus<span className="text-primary">.</span>
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-          Market intelligence for SEO & Google Business Profile agencies. Identify high-propensity leads hidden in plain sight.
-        </p>
-
-        {/* How it works - Easy to understand process */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-4xl mx-auto">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">1</div>
-            <span className="text-sm font-medium text-foreground">Target Niche</span>
-          </div>
-          <div className="hidden md:block w-16 h-[2px] bg-border" />
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">2</div>
-            <span className="text-sm font-medium text-foreground">Scan Market</span>
-          </div>
-          <div className="hidden md:block w-16 h-[2px] bg-border" />
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">3</div>
-            <span className="text-sm font-medium text-foreground">Find Signals</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Search Form */}
-      <div className="mb-12">
-        <SearchForm
-          onSearch={handleSearch}
-          isLoading={isSearching}
-          initialNiche={searchParams?.niche}
-          initialLocation={searchParams?.location}
-        />
-      </div>
-
-      {/* Error State */}
-      {error && (
-        <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-red-400 text-center">
-          {error}
-        </div>
-      )}
-
-      {/* Loading States */}
-      {isSearching && (
-        <LoadingState message="Searching Google Maps for businesses..." />
-      )}
-
-      {/* Progress bar for streaming analysis */}
-      {isAnalyzing && analyzeProgress && (
-        <div className={`mb-6 p-4 rounded-lg border transition-all ${analyzeProgress.firstPageComplete
-          ? 'bg-emerald-500/10 border-emerald-500/20'
-          : 'bg-primary/10 border-primary/20'
-          }`}>
-          {/* First page complete banner */}
-          {analyzeProgress.firstPageComplete && analyzeProgress.isBackground && (
-            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-emerald-500/20">
-              <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
-                <svg className="w-3 h-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-sm font-medium text-emerald-400">
-                First page ready! You can start browsing while more results load.
-              </span>
-            </div>
-          )}
-
-          {/* Phase indicator - hide when in background mode */}
-          {analyzeProgress.phase && analyzeProgress.totalPhases && !analyzeProgress.firstPageComplete && (
-            <div className="flex items-center gap-2 mb-3">
-              {[1, 2, 3].map((phase) => (
-                <div key={phase} className="flex items-center gap-1">
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-all ${phase < (analyzeProgress.phase || 0)
-                      ? 'bg-emerald-500 text-white'
-                      : phase === analyzeProgress.phase
-                        ? 'bg-primary text-primary-foreground animate-pulse'
-                        : 'bg-muted text-muted-foreground'
-                      }`}
-                  >
-                    {phase < (analyzeProgress.phase || 0) ? '✓' : phase}
-                  </div>
-                  <span className={`text-xs hidden sm:inline ${phase === analyzeProgress.phase ? 'text-primary font-medium' : 'text-muted-foreground'
-                    }`}>
-                    {phase === 1 ? 'Visibility' : phase === 2 ? 'Reviews' : 'Analysis'}
-                  </span>
-                  {phase < 3 && (
-                    <div className={`w-8 h-0.5 ${phase < (analyzeProgress.phase || 0) ? 'bg-emerald-500' : 'bg-muted'
-                      }`} />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between mb-2">
-            <span className={`text-sm font-medium ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-primary'
-              }`}>
-              {analyzeProgress.message || 'Analyzing businesses for Hidden Signals...'}
-            </span>
-            <span className={`text-sm ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-primary'
-              }`}>
-              {analyzeProgress.completed}/{analyzeProgress.total}
-            </span>
-          </div>
-          <div className={`w-full rounded-full h-2 ${analyzeProgress.firstPageComplete ? 'bg-emerald-500/20' : 'bg-primary/20'
-            }`}>
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${analyzeProgress.firstPageComplete ? 'bg-emerald-500' : 'bg-primary'
-                }`}
-              style={{ width: `${(analyzeProgress.completed / analyzeProgress.total) * 100}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between mt-2">
-            <p className={`text-xs ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-primary'
-              }`}>
-              {analyzeProgress.firstPageComplete
-                ? 'Background loading - results will appear automatically'
-                : 'Results appear as they complete - no need to wait!'}
+  // ============================================
+  // RENDER: Hero Mode (No Results)
+  // ============================================
+  if (!hasResults && !isSearching) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0b] flex flex-col">
+        {/* Centered Hero Content */}
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="w-full max-w-3xl mx-auto text-center">
+            {/* Logo */}
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+              TrueSignal<span className="text-violet-500">.</span>
+            </h1>
+            <p className="text-zinc-400 text-lg mb-10 max-w-xl mx-auto">
+              Find businesses that actually need your services. Powered by real signals, not guesswork.
             </p>
-            {analyzeProgress.phase === 2 && !analyzeProgress.firstPageComplete && (
-              <p className="text-xs text-primary">
-                Fetching review data with retry protection...
-              </p>
+
+            {/* Search Form */}
+            <SearchForm
+              onSearch={handleSearch}
+              isLoading={isSearching}
+              initialNiche={searchParams?.niche}
+              initialLocation={searchParams?.location}
+            />
+
+            {/* How it works */}
+            <div className="mt-16 flex items-center justify-center gap-8 text-sm text-zinc-500">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-xs font-medium">1</div>
+                <span>Search niche</span>
+              </div>
+              <div className="w-8 h-px bg-zinc-800" />
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-xs font-medium">2</div>
+                <span>Scan market</span>
+              </div>
+              <div className="w-8 h-px bg-zinc-800" />
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-xs font-medium">3</div>
+                <span>Find signals</span>
+              </div>
+            </div>
+
+            {/* Error State */}
+            {error && (
+              <div className="mt-8 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                {error}
+              </div>
             )}
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Results - show even while analyzing to display progressive results */}
-      {!isSearching && businesses.length > 0 && (
-        <div>
-          {/* Tab Navigation */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex gap-1 p-1 bg-muted rounded-lg">
-              <button
-                onClick={() => setActiveTab('general')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === 'general'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                General List ({businesses.length})
-              </button>
-              <button
-                onClick={() => setActiveTab('upgraded')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${activeTab === 'upgraded'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                <span>GMB Signals</span>
-                {isPremium ? (
-                  <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
-                    Pro
-                  </span>
-                ) : (
-                  <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-amber-500/20 text-amber-500 border border-amber-500/30">
-                    Premium
-                  </span>
-                )}
-                {tableBusinesses.length > 0 && (
-                  <span className="text-muted-foreground">({tableBusinesses.length})</span>
-                )}
-              </button>
+  // ============================================
+  // RENDER: Results Mode (Compact Header + Data)
+  // ============================================
+  return (
+    <div className="min-h-screen bg-[#0a0a0b] flex flex-col">
+      {/* Compact Header */}
+      <header className="sticky top-0 z-50 bg-[#0a0a0b]/95 backdrop-blur-sm border-b border-zinc-800/50">
+        <div className="max-w-[1600px] mx-auto px-4 py-3">
+          <div className="flex items-center gap-6">
+            {/* Logo - clickable to reset */}
+            <button
+              onClick={() => {
+                setBusinesses([]);
+                setTableBusinesses([]);
+                setSearchParams(null);
+                setError(null);
+                router.replace('/');
+              }}
+              className="text-xl font-bold text-white hover:text-violet-400 transition-colors flex-shrink-0"
+            >
+              TrueSignal<span className="text-violet-500">.</span>
+            </button>
+
+            {/* Compact Search Form */}
+            <div className="flex-1 max-w-xl">
+              <SearchForm
+                onSearch={handleSearch}
+                isLoading={isSearching}
+                initialNiche={searchParams?.niche}
+                initialLocation={searchParams?.location}
+                compact
+              />
             </div>
 
-            {/* Analyze Button */}
-            {activeTab === 'general' && businesses.length > 0 && (
-              <button
-                onClick={handleAnalyze}
-                disabled={isAnalyzing}
-                className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {selectedBusinesses.size > 0
-                  ? `Unlock Signals for ${selectedBusinesses.size} Selected`
-                  : 'Unlock Hidden GMB Signals'}
-              </button>
-            )}
-
-            {/* Dev toggle for testing - remove in production */}
-            {process.env.NODE_ENV === 'development' && (
-              <button
-                onClick={() => setIsPremium(!isPremium)}
-                className="ml-2 px-2 py-1 text-xs border border-border rounded text-muted-foreground hover:text-foreground"
-              >
-                {isPremium ? 'Dev: Disable Pro' : 'Dev: Enable Pro'}
-              </button>
-            )}
-          </div>
-
-          {/* Table Container */}
-          <div className={`bg-card border rounded-lg ${activeTab === 'upgraded' && isPremium ? 'border-primary/30 shadow-lg shadow-primary/5' : 'border-border'}`}>
-            {activeTab === 'general' ? (
-              <GeneralListTable
-                businesses={businesses}
-                selectedBusinesses={selectedBusinesses}
-                onSelectionChange={setSelectedBusinesses}
-              />
-            ) : !isPremium ? (
-              <PremiumGate
-                onUpgradeClick={handleUpgradeClick}
-                niche={searchParams?.niche}
-                location={searchParams?.location}
-              />
-            ) : (
-              <UpgradedListTable
-                businesses={tableBusinesses}
-                niche={searchParams?.niche}
-                location={searchParams?.location}
-                isLoadingMore={isAnalyzing}
-                expectedTotal={analyzeProgress?.total || businesses.length}
-              />
-            )}
-          </div>
-
-          {/* Results Summary */}
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            {activeTab === 'general' ? (
-              <span>
-                Found {businesses.length} businesses for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
+            {/* Quick Stats */}
+            {searchParams && (
+              <div className="hidden lg:flex items-center gap-4 text-sm">
+                <div className="text-zinc-500">
+                  <span className="text-zinc-300 font-medium">{businesses.length}</span> results
+                </div>
                 {isCached && (
-                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <span className="px-2 py-0.5 text-xs font-medium rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
                     Cached
                   </span>
                 )}
-              </span>
-            ) : isPremium && tableBusinesses.length > 0 ? (
-              <span>
-                {tableBusinesses.filter(b => !('isEnriching' in b && b.isEnriching)).length}/{tableBusinesses.length} businesses enriched with GMB Signals
-              </span>
-            ) : isPremium ? (
-              <span>
-                Select businesses from General List and click &quot;Unlock Hidden GMB Signals&quot; to analyze
-              </span>
-            ) : null}
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </header>
 
-      {/* Empty State */}
-      {isInitialized && !isSearching && !isAnalyzing && businesses.length === 0 && !error && (
-        <div className="text-center py-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-            <svg
-              className="w-8 h-8 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+      {/* Main Content */}
+      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-4">
+        {/* Loading State */}
+        {isSearching && (
+          <div className="py-16">
+            <LoadingState message="Searching businesses..." />
           </div>
-          <h3 className="text-lg font-medium text-foreground mb-2">
-            Start Your Search
-          </h3>
-          <p className="text-muted-foreground max-w-sm mx-auto">
-            Enter a business niche and location to find leads with high propensity to buy SEO services.
-          </p>
-        </div>
-      )}
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Results */}
+        {!isSearching && hasResults && (
+          <div className="space-y-4">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between">
+              {/* Tabs */}
+              <div className="flex items-center gap-1 p-1 bg-zinc-900 rounded-lg border border-zinc-800">
+                <button
+                  onClick={() => setActiveTab('general')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                    activeTab === 'general'
+                      ? 'bg-zinc-800 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  All Results
+                  <span className="ml-2 text-zinc-500">({businesses.length})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('upgraded')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${
+                    activeTab === 'upgraded'
+                      ? 'bg-zinc-800 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <span>Signals</span>
+                  {isPremium ? (
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      PRO
+                    </span>
+                  ) : (
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-violet-500/20 text-violet-400 border border-violet-500/30">
+                      UPGRADE
+                    </span>
+                  )}
+                  {tableBusinesses.length > 0 && (
+                    <span className="text-zinc-500">({tableBusinesses.length})</span>
+                  )}
+                </button>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                {/* Export */}
+                <button
+                  onClick={() => {
+                    if (activeTab === 'upgraded' && tableBusinesses.length > 0) {
+                      const hasEnrichedData = tableBusinesses.some(b => !isPendingBusiness(b));
+                      if (hasEnrichedData) {
+                        exportEnrichedListToCSV(tableBusinesses, searchParams?.niche, searchParams?.location);
+                      }
+                    } else {
+                      exportGeneralListToCSV(businesses, searchParams?.niche, searchParams?.location);
+                    }
+                  }}
+                  disabled={activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b))}
+                  className="px-3 py-2 text-sm font-medium rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white border border-zinc-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Export
+                </button>
+
+                {/* Analyze Button */}
+                {activeTab === 'general' && (
+                  <button
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                    className="px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {selectedBusinesses.size > 0
+                      ? `Analyze ${selectedBusinesses.size} Selected`
+                      : 'Analyze All'}
+                  </button>
+                )}
+
+                {/* Dev toggle */}
+                {process.env.NODE_ENV === 'development' && (
+                  <button
+                    onClick={() => setIsPremium(!isPremium)}
+                    className="px-2 py-1 text-xs border border-zinc-700 rounded text-zinc-500 hover:text-white"
+                  >
+                    {isPremium ? 'Pro ✓' : 'Free'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            {isAnalyzing && analyzeProgress && (
+              <div className={`p-3 rounded-lg border ${
+                analyzeProgress.firstPageComplete
+                  ? 'bg-emerald-500/5 border-emerald-500/20'
+                  : 'bg-violet-500/5 border-violet-500/20'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    {/* Phase indicators */}
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3].map((phase) => (
+                        <div
+                          key={phase}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            phase < (analyzeProgress.phase || 0)
+                              ? 'bg-emerald-500'
+                              : phase === analyzeProgress.phase
+                                ? 'bg-violet-500 animate-pulse'
+                                : 'bg-zinc-700'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className={`text-sm font-medium ${
+                      analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-violet-400'
+                    }`}>
+                      {analyzeProgress.message}
+                    </span>
+                  </div>
+                  <span className={`text-sm ${
+                    analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-violet-400'
+                  }`}>
+                    {analyzeProgress.completed}/{analyzeProgress.total}
+                  </span>
+                </div>
+                <div className={`h-1 rounded-full ${
+                  analyzeProgress.firstPageComplete ? 'bg-emerald-500/20' : 'bg-violet-500/20'
+                }`}>
+                  <div
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      analyzeProgress.firstPageComplete ? 'bg-emerald-500' : 'bg-violet-500'
+                    }`}
+                    style={{ width: `${(analyzeProgress.completed / analyzeProgress.total) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Data Table */}
+            <div className={`bg-zinc-900/50 border rounded-lg overflow-hidden ${
+              activeTab === 'upgraded' && isPremium
+                ? 'border-violet-500/20'
+                : 'border-zinc-800'
+            }`}>
+              {activeTab === 'general' ? (
+                <GeneralListTable
+                  businesses={businesses}
+                  selectedBusinesses={selectedBusinesses}
+                  onSelectionChange={setSelectedBusinesses}
+                />
+              ) : !isPremium ? (
+                <PremiumGate
+                  onUpgradeClick={handleUpgradeClick}
+                  niche={searchParams?.niche}
+                  location={searchParams?.location}
+                />
+              ) : (
+                <UpgradedListTable
+                  businesses={tableBusinesses}
+                  niche={searchParams?.niche}
+                  location={searchParams?.location}
+                  isLoadingMore={isAnalyzing}
+                  expectedTotal={analyzeProgress?.total || businesses.length}
+                />
+              )}
+            </div>
+
+            {/* Footer Summary */}
+            <div className="text-center text-sm text-zinc-500 pb-4">
+              {activeTab === 'general' ? (
+                <span>
+                  Showing {businesses.length} businesses for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
+                </span>
+              ) : isPremium && tableBusinesses.length > 0 ? (
+                <span>
+                  {tableBusinesses.filter(b => !isPendingBusiness(b)).length} of {tableBusinesses.length} analyzed
+                </span>
+              ) : null}
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[Search API] Cache MISS for "${body.niche}" in "${body.location}"`);
-    const businesses = await searchGoogleMaps(body.niche, body.location, 50);
+    const businesses = await searchGoogleMaps(body.niche, body.location, 25);
 
     // Cache the results
     cache.set(cacheKey, businesses, CACHE_TTL.SEARCH_RESULTS);

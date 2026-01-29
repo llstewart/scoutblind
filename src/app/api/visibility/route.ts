@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkSearchVisibility } from '@/lib/openai';
+import { checkSearchVisibility } from '@/lib/visibility';
 import { VisibilityRequest, VisibilityResponse } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
