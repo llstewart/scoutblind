@@ -9,7 +9,8 @@
       "Bash(taskkill:*)",
       "Bash(powershell -Command:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(pkill:*)"
     ]
   }
 }

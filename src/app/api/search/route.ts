@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchGoogleMaps } from '@/lib/outscraper';
-import { SearchRequest, SearchResponse } from '@/lib/types';
+import { SearchRequest, SearchResponse, Business } from '@/lib/types';
+import { cache, CACHE_TTL } from '@/lib/cache';
+import MemoryCache from '@/lib/cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,11 +15,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check cache first
+    const cacheKey = MemoryCache.searchKey(body.niche, body.location);
+    const cachedResults = cache.get<Business[]>(cacheKey);
+
+    if (cachedResults) {
+      console.log(`[Search API] Cache HIT for "${body.niche}" in "${body.location}"`);
+      const response: SearchResponse = {
+        businesses: cachedResults,
+        totalResults: cachedResults.length,
+        cached: true,
+      };
+      return NextResponse.json(response);
+    }
+
+    console.log(`[Search API] Cache MISS for "${body.niche}" in "${body.location}"`);
     const businesses = await searchGoogleMaps(body.niche, body.location, 50);
+
+    // Cache the results
+    cache.set(cacheKey, businesses, CACHE_TTL.SEARCH_RESULTS);
 
     const response: SearchResponse = {
       businesses,
       totalResults: businesses.length,
+      cached: false,
     };
 
     return NextResponse.json(response);

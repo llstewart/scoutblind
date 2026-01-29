@@ -1,17 +1,167 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Business } from '@/lib/types';
 import { StatusTag } from './StatusTag';
 
 interface GeneralListTableProps {
   businesses: Business[];
+  selectedBusinesses?: Set<number>;
+  onSelectionChange?: (selected: Set<number>) => void;
 }
 
 const ITEMS_PER_PAGE = 20;
 
-export function GeneralListTable({ businesses }: GeneralListTableProps) {
+// Copy button component
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="p-1 rounded hover:bg-muted-foreground/20 transition-colors"
+      title={`Copy ${label}`}
+    >
+      {copied ? (
+        <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+export function GeneralListTable({
+  businesses,
+  selectedBusinesses = new Set(),
+  onSelectionChange
+}: GeneralListTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCompact, setIsCompact] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showTopShadow, setShowTopShadow] = useState(false);
+  const [focusedRow, setFocusedRow] = useState<number | null>(null);
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
+
+  // Reset page when businesses change
+  useEffect(() => {
+    setCurrentPage(1);
+    setFocusedRow(null);
+  }, [businesses]);
+
+  // Handle scroll events for shadow and back-to-top button
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const scrollTop = container.scrollTop;
+    setShowTopShadow(scrollTop > 10);
+    setShowScrollTop(scrollTop > 200);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // Refs for keyboard navigation to avoid stale closures
+  const pageStateRef = useRef({ startIndex: 0, endIndex: 0, pageSize: ITEMS_PER_PAGE });
+  const selectionRef = useRef({ selectedBusinesses, onSelectionChange });
+
+  // Update refs when values change
+  useEffect(() => {
+    selectionRef.current = { selectedBusinesses, onSelectionChange };
+  }, [selectedBusinesses, onSelectionChange]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!tableRef.current?.contains(document.activeElement) && focusedRow === null) return;
+
+      const { startIndex: si, pageSize } = pageStateRef.current;
+      const maxIndex = Math.min(pageSize, businesses.length - si) - 1;
+
+      switch (e.key) {
+        case 'ArrowDown':
+        case 'j':
+          e.preventDefault();
+          setFocusedRow(prev => {
+            const next = prev === null ? 0 : Math.min(prev + 1, maxIndex);
+            return next;
+          });
+          break;
+        case 'ArrowUp':
+        case 'k':
+          e.preventDefault();
+          setFocusedRow(prev => {
+            const next = prev === null ? 0 : Math.max(prev - 1, 0);
+            return next;
+          });
+          break;
+        case 'Enter':
+        case ' ':
+          if (focusedRow !== null && selectionRef.current.onSelectionChange) {
+            e.preventDefault();
+            const globalIndex = pageStateRef.current.startIndex + focusedRow;
+            const newSelected = new Set(selectionRef.current.selectedBusinesses);
+            if (newSelected.has(globalIndex)) {
+              newSelected.delete(globalIndex);
+            } else {
+              newSelected.add(globalIndex);
+            }
+            selectionRef.current.onSelectionChange(newSelected);
+          }
+          break;
+        case 'Escape':
+          setFocusedRow(null);
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [focusedRow, businesses.length]);
+
+  // Scroll focused row into view
+  useEffect(() => {
+    if (focusedRow !== null && scrollContainerRef.current) {
+      const row = scrollContainerRef.current.querySelector(`[data-row-index="${focusedRow}"]`);
+      row?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [focusedRow]);
+
+  const scrollToTop = () => {
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Column resize handler
+  const handleColumnResize = (columnId: string, delta: number) => {
+    setColumnWidths(prev => ({
+      ...prev,
+      [columnId]: Math.max(60, (prev[columnId] || 150) + delta)
+    }));
+  };
 
   if (businesses.length === 0) {
     return (
@@ -34,108 +184,327 @@ export function GeneralListTable({ businesses }: GeneralListTableProps) {
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentBusinesses = businesses.slice(startIndex, endIndex);
 
+  // Update ref for keyboard navigation
+  pageStateRef.current = { startIndex, endIndex, pageSize: currentBusinesses.length };
+
+  const handleToggleSelect = (index: number) => {
+    if (!onSelectionChange) return;
+    const newSelected = new Set(selectedBusinesses);
+    if (newSelected.has(index)) {
+      newSelected.delete(index);
+    } else {
+      newSelected.add(index);
+    }
+    onSelectionChange(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (!onSelectionChange) return;
+    const currentPageIndices = currentBusinesses.map((_, i) => startIndex + i);
+    const allCurrentSelected = currentPageIndices.every(i => selectedBusinesses.has(i));
+
+    const newSelected = new Set(selectedBusinesses);
+    if (allCurrentSelected) {
+      currentPageIndices.forEach(i => newSelected.delete(i));
+    } else {
+      currentPageIndices.forEach(i => newSelected.add(i));
+    }
+    onSelectionChange(newSelected);
+  };
+
+  const handleSelectAllPages = () => {
+    if (!onSelectionChange) return;
+    const allSelected = selectedBusinesses.size === businesses.length;
+    if (allSelected) {
+      onSelectionChange(new Set());
+    } else {
+      onSelectionChange(new Set(businesses.map((_, i) => i)));
+    }
+  };
+
+  const currentPageAllSelected = currentBusinesses.every((_, i) => selectedBusinesses.has(startIndex + i));
+  const currentPageSomeSelected = currentBusinesses.some((_, i) => selectedBusinesses.has(startIndex + i));
+
+  const cellPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
+  const headerPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
+
   return (
-    <div>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-left">
-          <thead>
+    <div className="relative">
+      {/* Header bar with result count and compact toggle */}
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-foreground">
+            {businesses.length} result{businesses.length !== 1 ? 's' : ''}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            Use <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↑</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↓</kbd> or <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">j</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">k</kbd> to navigate
+          </span>
+        </div>
+        <button
+          onClick={() => setIsCompact(!isCompact)}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
+            isCompact
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          Compact
+        </button>
+      </div>
+
+      {/* Selection toolbar */}
+      {onSelectionChange && selectedBusinesses.size > 0 && (
+        <div className="px-4 py-3 bg-primary/10 border-b border-primary/20 flex items-center justify-between">
+          <span className="text-sm font-medium text-primary">
+            {selectedBusinesses.size} business{selectedBusinesses.size !== 1 ? 'es' : ''} selected
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSelectAllPages}
+              className="text-sm text-primary hover:text-primary/80 underline"
+            >
+              {selectedBusinesses.size === businesses.length ? 'Deselect all' : `Select all ${businesses.length}`}
+            </button>
+            <button
+              onClick={() => onSelectionChange(new Set())}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Clear selection
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Scroll shadow indicator */}
+      <div
+        className={`absolute left-0 right-0 h-4 bg-gradient-to-b from-black/10 to-transparent z-20 pointer-events-none transition-opacity duration-200 ${
+          showTopShadow ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ top: onSelectionChange && selectedBusinesses.size > 0 ? '106px' : '41px' }}
+      />
+
+      <div
+        ref={scrollContainerRef}
+        className="overflow-auto max-h-[calc(100vh-320px)] min-h-[400px]"
+        tabIndex={0}
+        onFocus={() => focusedRow === null && setFocusedRow(0)}
+      >
+        <table ref={tableRef} className="w-full border-collapse text-left">
+          <thead className="sticky top-0 z-10 bg-card shadow-sm">
             <tr className="border-b border-border">
-              <th className="py-4 px-4 text-sm font-semibold text-foreground w-12">
+              {onSelectionChange && (
+                <th className={`${headerPadding} w-12`}>
+                  <input
+                    type="checkbox"
+                    checked={currentPageAllSelected && currentBusinesses.length > 0}
+                    ref={el => {
+                      if (el) el.indeterminate = currentPageSomeSelected && !currentPageAllSelected;
+                    }}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                  />
+                </th>
+              )}
+              <th className={`${headerPadding} text-sm font-semibold text-foreground w-12`}>
                 #
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
-                Business Name
+              <th
+                className={`${headerPadding} text-sm font-semibold text-foreground relative group`}
+                style={{ width: columnWidths['name'] || 'auto', minWidth: '120px' }}
+              >
+                <div className="flex items-center justify-between">
+                  Business Name
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onMouseDown={(e) => {
+                      const startX = e.clientX;
+                      const startWidth = columnWidths['name'] || 150;
+
+                      const handleMouseMove = (e: MouseEvent) => {
+                        handleColumnResize('name', e.clientX - startX);
+                      };
+
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                  />
+                </div>
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
-                Address
+              <th
+                className={`${headerPadding} text-sm font-semibold text-foreground relative group`}
+                style={{ width: columnWidths['address'] || 'auto', minWidth: '100px' }}
+              >
+                <div className="flex items-center justify-between">
+                  Address
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onMouseDown={(e) => {
+                      const startX = e.clientX;
+                      const handleMouseMove = (e: MouseEvent) => {
+                        handleColumnResize('address', e.clientX - startX);
+                      };
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                  />
+                </div>
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Phone
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Website
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Rating
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Reviews
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Category
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Claim Status
               </th>
-              <th className="py-4 px-4 text-sm font-semibold text-foreground">
+              <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
                 Ad Status
               </th>
             </tr>
           </thead>
           <tbody>
-            {currentBusinesses.map((business, index) => (
+            {currentBusinesses.map((business, index) => {
+              const globalIndex = startIndex + index;
+              const isSelected = selectedBusinesses.has(globalIndex);
+              const isFocused = focusedRow === index;
+
+              return (
               <tr
                 key={index}
-                className="border-b border-border hover:bg-muted/30 transition-colors"
+                data-row-index={index}
+                onClick={() => setFocusedRow(index)}
+                className={`border-b border-border transition-colors cursor-pointer group ${
+                  isFocused ? 'bg-primary/10 ring-1 ring-inset ring-primary/30' :
+                  isSelected ? 'bg-primary/5' : 'hover:bg-muted/30'
+                }`}
               >
-                <td className="py-4 px-4 text-sm font-medium text-muted-foreground">
-                  {startIndex + index + 1}
+                {onSelectionChange && (
+                  <td className={cellPadding}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleToggleSelect(globalIndex)}
+                      className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                    />
+                  </td>
+                )}
+                <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
+                  {globalIndex + 1}
                 </td>
-                <td className="py-4 px-4 text-sm font-medium text-foreground">
-                  {business.name}
+                <td className={`${cellPadding} text-sm font-medium text-foreground`}>
+                  <div className="flex items-center gap-2">
+                    <span className="truncate">{business.name}</span>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <CopyButton text={business.name} label="name" />
+                    </div>
+                  </div>
                 </td>
-                <td className="py-4 px-4 text-sm text-muted-foreground max-w-xs truncate">
-                  {business.address}
+                <td className={`${cellPadding} text-sm text-muted-foreground max-w-xs`}>
+                  <div className="flex items-center gap-2">
+                    <span className="truncate">{business.address}</span>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <CopyButton text={business.address} label="address" />
+                    </div>
+                  </div>
                 </td>
-                <td className="py-4 px-4 text-sm text-muted-foreground">
-                  {business.phone || (
+                <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                  {business.phone ? (
+                    <div className="flex items-center gap-2">
+                      <span>{business.phone}</span>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <CopyButton text={business.phone} label="phone" />
+                      </div>
+                    </div>
+                  ) : (
                     <span className="text-muted-foreground/50">No Phone Listed</span>
                   )}
                 </td>
-                <td className="py-4 px-4 text-sm">
+                <td className={`${cellPadding} text-sm`}>
                   {business.website ? (
-                    <a
-                      href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline hover:text-white truncate block max-w-[200px]"
-                    >
-                      {(() => {
-                        try {
-                          return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname;
-                        } catch {
-                          return business.website;
-                        }
-                      })()}
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline hover:text-white truncate block max-w-[180px]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {(() => {
+                          try {
+                            return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname;
+                          } catch {
+                            return business.website;
+                          }
+                        })()}
+                      </a>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <CopyButton text={business.website} label="website" />
+                      </div>
+                    </div>
                   ) : (
                     <span className="text-muted-foreground/50">No Website Listed</span>
                   )}
                 </td>
-                <td className="py-4 px-4 text-sm text-muted-foreground">
+                <td className={`${cellPadding} text-sm text-muted-foreground`}>
                   {business.rating > 0 ? `${business.rating} Stars` : 'No Rating'}
                 </td>
-                <td className="py-4 px-4 text-sm text-muted-foreground">
+                <td className={`${cellPadding} text-sm text-muted-foreground`}>
                   {business.reviewCount} Reviews
                 </td>
-                <td className="py-4 px-4 text-sm text-muted-foreground">
+                <td className={`${cellPadding} text-sm text-muted-foreground`}>
                   {business.category}
                 </td>
-                <td className="py-4 px-4">
+                <td className={cellPadding}>
                   <StatusTag status={business.claimed ? 'success' : 'warning'}>
                     {business.claimed ? 'Claimed' : 'Unclaimed'}
                   </StatusTag>
                 </td>
-                <td className="py-4 px-4">
+                <td className={cellPadding}>
                   <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
                     {business.sponsored ? 'Active Ads' : 'No Ads'}
                   </StatusTag>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      {/* Back to top button */}
+      <button
+        onClick={scrollToTop}
+        className={`absolute bottom-20 right-4 p-2 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-200 hover:bg-primary/90 ${
+          showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+        title="Back to top"
+      >
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
 
       {/* Pagination */}
       {totalPages > 1 && (

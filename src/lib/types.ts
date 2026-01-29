@@ -22,6 +22,20 @@ export interface EnrichedBusiness extends Business {
   locationType: 'residential' | 'commercial';
   websiteTech: string;
   seoOptimized: boolean;
+  isEnriching?: false; // Fully enriched
+}
+
+// Business that is currently being enriched - shows spinners
+export interface PendingBusiness extends Business {
+  isEnriching: true;
+}
+
+// Union type for table display
+export type TableBusiness = EnrichedBusiness | PendingBusiness;
+
+// Type guard to check if business is still pending enrichment
+export function isPendingBusiness(business: TableBusiness): business is PendingBusiness {
+  return 'isEnriching' in business && business.isEnriching === true;
 }
 
 export interface SearchRequest {
@@ -32,6 +46,7 @@ export interface SearchRequest {
 export interface SearchResponse {
   businesses: Business[];
   totalResults: number;
+  cached?: boolean;
 }
 
 export interface AnalyzeRequest {
