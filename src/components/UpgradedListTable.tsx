@@ -15,13 +15,28 @@ interface UpgradedListTableProps {
   businesses: EnrichedBusiness[];
   niche?: string;
   location?: string;
+  isLoadingMore?: boolean;
+  expectedTotal?: number;
 }
 
 const ITEMS_PER_PAGE = 20;
 
-export function UpgradedListTable({ businesses, niche, location }: UpgradedListTableProps) {
+export function UpgradedListTable({ businesses, niche, location, isLoadingMore, expectedTotal }: UpgradedListTableProps) {
   const [sortByPriority, setSortByPriority] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedSignals, setExpandedSignals] = useState<Set<number>>(new Set());
+
+  const toggleSignals = (index: number) => {
+    setExpandedSignals(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
 
   const displayedBusinesses = useMemo(() => {
     if (sortByPriority) {
@@ -41,6 +56,11 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
     setCurrentPage(1);
   };
 
+  // Calculate data quality stats
+  const reviewDataCount = businesses.filter(b => b.lastReviewDate || b.responseRate > 0).length;
+  const websiteAnalyzedCount = businesses.filter(b => b.websiteTech && b.websiteTech !== 'Analysis Failed' && b.websiteTech !== 'No Website').length;
+  const websiteFailedCount = businesses.filter(b => b.websiteTech === 'Analysis Failed').length;
+
   if (businesses.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -51,11 +71,60 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
 
   return (
     <div>
+      {/* Data Quality Banner - only show if some data is missing */}
+      {(reviewDataCount < businesses.length || websiteFailedCount > 0) && (
+        <div className="px-4 py-2 bg-amber-50 border-b border-amber-200 flex items-center justify-between">
+          <div className="flex items-center gap-4 text-xs">
+            <span className="text-amber-700 font-medium">Data Quality:</span>
+            <span className="text-amber-600 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Review data: {reviewDataCount}/{businesses.length}
+            </span>
+            <span className="text-amber-600 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+              Websites analyzed: {websiteAnalyzedCount}/{businesses.length}
+            </span>
+            {websiteFailedCount > 0 && (
+              <span className="text-amber-600 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                {websiteFailedCount} failed
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-amber-500">
+            Missing data shown as &quot;No data&quot; with hover explanations
+          </span>
+        </div>
+      )}
+
       {/* Filter Controls */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
-        <span className="text-sm text-gray-600">
-          {businesses.length} businesses analyzed
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-600">
+            {businesses.length}{expectedTotal && expectedTotal > businesses.length ? `/${expectedTotal}` : ''} businesses analyzed
+          </span>
+          {isLoadingMore && (
+            <span className="text-xs text-blue-600 flex items-center gap-1.5 animate-pulse">
+              <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Loading more...
+            </span>
+          )}
+          {businesses.length > 0 && !isLoadingMore && (
+            <span className="text-xs text-gray-500 flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              With review data: {businesses.filter(b => b.lastReviewDate || b.responseRate > 0).length}
+            </span>
+          )}
+        </div>
         <button
           onClick={handleSortToggle}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
@@ -298,7 +367,7 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
                       )}
                       {signals.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
-                          {signals.slice(0, 3).map((signal, i) => (
+                          {(expandedSignals.has(startIndex + index) ? signals : signals.slice(0, 3)).map((signal, i) => (
                             <span
                               key={i}
                               className="inline-block px-2 py-0.5 text-xs bg-red-50 text-red-700 rounded border border-red-200"
@@ -307,9 +376,14 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
                             </span>
                           ))}
                           {signals.length > 3 && (
-                            <span className="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                              +{signals.length - 3} more
-                            </span>
+                            <button
+                              onClick={() => toggleSignals(startIndex + index)}
+                              className="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 cursor-pointer transition-colors"
+                            >
+                              {expandedSignals.has(startIndex + index)
+                                ? 'Show less'
+                                : `+${signals.length - 3} more`}
+                            </button>
                           )}
                         </div>
                       ) : (
@@ -372,27 +446,52 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
                   </td>
                   {/* Upgraded List additional columns */}
                   <td className="py-3 px-4 text-sm text-gray-600">
-                    <span className="text-gray-400">-</span>
+                    {business.ownerName || (
+                      <span className="text-gray-400 text-xs">Not found</span>
+                    )}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
-                    <span className="text-gray-400">-</span>
+                    {business.ownerPhone || (
+                      <span className="text-gray-400 text-xs">Not found</span>
+                    )}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     {business.lastReviewDate
                       ? formatDate(new Date(business.lastReviewDate))
-                      : <span className="text-gray-400">-</span>}
+                      : (
+                        <span className="relative group">
+                          <span className="text-gray-400 text-xs cursor-help">No data</span>
+                          <span className="absolute left-0 top-full mt-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                            No recent reviews found
+                          </span>
+                        </span>
+                      )}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     {business.lastOwnerActivity
                       ? formatDate(new Date(business.lastOwnerActivity))
-                      : <span className="text-gray-400">-</span>}
+                      : (
+                        <span className="relative group">
+                          <span className="text-gray-400 text-xs cursor-help">No data</span>
+                          <span className="absolute left-0 top-full mt-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                            No owner replies found in reviews
+                          </span>
+                        </span>
+                      )}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     {business.daysDormant !== null
                       ? <StatusTag status={getDormancyStatus(business.daysDormant)}>
                           {business.daysDormant} days ago
                         </StatusTag>
-                      : <span className="text-gray-400">-</span>}
+                      : (
+                        <span className="relative group">
+                          <span className="text-gray-400 text-xs cursor-help">Unknown</span>
+                          <span className="absolute left-0 top-full mt-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                            Could not determine activity level
+                          </span>
+                        </span>
+                      )}
                   </td>
                   <td className="py-3 px-4">
                     <StatusTag status={business.searchVisibility ? 'success' : 'error'}>
@@ -408,7 +507,12 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
                         {business.responseRate}%
                       </StatusTag>
                     ) : (
-                      <span className="text-gray-400">-</span>
+                      <span className="relative group">
+                        <span className="text-gray-400 text-xs cursor-help">0%</span>
+                        <span className="absolute left-0 top-full mt-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                          No owner responses found
+                        </span>
+                      </span>
                     )}
                   </td>
                   <td className="py-3 px-4">
@@ -420,9 +524,20 @@ export function UpgradedListTable({ businesses, niche, location }: UpgradedListT
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
-                      <span>{business.websiteTech}</span>
-                      {business.seoOptimized && (
-                        <StatusTag status="success">SEO</StatusTag>
+                      {business.websiteTech === 'Analysis Failed' ? (
+                        <span className="relative group">
+                          <span className="text-amber-600 text-xs cursor-help">Analysis Failed</span>
+                          <span className="absolute left-0 top-full mt-1 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+                            Website could not be analyzed (may be blocked or slow)
+                          </span>
+                        </span>
+                      ) : (
+                        <>
+                          <span>{business.websiteTech}</span>
+                          {business.seoOptimized && (
+                            <StatusTag status="success">SEO</StatusTag>
+                          )}
+                        </>
                       )}
                     </div>
                   </td>

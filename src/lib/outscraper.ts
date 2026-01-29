@@ -1,7 +1,20 @@
 import { Business } from './types';
+import { withRetry, Semaphore, sleep, RetryOptions } from './rate-limiter';
 
 const OUTSCRAPER_SEARCH_URL = 'https://api.app.outscraper.com/maps/search-v3';
 const OUTSCRAPER_REVIEWS_URL = 'https://api.app.outscraper.com/maps/reviews-v3';
+
+// Rate limiting configuration for Outscraper API
+const REVIEWS_API_TIMEOUT_MS = 20000; // 20 seconds (reduced from 45s)
+const REVIEWS_RETRY_OPTIONS: Partial<RetryOptions> = {
+  maxRetries: 2,
+  baseDelayMs: 1500,
+  maxDelayMs: 5000,
+  jitterMs: 500,
+};
+
+// Global semaphore to limit concurrent reviews API calls
+const reviewsApiSemaphore = new Semaphore(3); // Max 3 concurrent reviews requests
 
 interface OutscraperRawPlace {
   name?: string;
@@ -103,7 +116,14 @@ function parseOutscraperPlace(place: OutscraperRawPlace): Business {
   const category = place.type || place.category || place.main_category || 'Uncategorized';
   const claimed = place.is_claimed ?? place.claimed ?? place.verified ?? false;
   const sponsored = place.is_sponsored ?? place.sponsored ?? false;
+
+  // Prefer place_id (ChIJ format) over google_id (hex format) for reviews API compatibility
   const placeId = place.place_id || place.google_id || null;
+
+  // Log the IDs we're getting for debugging
+  if (place.name) {
+    console.log(`[Outscraper] Parsed ${place.name}: place_id=${place.place_id}, google_id=${place.google_id?.substring(0, 30)}`);
+  }
 
   const parsed: Business = {
     name: place.name || 'Unknown Business',
@@ -121,36 +141,25 @@ function parseOutscraperPlace(place: OutscraperRawPlace): Business {
   return parsed;
 }
 
-export async function fetchBusinessReviews(
+/**
+ * Internal function to make a single reviews API request
+ */
+async function fetchReviewsInternal(
   placeIdOrName: string,
-  reviewsLimit: number = 20
+  reviewsLimit: number,
+  apiKey: string
 ): Promise<ReviewData> {
-  const apiKey = process.env.OUTSCRAPER_API_KEY;
+  const params = new URLSearchParams({
+    query: placeIdOrName,
+    reviewsLimit: reviewsLimit.toString(),
+    sort: 'newest',
+    async: 'false',
+  });
 
-  if (!apiKey) {
-    throw new Error('OUTSCRAPER_API_KEY is not configured');
-  }
-
-  const defaultResult: ReviewData = {
-    lastReviewDate: null,
-    lastOwnerActivity: null,
-    responseRate: 0,
-    reviewCount: 0,
-  };
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REVIEWS_API_TIMEOUT_MS);
 
   try {
-    const params = new URLSearchParams({
-      query: placeIdOrName,
-      reviewsLimit: reviewsLimit.toString(),
-      sort: 'newest',
-      async: 'false',
-    });
-
-    console.log(`[Outscraper Reviews] Fetching reviews for: ${placeIdOrName}`);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
     const response = await fetch(`${OUTSCRAPER_REVIEWS_URL}?${params}`, {
       method: 'GET',
       headers: {
@@ -162,30 +171,46 @@ export async function fetchBusinessReviews(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.error(`[Outscraper Reviews] Error: ${response.status}`);
-      return defaultResult;
+      throw new Error(`API error: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // Outscraper returns results in a nested array structure
-    const results: OutscraperReviewsResponse[] = data.data?.[0] || data.data || [];
+    // Outscraper returns results in various nested structures - handle them all
+    let place: OutscraperReviewsResponse | null = null;
 
-    if (!results || results.length === 0) {
-      console.log(`[Outscraper Reviews] No results for: ${placeIdOrName}`);
-      return defaultResult;
+    if (data.data?.[0]?.[0]) {
+      place = data.data[0][0];
+    } else if (data.data?.[0] && !Array.isArray(data.data[0])) {
+      place = data.data[0];
+    } else if (Array.isArray(data.data) && data.data.length > 0) {
+      place = data.data[0];
+    } else if (data.reviews_data) {
+      place = data;
     }
 
-    const place = results[0];
+    if (!place) {
+      // Return empty but valid result - no data found
+      return {
+        lastReviewDate: null,
+        lastOwnerActivity: null,
+        responseRate: 0,
+        reviewCount: 0,
+      };
+    }
+
     const reviews = place.reviews_data || [];
 
-    console.log(`[Outscraper Reviews] Got ${reviews.length} reviews for: ${placeIdOrName}`);
-
     if (reviews.length === 0) {
-      return defaultResult;
+      return {
+        lastReviewDate: null,
+        lastOwnerActivity: null,
+        responseRate: 0,
+        reviewCount: 0,
+      };
     }
 
-    // Calculate last review date (reviews should be sorted by newest)
+    // Calculate last review date
     let lastReviewDate: Date | null = null;
     for (const review of reviews) {
       if (review.review_datetime_utc) {
@@ -209,7 +234,6 @@ export async function fetchBusinessReviews(
       if (review.owner_answer && review.owner_answer.trim().length > 0) {
         repliedCount++;
 
-        // Get owner reply date
         if (review.owner_answer_timestamp_datetime_utc) {
           const replyDate = new Date(review.owner_answer_timestamp_datetime_utc);
           if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
@@ -228,19 +252,122 @@ export async function fetchBusinessReviews(
       ? Math.round((repliedCount / reviews.length) * 100)
       : 0;
 
-    const result: ReviewData = {
+    return {
       lastReviewDate,
       lastOwnerActivity,
       responseRate,
       reviewCount: reviews.length,
     };
-
-    console.log(`[Outscraper Reviews] Result for ${placeIdOrName}: lastReview=${lastReviewDate?.toISOString()}, lastOwnerActivity=${lastOwnerActivity?.toISOString()}, responseRate=${responseRate}%`);
-
-    return result;
-
   } catch (error) {
-    console.error(`[Outscraper Reviews] Failed for ${placeIdOrName}:`, error);
-    return defaultResult;
+    clearTimeout(timeoutId);
+    throw error;
   }
+}
+
+/**
+ * Fetch reviews for a single business with retry logic and rate limiting
+ */
+export async function fetchBusinessReviews(
+  placeIdOrName: string,
+  reviewsLimit: number = 20
+): Promise<ReviewData> {
+  const apiKey = process.env.OUTSCRAPER_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('OUTSCRAPER_API_KEY is not configured');
+  }
+
+  const defaultResult: ReviewData = {
+    lastReviewDate: null,
+    lastOwnerActivity: null,
+    responseRate: 0,
+    reviewCount: 0,
+  };
+
+  // Use semaphore to limit concurrent requests
+  return reviewsApiSemaphore.withPermit(async () => {
+    try {
+      console.log(`[Outscraper Reviews] Fetching reviews for: ${placeIdOrName}`);
+
+      const result = await withRetry(
+        () => fetchReviewsInternal(placeIdOrName, reviewsLimit, apiKey),
+        REVIEWS_RETRY_OPTIONS,
+        (attempt, error, delayMs) => {
+          console.log(`[Outscraper Reviews] Retry ${attempt} for ${placeIdOrName} after ${delayMs}ms: ${error.message}`);
+        }
+      );
+
+      console.log(`[Outscraper Reviews] Success for ${placeIdOrName}: responseRate=${result.responseRate}%`);
+      return result;
+
+    } catch (error) {
+      console.error(`[Outscraper Reviews] All retries failed for ${placeIdOrName}:`, error);
+      return defaultResult;
+    }
+  });
+}
+
+/**
+ * Fetch reviews for multiple businesses in parallel with controlled concurrency
+ * This is more efficient than calling fetchBusinessReviews individually
+ */
+export async function fetchBatchReviews(
+  businesses: Array<{ id: string; query: string }>,
+  reviewsLimit: number = 5,
+  onProgress?: (completed: number, total: number, businessId: string, success: boolean) => void
+): Promise<Map<string, ReviewData>> {
+  const apiKey = process.env.OUTSCRAPER_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('OUTSCRAPER_API_KEY is not configured');
+  }
+
+  const results = new Map<string, ReviewData>();
+  const defaultResult: ReviewData = {
+    lastReviewDate: null,
+    lastOwnerActivity: null,
+    responseRate: 0,
+    reviewCount: 0,
+  };
+
+  console.log(`[Outscraper Reviews] Batch fetching reviews for ${businesses.length} businesses`);
+
+  // Process all businesses with controlled concurrency via semaphore
+  let completedCount = 0;
+
+  const promises = businesses.map(async ({ id, query }) => {
+    return reviewsApiSemaphore.withPermit(async () => {
+      // Add small staggered delay to avoid burst requests
+      await sleep(Math.random() * 300);
+
+      try {
+        const result = await withRetry(
+          () => fetchReviewsInternal(query, reviewsLimit, apiKey),
+          REVIEWS_RETRY_OPTIONS,
+          (attempt, error, delayMs) => {
+            console.log(`[Outscraper Reviews] Retry ${attempt} for ${id} after ${delayMs}ms: ${error.message}`);
+          }
+        );
+
+        results.set(id, result);
+        completedCount++;
+        onProgress?.(completedCount, businesses.length, id, true);
+        console.log(`[Outscraper Reviews] ✓ ${id} (${completedCount}/${businesses.length})`);
+
+      } catch (error) {
+        console.error(`[Outscraper Reviews] ✗ ${id}: All retries failed`);
+        results.set(id, defaultResult);
+        completedCount++;
+        onProgress?.(completedCount, businesses.length, id, false);
+      }
+
+      // Throttle between requests within semaphore
+      await sleep(500 + Math.random() * 500); // 500-1000ms between requests
+    });
+  });
+
+  await Promise.all(promises);
+
+  console.log(`[Outscraper Reviews] Batch complete: ${results.size}/${businesses.length} succeeded`);
+  return results;
 }

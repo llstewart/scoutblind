@@ -2,8 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AnalyzeRequest, AnalyzeResponse, EnrichedBusiness, Business } from '@/lib/types';
 import { analyzeWebsite } from '@/lib/website-analyzer';
 import { batchCheckVisibility } from '@/lib/openai';
-import { fetchBusinessReviews } from '@/lib/outscraper';
 import { classifyLocationType } from '@/utils/address';
+import { fetchBatchReviews, ReviewData } from '@/lib/outscraper';
+import { Semaphore, sleep } from '@/lib/rate-limiter';
+
+// Configuration
+const ENABLE_REVIEWS_API = true; // Set to true to enable reviews fetching
+const WEBSITE_ANALYSIS_CONCURRENCY = 5;
+const BATCH_SIZE = 5;
+const BATCH_DELAY_MS = 500;
+
+// Semaphore for website analysis
+const websiteAnalysisSemaphore = new Semaphore(WEBSITE_ANALYSIS_CONCURRENCY);
 
 function calculateDaysDormant(lastOwnerActivity: Date | null): number | null {
   if (!lastOwnerActivity) {
@@ -33,10 +43,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[Analyze API] Starting analysis for ${body.businesses.length} businesses`);
+    const totalBusinesses = body.businesses.length;
+    console.log(`[Analyze API] Starting analysis for ${totalBusinesses} businesses`);
 
-    // Check visibility for all businesses in parallel batches
-    console.log(`[Analyze API] Checking search visibility...`);
+    // Phase 1: Check visibility for all businesses (single API call)
+    console.log(`[Analyze API] Phase 1: Checking search visibility...`);
     const visibilityResults = await batchCheckVisibility(
       body.businesses,
       body.niche,
@@ -44,60 +55,122 @@ export async function POST(request: NextRequest) {
     );
     console.log(`[Analyze API] Visibility check complete`);
 
-    // Process businesses in parallel batches for speed
-    const enrichedBusinesses: EnrichedBusiness[] = [];
-    const batchSize = 10; // Process 10 at a time for speed
+    // Phase 2: Fetch reviews if enabled (with internal rate limiting)
+    let reviewResults: Map<string, ReviewData> = new Map();
 
-    for (let i = 0; i < body.businesses.length; i += batchSize) {
-      const batch = body.businesses.slice(i, i + batchSize);
-      console.log(`[Analyze API] Processing batch ${Math.floor(i / batchSize) + 1} (businesses ${i + 1}-${Math.min(i + batchSize, body.businesses.length)})`);
+    if (ENABLE_REVIEWS_API) {
+      console.log(`[Analyze API] Phase 2: Fetching reviews for ${totalBusinesses} businesses...`);
+
+      const reviewQueries = body.businesses.map((business: Business, index: number) => ({
+        id: `${index}`,
+        query: business.placeId || `${business.name}, ${business.address}`,
+      }));
+
+      reviewResults = await fetchBatchReviews(
+        reviewQueries,
+        5, // reviewsLimit per business
+        (completed, total) => {
+          if (completed % 10 === 0 || completed === total) {
+            console.log(`[Analyze API] Reviews progress: ${completed}/${total}`);
+          }
+        }
+      );
+
+      console.log(`[Analyze API] Reviews fetching complete`);
+    } else {
+      console.log(`[Analyze API] Phase 2: Skipping reviews (disabled)`);
+    }
+
+    // Phase 3: Process businesses with website analysis
+    console.log(`[Analyze API] Phase 3: Analyzing websites...`);
+    const enrichedBusinesses: EnrichedBusiness[] = [];
+
+    for (let i = 0; i < body.businesses.length; i += BATCH_SIZE) {
+      const batch = body.businesses.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(body.businesses.length / BATCH_SIZE);
+      console.log(`[Analyze API] Processing batch ${batchNum}/${totalBatches}`);
 
       const batchResults = await Promise.all(
-        batch.map(async (business: Business) => {
-          console.log(`[Analyze API] Analyzing: ${business.name}`);
+        batch.map(async (business: Business, batchIndex: number) => {
+          const globalIndex = i + batchIndex;
 
-          // Run website analysis and reviews fetch in PARALLEL for speed
-          const queryForReviews = business.placeId || business.name;
+          return websiteAnalysisSemaphore.withPermit(async () => {
+            try {
+              // Website analysis
+              const websiteAnalysis = business.website
+                ? await analyzeWebsite(business.website)
+                : {
+                    cms: null,
+                    seoOptimized: false,
+                    ownerName: null,
+                    ownerPhone: null,
+                    techStack: 'No Website',
+                  };
 
-          const [websiteAnalysis, reviewData] = await Promise.all([
-            business.website
-              ? analyzeWebsite(business.website)
-              : Promise.resolve({
-                  cms: null,
-                  seoOptimized: false,
-                  ownerName: null,
-                  ownerPhone: null,
-                  techStack: 'No Website',
-                }),
-            fetchBusinessReviews(queryForReviews, 10), // Reduced from 20 to 10 for speed
-          ]);
+              // Get review data
+              const reviewData: ReviewData = reviewResults.get(`${globalIndex}`) || {
+                lastReviewDate: null,
+                lastOwnerActivity: null,
+                responseRate: 0,
+                reviewCount: business.reviewCount || 0,
+              };
 
-          const locationType = classifyLocationType(business.address);
-          const searchVisibility = visibilityResults.get(business.name) || false;
-          const daysDormant = calculateDaysDormant(reviewData.lastOwnerActivity);
+              const locationType = classifyLocationType(business.address);
+              const searchVisibility = visibilityResults.get(business.name) || false;
+              const daysDormant = calculateDaysDormant(reviewData.lastOwnerActivity);
 
-          console.log(`[Analyze API] Complete for ${business.name}: responseRate=${reviewData.responseRate}%, daysDormant=${daysDormant}`);
+              return {
+                ...business,
+                ownerName: websiteAnalysis.ownerName,
+                ownerPhone: websiteAnalysis.ownerPhone,
+                lastReviewDate: reviewData.lastReviewDate,
+                lastOwnerActivity: reviewData.lastOwnerActivity,
+                daysDormant,
+                searchVisibility,
+                responseRate: reviewData.responseRate,
+                locationType,
+                websiteTech: websiteAnalysis.techStack,
+                seoOptimized: websiteAnalysis.seoOptimized,
+              };
+            } catch (error) {
+              console.error(`[Analyze API] Error processing ${business.name}:`, error);
 
-          return {
-            ...business,
-            ownerName: websiteAnalysis.ownerName,
-            ownerPhone: websiteAnalysis.ownerPhone,
-            lastReviewDate: reviewData.lastReviewDate,
-            lastOwnerActivity: reviewData.lastOwnerActivity,
-            daysDormant,
-            searchVisibility,
-            responseRate: reviewData.responseRate,
-            locationType,
-            websiteTech: websiteAnalysis.techStack,
-            seoOptimized: websiteAnalysis.seoOptimized,
-          };
+              // Return with defaults on error - never skip
+              const reviewData: ReviewData = reviewResults.get(`${globalIndex}`) || {
+                lastReviewDate: null,
+                lastOwnerActivity: null,
+                responseRate: 0,
+                reviewCount: business.reviewCount || 0,
+              };
+
+              return {
+                ...business,
+                ownerName: null,
+                ownerPhone: null,
+                lastReviewDate: reviewData.lastReviewDate,
+                lastOwnerActivity: reviewData.lastOwnerActivity,
+                daysDormant: calculateDaysDormant(reviewData.lastOwnerActivity),
+                searchVisibility: visibilityResults.get(business.name) || false,
+                responseRate: reviewData.responseRate,
+                locationType: classifyLocationType(business.address),
+                websiteTech: 'Analysis Failed',
+                seoOptimized: false,
+              };
+            }
+          });
         })
       );
 
       enrichedBusinesses.push(...batchResults);
+
+      // Throttle between batches
+      if (i + BATCH_SIZE < body.businesses.length) {
+        await sleep(BATCH_DELAY_MS + Math.random() * 200);
+      }
     }
 
-    console.log(`[Analyze API] Analysis complete for ${enrichedBusinesses.length} businesses`);
+    console.log(`[Analyze API] Analysis complete for ${enrichedBusinesses.length}/${totalBusinesses} businesses`);
 
     const response: AnalyzeResponse = {
       enrichedBusinesses,
