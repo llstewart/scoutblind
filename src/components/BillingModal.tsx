@@ -115,20 +115,22 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto m-4 border border-gray-800">
+      <div className="relative bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto m-2 sm:m-4 border border-gray-800">
         {/* Header */}
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-6 flex items-center justify-between z-10">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Upgrade Your Plan</h2>
-            <p className="text-gray-400 mt-1">
-              Current: {SUBSCRIPTION_TIERS[currentTier as keyof typeof SUBSCRIPTION_TIERS]?.name || 'Free'}
-              {' '}&bull;{' '}
-              {creditsRemaining} credits remaining
+        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-4 sm:p-6 flex items-start sm:items-center justify-between z-10 gap-4">
+          <div className="min-w-0">
+            <h2 className="text-xl sm:text-2xl font-bold text-white">Upgrade Your Plan</h2>
+            <p className="text-gray-400 mt-1 text-sm sm:text-base">
+              <span className="hidden sm:inline">Current: </span>
+              {SUBSCRIPTION_TIERS[currentTier as keyof typeof SUBSCRIPTION_TIERS]?.name || 'Free'}
+              <span className="hidden sm:inline">{' '}&bull;{' '}</span>
+              <span className="sm:hidden"> · </span>
+              {creditsRemaining} credits
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0"
           >
             <X className="w-5 h-5 text-gray-400" />
           </button>

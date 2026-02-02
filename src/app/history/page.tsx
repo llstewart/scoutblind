@@ -233,35 +233,36 @@ export default function HistoryPage() {
             </button>
           </div>
         ) : (
-          // Main content - two column layout
-          <div className="flex gap-6">
-            {/* Left sidebar - Analysis list */}
-            <div className="w-80 flex-shrink-0">
-              <div className="sticky top-24">
+          // Main content - responsive layout (stacks on mobile)
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+            {/* Left sidebar - Analysis list (horizontal scroll on mobile) */}
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <div className="lg:sticky lg:top-24">
                 <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wider mb-3">
                   Your Searches ({savedAnalyses.length})
                 </h2>
-                <div className="space-y-2 max-h-[calc(100vh-180px)] overflow-y-auto pr-2">
+                {/* Horizontal scroll on mobile, vertical on desktop */}
+                <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto pb-2 lg:pb-0 lg:pr-2 -mx-4 px-4 lg:mx-0 lg:px-0">
                   {savedAnalyses.map((analysis) => (
                     <button
                       key={analysis.searchKey}
                       onClick={() => setSelectedAnalysis(analysis)}
-                      className={`w-full text-left p-4 rounded-lg border transition-all ${
+                      className={`flex-shrink-0 w-64 lg:w-full text-left p-3 lg:p-4 rounded-lg border transition-all ${
                         selectedAnalysis?.searchKey === analysis.searchKey
                           ? 'bg-violet-500/10 border-violet-500/30 ring-1 ring-violet-500/20'
                           : 'bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800/50 hover:border-zinc-700'
                       }`}
                     >
-                      <div className="font-medium text-white truncate">{analysis.niche}</div>
-                      <div className="flex items-center gap-1.5 mt-1 text-sm text-zinc-400">
-                        <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="font-medium text-white truncate text-sm lg:text-base">{analysis.niche}</div>
+                      <div className="flex items-center gap-1.5 mt-1 text-xs lg:text-sm text-zinc-400">
+                        <svg className="w-3 lg:w-3.5 h-3 lg:h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         </svg>
                         <span className="truncate">{analysis.location}</span>
                       </div>
-                      <div className="flex items-center justify-between mt-2 text-xs">
+                      <div className="flex items-center justify-between mt-2 text-[10px] lg:text-xs">
                         <span className="text-zinc-500">{analysis.businesses.length} businesses</span>
-                        <span className="text-zinc-600">{formatDate(analysis.analyzedAt)}</span>
+                        <span className="text-zinc-600 hidden sm:inline">{formatDate(analysis.analyzedAt)}</span>
                       </div>
                     </button>
                   ))}
@@ -274,43 +275,43 @@ export default function HistoryPage() {
               {selectedAnalysis ? (
                 <div>
                   {/* Header */}
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-white">{selectedAnalysis.niche}</h2>
-                    <p className="text-zinc-400 mt-1">
-                      {selectedAnalysis.location} &bull; {selectedAnalysis.businesses.length} businesses analyzed
+                  <div className="mb-4 lg:mb-6">
+                    <h2 className="text-xl lg:text-2xl font-bold text-white">{selectedAnalysis.niche}</h2>
+                    <p className="text-zinc-400 mt-1 text-sm lg:text-base">
+                      {selectedAnalysis.location} · {selectedAnalysis.businesses.length} businesses
                     </p>
-                    <p className="text-zinc-600 text-sm mt-1">
-                      Analyzed on {formatDate(selectedAnalysis.analyzedAt)}
+                    <p className="text-zinc-600 text-xs lg:text-sm mt-1">
+                      {formatDate(selectedAnalysis.analyzedAt)}
                     </p>
                   </div>
 
-                  {/* Stats summary */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-emerald-400">
+                  {/* Stats summary - responsive grid */}
+                  <div className="grid grid-cols-3 gap-2 lg:gap-4 mb-4 lg:mb-6">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 lg:p-4">
+                      <div className="text-lg lg:text-2xl font-bold text-emerald-400">
                         {selectedAnalysis.businesses.filter(b => calculateSeoNeedScore(b) >= 70).length}
                       </div>
-                      <div className="text-sm text-zinc-500">High SEO Need</div>
+                      <div className="text-[10px] lg:text-sm text-zinc-500">High Need</div>
                     </div>
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-amber-400">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 lg:p-4">
+                      <div className="text-lg lg:text-2xl font-bold text-amber-400">
                         {selectedAnalysis.businesses.filter(b => {
                           const score = calculateSeoNeedScore(b);
                           return score >= 40 && score < 70;
                         }).length}
                       </div>
-                      <div className="text-sm text-zinc-500">Medium SEO Need</div>
+                      <div className="text-[10px] lg:text-sm text-zinc-500">Medium Need</div>
                     </div>
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-zinc-400">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-2 lg:p-4">
+                      <div className="text-lg lg:text-2xl font-bold text-zinc-400">
                         {selectedAnalysis.businesses.filter(b => calculateSeoNeedScore(b) < 40).length}
                       </div>
-                      <div className="text-sm text-zinc-500">Low SEO Need</div>
+                      <div className="text-[10px] lg:text-sm text-zinc-500">Low Need</div>
                     </div>
                   </div>
 
                   {/* Business list */}
-                  <div className="space-y-3">
+                  <div className="space-y-2 lg:space-y-3">
                     {selectedAnalysis.businesses
                       .sort((a, b) => calculateSeoNeedScore(b) - calculateSeoNeedScore(a))
                       .map((business) => {
@@ -327,20 +328,20 @@ export default function HistoryPage() {
                             {/* Business header - always visible */}
                             <button
                               onClick={() => toggleBusinessExpanded(businessId)}
-                              className="w-full p-4 text-left hover:bg-zinc-800/30 transition-colors"
+                              className="w-full p-3 lg:p-4 text-left hover:bg-zinc-800/30 transition-colors"
                             >
-                              <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-start justify-between gap-2 lg:gap-4">
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-3">
-                                    <h3 className="font-medium text-white truncate">{business.name}</h3>
-                                    <span className={`px-2 py-0.5 text-xs font-medium rounded border ${getSignalColor(seoScore)}`}>
-                                      {seoScore}/100 - {getSignalLabel(seoScore)}
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                                    <h3 className="font-medium text-white truncate text-sm lg:text-base">{business.name}</h3>
+                                    <span className={`inline-flex w-fit px-1.5 lg:px-2 py-0.5 text-[10px] lg:text-xs font-medium rounded border ${getSignalColor(seoScore)}`}>
+                                      {seoScore} - {getSignalLabel(seoScore)}
                                     </span>
                                   </div>
-                                  <p className="text-sm text-zinc-500 mt-1 truncate">{business.address}</p>
+                                  <p className="text-xs lg:text-sm text-zinc-500 mt-1 truncate">{business.address}</p>
                                 </div>
                                 <svg
-                                  className={`w-5 h-5 text-zinc-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                                  className={`w-4 lg:w-5 h-4 lg:h-5 text-zinc-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -352,8 +353,8 @@ export default function HistoryPage() {
 
                             {/* Expanded details */}
                             {isExpanded && (
-                              <div className="px-4 pb-4 border-t border-zinc-800/50">
-                                <div className="grid grid-cols-2 gap-4 mt-4">
+                              <div className="px-3 lg:px-4 pb-3 lg:pb-4 border-t border-zinc-800/50">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                                   {/* Contact Info */}
                                   <div>
                                     <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Contact</h4>

@@ -1004,24 +1004,24 @@ function HomeContent() {
         {/* Results */}
         {!isSearching && hasResults && (
           <div className="space-y-4">
-            {/* Toolbar */}
-            <div className="flex items-center justify-between">
+            {/* Toolbar - Responsive: stacks on mobile */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               {/* Tabs */}
-              <div className="flex items-center gap-1 p-1 bg-zinc-900 rounded-lg border border-zinc-800">
+              <div className="flex items-center gap-1 p-1 bg-zinc-900 rounded-lg border border-zinc-800 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('general')}
-                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                  className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${
                     activeTab === 'general'
                       ? 'bg-zinc-800 text-white shadow-sm'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   All Results
-                  <span className="ml-2 text-zinc-500">({businesses.length})</span>
+                  <span className="ml-1.5 sm:ml-2 text-zinc-500">({businesses.length})</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('upgraded')}
-                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                     activeTab === 'upgraded'
                       ? 'bg-zinc-800 text-white shadow-sm'
                       : 'text-zinc-400 hover:text-white'
@@ -1063,7 +1063,7 @@ function HomeContent() {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  Export
+                  <span className="hidden sm:inline">Export</span>
                 </button>
 
                 {/* Analyze Button */}
@@ -1072,31 +1072,35 @@ function HomeContent() {
                     <button
                       onClick={handleAnalyze}
                       disabled={isAnalyzing}
-                      className="px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
+                      className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      {selectedBusinesses.size > 0
-                        ? `Analyze ${selectedBusinesses.size} Selected`
-                        : 'Analyze All'}
+                      <span className="hidden sm:inline">
+                        {selectedBusinesses.size > 0
+                          ? `Analyze ${selectedBusinesses.size} Selected`
+                          : 'Analyze All'}
+                      </span>
+                      <span className="sm:hidden">Analyze</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => setShowBillingModal(true)}
-                      className="px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 transition-all flex items-center gap-2"
+                      className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 transition-all flex items-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                       </svg>
-                      Upgrade to Analyze
+                      <span className="hidden sm:inline">Upgrade to Analyze</span>
+                      <span className="sm:hidden">Upgrade</span>
                     </button>
                   )
                 )}
 
                 {/* Dev info - shows current auth status */}
                 {process.env.NODE_ENV === 'development' && (
-                  <span className="px-2 py-1 text-xs border border-zinc-700 rounded text-zinc-500">
+                  <span className="hidden sm:inline px-2 py-1 text-xs border border-zinc-700 rounded text-zinc-500">
                     {user ? `${credits} credits` : 'Not signed in'}
                   </span>
                 )}

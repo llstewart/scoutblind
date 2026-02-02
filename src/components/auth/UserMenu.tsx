@@ -31,7 +31,12 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    window.location.reload();
+    // Clear all local storage for complete session refresh
+    sessionStorage.clear();
+    localStorage.removeItem('truesignal_session');
+    localStorage.removeItem('truesignal_sid');
+    // Redirect to homepage
+    window.location.href = '/';
   };
 
   const userInitial = user.user_metadata?.full_name?.[0] || user.email?.[0] || '?';
@@ -56,19 +61,19 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
     <div ref={menuRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 px-3 py-1.5 hover:bg-zinc-800 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 sm:gap-3 px-2 sm:px-3 py-1.5 hover:bg-zinc-800 rounded-lg transition-colors"
       >
-        {/* Tier Badge - Always visible */}
-        <div className={`px-2 py-1 text-[10px] font-bold rounded border ${tierColors[tier] || tierColors.free}`}>
+        {/* Tier Badge - Hidden on mobile, visible on sm+ */}
+        <div className={`hidden sm:block px-2 py-1 text-[10px] font-bold rounded border ${tierColors[tier] || tierColors.free}`}>
           {tierLabels[tier] || 'FREE'}
         </div>
 
         {/* Credits Badge */}
-        <div className="flex items-center gap-1.5 px-2 py-1 bg-zinc-800 rounded-md">
-          <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-1 bg-zinc-800 rounded-md">
+          <svg className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="text-sm font-medium text-white">{credits}</span>
+          <span className="text-xs sm:text-sm font-medium text-white">{credits}</span>
         </div>
 
         {/* Avatar */}
@@ -76,17 +81,17 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
           <img
             src={userAvatar}
             alt={userName}
-            className="w-8 h-8 rounded-full"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white font-medium text-sm">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-violet-600 flex items-center justify-center text-white font-medium text-xs sm:text-sm">
             {userInitial.toUpperCase()}
           </div>
         )}
 
-        {/* Dropdown Arrow */}
+        {/* Dropdown Arrow - Hidden on smallest screens */}
         <svg
-          className={`w-4 h-4 text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`hidden sm:block w-4 h-4 text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

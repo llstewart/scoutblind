@@ -42,7 +42,10 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
         throw new Error(data.error || 'Failed to delete account');
       }
 
-      // Account deleted successfully - redirect to home and reload
+      // Account deleted successfully - clear all local data and redirect
+      sessionStorage.clear();
+      localStorage.removeItem('truesignal_session');
+      localStorage.removeItem('truesignal_sid');
       window.location.href = '/';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
