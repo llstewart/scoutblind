@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { EnrichedBusiness, TableBusiness, isPendingBusiness } from '@/lib/types';
+import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
 import { CellSpinner } from './CellSpinner';
 import { formatDate } from '@/utils/date';
@@ -81,9 +81,16 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
     });
   };
 
-  // Filter out only enriched businesses for sorting and stats
-  const enrichedBusinesses = businesses.filter((b): b is EnrichedBusiness => !isPendingBusiness(b));
+  // Filter out only truly enriched businesses (with SEO data) for sorting and stats
+  const enrichedBusinesses = businesses.filter((b): b is EnrichedBusiness =>
+    !isPendingBusiness(b) && isEnrichedBusiness(b)
+  );
   const pendingCount = businesses.filter(isPendingBusiness).length;
+
+  // Check if we have businesses that haven't been analyzed yet (basic data only)
+  const unanalyzedCount = businesses.filter(b =>
+    !isPendingBusiness(b) && !isEnrichedBusiness(b)
+  ).length;
 
   const displayedBusinesses = useMemo(() => {
     if (sortByPriority && pendingCount === 0) {
@@ -182,7 +189,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   const cellPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
   const headerPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
 
-  if (businesses.length === 0) {
+  // Show prompt to analyze when businesses exist but none have been analyzed
+  if (businesses.length === 0 || (enrichedBusinesses.length === 0 && pendingCount === 0)) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
@@ -190,10 +198,25 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-foreground mb-1">No enriched data available</h3>
+        <h3 className="text-lg font-medium text-foreground mb-1">
+          {unanalyzedCount > 0 ? 'Analysis Required' : 'No enriched data available'}
+        </h3>
         <p className="text-muted-foreground max-w-sm">
-          Run an analysis on your search results to unlock Hidden Signals and high-value data.
+          {unanalyzedCount > 0
+            ? `You have ${unanalyzedCount} businesses ready to analyze. Go to the "All Results" tab and click "Analyze All" to unlock SEO Signals.`
+            : 'Run an analysis on your search results to unlock Hidden Signals and high-value data.'
+          }
         </p>
+        {unanalyzedCount > 0 && (
+          <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span className="text-sm text-amber-400">
+              Data shown without analysis may be incomplete or inaccurate
+            </span>
+          </div>
+        )}
       </div>
     );
   }
@@ -309,7 +332,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         tabIndex={0}
         onFocus={() => focusedRow === null && setFocusedRow(0)}
       >
-        <table ref={tableRef} className="w-full border-collapse">
+        <table ref={tableRef} className="w-full min-w-full border-collapse">
           <thead className="sticky top-0 z-10 bg-card shadow-sm">
             <tr className="border-b border-border">
               <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground w-12`}>
@@ -477,8 +500,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
           <tbody>
             {currentBusinesses.map((business, index) => {
               const isPending = isPendingBusiness(business);
-              const signals = isPending ? [] : getSeoNeedSummary(business as EnrichedBusiness);
-              const score = isPending ? 0 : calculateSeoNeedScore(business as EnrichedBusiness);
+              const isEnriched = !isPending && isEnrichedBusiness(business);
+              const signals = isEnriched ? getSeoNeedSummary(business as EnrichedBusiness) : [];
+              const score = isEnriched ? calculateSeoNeedScore(business as EnrichedBusiness) : 0;
               const isFocused = focusedRow === index;
 
               return (
@@ -498,6 +522,13 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   <td className={cellPadding}>
                     {isPending ? (
                       <CellSpinner />
+                    ) : !isEnriched ? (
+                      <span className="text-xs text-amber-400 font-medium flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Not analyzed
+                      </span>
                     ) : (
                       <div className="flex flex-col gap-1">
                         {sortByPriority && (
@@ -627,7 +658,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     <span className="text-muted-foreground/60 text-xs italic">Feature coming soon</span>
                   </td>
                   <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       (business as EnrichedBusiness).lastReviewDate
                         ? formatDate(new Date((business as EnrichedBusiness).lastReviewDate!))
                         : (
@@ -641,7 +674,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     )}
                   </td>
                   <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       (business as EnrichedBusiness).lastOwnerActivity
                         ? formatDate(new Date((business as EnrichedBusiness).lastOwnerActivity!))
                         : (
@@ -655,7 +690,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     )}
                   </td>
                   <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       (business as EnrichedBusiness).daysDormant !== null
                         ? <StatusTag status={getDormancyStatus((business as EnrichedBusiness).daysDormant)}>
                           {(business as EnrichedBusiness).daysDormant} days ago
@@ -671,14 +708,18 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     )}
                   </td>
                   <td className={cellPadding}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       <StatusTag status={(business as EnrichedBusiness).searchVisibility ? 'success' : 'error'}>
                         {(business as EnrichedBusiness).searchVisibility ? 'Ranked' : 'Not Ranked'}
                       </StatusTag>
                     )}
                   </td>
                   <td className={cellPadding}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       (business as EnrichedBusiness).responseRate > 0 || (business as EnrichedBusiness).lastOwnerActivity ? (
                         <StatusTag status={
                           (business as EnrichedBusiness).responseRate >= 70 ? 'success' :
@@ -697,7 +738,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     )}
                   </td>
                   <td className={cellPadding}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       <StatusTag
                         status={(business as EnrichedBusiness).locationType === 'residential' ? 'warning' : 'neutral'}
                       >
@@ -706,7 +749,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     )}
                   </td>
                   <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {isPending ? <CellSpinner /> : (
+                    {isPending ? <CellSpinner /> : !isEnriched ? (
+                      <span className="text-amber-400/70 text-xs">—</span>
+                    ) : (
                       <div className="flex items-center gap-2">
                         {(business as EnrichedBusiness).websiteTech === 'Analysis Failed' ? (
                           <span className="relative group/tooltip">

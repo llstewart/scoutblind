@@ -38,6 +38,11 @@ export function isPendingBusiness(business: TableBusiness): business is PendingB
   return 'isEnriching' in business && business.isEnriching === true;
 }
 
+// Type guard to check if business has actually been enriched with SEO data
+export function isEnrichedBusiness(business: Business | TableBusiness): business is EnrichedBusiness {
+  return 'searchVisibility' in business && 'responseRate' in business && 'websiteTech' in business;
+}
+
 export interface SearchRequest {
   niche: string;
   location: string;

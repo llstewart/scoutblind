@@ -292,7 +292,7 @@ export function GeneralListTable({
         tabIndex={0}
         onFocus={() => focusedRow === null && setFocusedRow(0)}
       >
-        <table ref={tableRef} className="w-full border-collapse text-left">
+        <table ref={tableRef} className="w-full min-w-full border-collapse text-left">
           <thead className="sticky top-0 z-10 bg-card shadow-sm">
             <tr className="border-b border-border">
               {onSelectionChange && (
