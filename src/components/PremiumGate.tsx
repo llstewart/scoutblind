@@ -107,10 +107,10 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
             </div>
 
             <h3 className="text-2xl font-bold text-foreground mb-3">
-              Unlock Hidden GMB Signals
+              Unlock SEO Signals Pro
             </h3>
             <p className="text-muted-foreground mb-6">
-              Discover which {niche || 'businesses'} in {location || 'your area'} are missing opportunities.
+              Subscribe to a paid plan to analyze {niche || 'businesses'} in {location || 'your area'}.
               See response rates, activity gaps, SEO weaknesses, and get a lead score for each prospect.
             </p>
 
@@ -159,13 +159,13 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
-              Upgrade to Pro
+              View Subscription Plans
             </button>
 
             <p className="text-xs text-muted-foreground mt-4">
-              Start finding high-intent leads today
+              Choose a plan to unlock SEO Signals analysis
             </p>
           </div>
         </div>

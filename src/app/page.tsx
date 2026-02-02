@@ -64,7 +64,7 @@ function HomeContent() {
   const urlSearchParams = useSearchParams();
 
   // Auth state
-  const { user, subscription, isLoading: isAuthLoading, credits, tier, refreshUser, deductCredit } = useUser();
+  const { user, subscription, isLoading: isAuthLoading, credits, tier, refreshUser, deductCredit, getCredits } = useUser();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [showBillingModal, setShowBillingModal] = useState(false);
@@ -86,8 +86,8 @@ function HomeContent() {
   const [isSessionConnected, setIsSessionConnected] = useState(false);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
 
-  // User is considered premium if they're logged in (they get free credits to start)
-  const isPremium = !!user;
+  // User is considered premium only if they have a paid subscription (not free tier)
+  const isPremium = !!user && !!subscription && subscription.tier !== 'free';
 
   // Toast message for checkout success
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -274,8 +274,11 @@ function HomeContent() {
       return;
     }
 
+    // Get fresh credits from database
+    const currentCredits = await getCredits();
+
     // Check if user has credits
-    if (credits < 1) {
+    if (currentCredits < 1) {
       setSearchParams({ niche, location });
       setError('You need 1 credit to search. Purchase more credits to continue.');
       setShowBillingModal(true);
@@ -342,8 +345,11 @@ function HomeContent() {
       return;
     }
 
+    // Get fresh credits from database (not stale React state)
+    const currentCredits = await getCredits();
+
     // Check if user has credits (1 credit per search)
-    if (credits < 1) {
+    if (currentCredits < 1) {
       setError('You need 1 credit to search. Purchase more credits to continue.');
       setShowBillingModal(true);
       return;
@@ -419,9 +425,15 @@ function HomeContent() {
   } | null>(null);
 
   const handleUpgradeClick = () => {
-    // User needs to sign up to upgrade
-    setAuthMode('signup');
-    setShowAuthModal(true);
+    // User needs a paid subscription to access Signals Pro
+    if (!user) {
+      // Not logged in - show auth modal
+      setAuthMode('signup');
+      setShowAuthModal(true);
+    } else {
+      // Logged in but on free tier - show billing modal
+      setShowBillingModal(true);
+    }
     setShowUpgradeModal(false);
   };
 
@@ -456,22 +468,33 @@ function HomeContent() {
       return;
     }
 
-    // Check if user has credits
-    const businessesToAnalyze = selectedBusinesses.size > 0
-      ? Array.from(selectedBusinesses).map(i => businesses[i])
-      : businesses;
-
-    const creditsNeeded = businessesToAnalyze.length;
-    if (credits < creditsNeeded) {
-      setError(`You need ${creditsNeeded} credits to analyze ${businessesToAnalyze.length} businesses. You have ${credits} credits remaining.`);
+    // Check if user has a paid subscription (not free tier)
+    if (!subscription || subscription.tier === 'free') {
+      setError('Upgrade to a paid plan to access SEO Signals analysis.');
       setShowBillingModal(true);
       return;
     }
 
-    // Deduct credits
+    // Calculate credits needed
+    const businessesToAnalyze = selectedBusinesses.size > 0
+      ? Array.from(selectedBusinesses).map(i => businesses[i])
+      : businesses;
+    const creditsNeeded = businessesToAnalyze.length;
+
+    // Get fresh credits from database (not stale React state)
+    const currentCredits = await getCredits();
+
+    if (currentCredits < creditsNeeded) {
+      setError(`You need ${creditsNeeded} credits to analyze ${businessesToAnalyze.length} businesses. You have ${currentCredits} credits remaining.`);
+      setShowBillingModal(true);
+      return;
+    }
+
+    // Deduct credits (server-side will also validate)
     const success = await deductCredit(creditsNeeded);
     if (!success) {
-      setError('Failed to deduct credits. Please try again.');
+      setError(`Insufficient credits. You need ${creditsNeeded} credits but only have ${currentCredits} available.`);
+      setShowBillingModal(true);
       return;
     }
 
@@ -1022,18 +1045,30 @@ function HomeContent() {
 
                 {/* Analyze Button */}
                 {activeTab === 'general' && (
-                  <button
-                    onClick={handleAnalyze}
-                    disabled={isAnalyzing}
-                    className="px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    {selectedBusinesses.size > 0
-                      ? `Analyze ${selectedBusinesses.size} Selected`
-                      : 'Analyze All'}
-                  </button>
+                  isPremium ? (
+                    <button
+                      onClick={handleAnalyze}
+                      disabled={isAnalyzing}
+                      className="px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      {selectedBusinesses.size > 0
+                        ? `Analyze ${selectedBusinesses.size} Selected`
+                        : 'Analyze All'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowBillingModal(true)}
+                      className="px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 transition-all flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                      Upgrade to Analyze
+                    </button>
+                  )
                 )}
 
                 {/* Dev info - shows current auth status */}

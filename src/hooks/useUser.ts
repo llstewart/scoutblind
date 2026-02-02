@@ -23,6 +23,7 @@ interface UseUserReturn {
   tier: string;
   refreshUser: () => Promise<void>;
   deductCredit: (amount?: number) => Promise<boolean>;
+  getCredits: () => Promise<number>;
 }
 
 const defaultSubscription: Subscription = {
@@ -115,10 +116,38 @@ export function useUser(): UseUserReturn {
     };
   }, [fetchUser, supabase.auth]);
 
+  // Get fresh credits from database (bypasses React state timing issues)
+  const getCredits = useCallback(async (): Promise<number> => {
+    if (!user) return 0;
+
+    try {
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('credits_remaining, credits_purchased')
+        .eq('user_id', user.id)
+        .single();
+
+      if (sub) {
+        return (sub.credits_remaining || 0) + (sub.credits_purchased || 0);
+      }
+      return 0;
+    } catch (error) {
+      console.error('Error fetching credits:', error);
+      return 0;
+    }
+  }, [user, supabase]);
+
   const deductCredit = useCallback(async (amount: number = 1): Promise<boolean> => {
     if (!user) return false;
 
     try {
+      // First check if user has enough credits
+      const currentCredits = await getCredits();
+      if (currentCredits < amount) {
+        console.error(`Insufficient credits: need ${amount}, have ${currentCredits}`);
+        return false;
+      }
+
       const { data, error } = await supabase.rpc('deduct_credits', {
         p_user_id: user.id,
         p_amount: amount,
@@ -137,7 +166,7 @@ export function useUser(): UseUserReturn {
       console.error('Error deducting credit:', error);
       return false;
     }
-  }, [user, supabase, fetchUser]);
+  }, [user, supabase, fetchUser, getCredits]);
 
   const credits = subscription
     ? subscription.credits_remaining + subscription.credits_purchased
@@ -153,5 +182,6 @@ export function useUser(): UseUserReturn {
     tier,
     refreshUser: fetchUser,
     deductCredit,
+    getCredits,
   };
 }
