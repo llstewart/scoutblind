@@ -653,6 +653,7 @@ function HomeContent() {
           currentSearchKey={currentSearchKey}
           onLoadSearch={handleLoadFromHistory}
           onClearHistory={handleClearHistory}
+          isLoggedIn={!!user}
         />
 
         {/* Auth Modal (Hero Mode) */}
@@ -999,6 +1000,7 @@ function HomeContent() {
         currentSearchKey={currentSearchKey}
         onLoadSearch={handleLoadFromHistory}
         onClearHistory={handleClearHistory}
+        isLoggedIn={!!user}
       />
 
       {/* Auth Modal */}

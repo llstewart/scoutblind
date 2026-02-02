@@ -17,6 +17,7 @@ interface SavedAnalysesPanelProps {
   currentSearchKey?: string;
   onLoadSearch: (niche: string, location: string) => void;
   onClearHistory: () => void;
+  isLoggedIn?: boolean;
 }
 
 export function SavedAnalysesPanel({
@@ -26,6 +27,7 @@ export function SavedAnalysesPanel({
   currentSearchKey,
   onLoadSearch,
   onClearHistory,
+  isLoggedIn = false,
 }: SavedAnalysesPanelProps) {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -109,7 +111,9 @@ export function SavedAnalysesPanel({
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
           <div>
             <h2 className="text-lg font-semibold text-white">Saved Analyses</h2>
-            <p className="text-xs text-zinc-500 mt-0.5">Your analysis history (saved for 7 days)</p>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              {isLoggedIn ? 'Saved to your account' : 'Saved for 7 days (sign in to save permanently)'}
+            </p>
           </div>
           <button
             onClick={onClose}
