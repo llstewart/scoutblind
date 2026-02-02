@@ -89,8 +89,37 @@ function HomeContent() {
   // User is considered premium if they're logged in (they get free credits to start)
   const isPremium = !!user;
 
+  // Toast message for checkout success
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
+
+  // Handle checkout success/cancel from Stripe redirect
+  useEffect(() => {
+    const checkout = urlSearchParams.get('checkout');
+    if (checkout === 'success') {
+      // Refresh user data to get updated credits
+      refreshUser();
+      setToastMessage('Payment successful! Your credits have been added.');
+      // Clear the query parameter
+      const params = new URLSearchParams(window.location.search);
+      params.delete('checkout');
+      params.delete('session_id');
+      const newUrl = params.toString() ? `?${params.toString()}` : '/';
+      router.replace(newUrl, { scroll: false });
+      // Auto-hide toast after 5 seconds
+      setTimeout(() => setToastMessage(null), 5000);
+    } else if (checkout === 'canceled') {
+      setToastMessage('Checkout was canceled.');
+      // Clear the query parameter
+      const params = new URLSearchParams(window.location.search);
+      params.delete('checkout');
+      const newUrl = params.toString() ? `?${params.toString()}` : '/';
+      router.replace(newUrl, { scroll: false });
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  }, [urlSearchParams, refreshUser, router]);
 
   // Fetch saved analyses count for session indicator
   const fetchSavedCount = useCallback(async () => {
@@ -643,6 +672,24 @@ function HomeContent() {
           currentTier={tier}
           creditsRemaining={credits}
         />
+
+        {/* Toast Notification */}
+        {toastMessage && (
+          <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
+            <div className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 shadow-lg flex items-center gap-3">
+              <div className={`w-2 h-2 rounded-full ${toastMessage.includes('successful') ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+              <span className="text-sm text-zinc-200">{toastMessage}</span>
+              <button
+                onClick={() => setToastMessage(null)}
+                className="text-zinc-400 hover:text-white ml-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -971,6 +1018,24 @@ function HomeContent() {
         currentTier={tier}
         creditsRemaining={credits}
       />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 shadow-lg flex items-center gap-3">
+            <div className={`w-2 h-2 rounded-full ${toastMessage.includes('successful') ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+            <span className="text-sm text-zinc-200">{toastMessage}</span>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="text-zinc-400 hover:text-white ml-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

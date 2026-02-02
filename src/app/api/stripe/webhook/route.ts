@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, SUBSCRIPTION_TIERS, SubscriptionTier } from '@/lib/stripe/server';
-import { createClient } from '@supabase/supabase-js';
+import { getStripeServer, SUBSCRIPTION_TIERS, SubscriptionTier } from '@/lib/stripe/server';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
-// Use service role for webhook operations (bypasses RLS)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization to avoid build-time errors
+let _supabase: SupabaseClient | null = null;
+
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Supabase environment variables not set');
+    }
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+  }
+  return _supabase;
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -20,7 +30,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripeServer().webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
@@ -91,7 +101,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
     if (credits > 0) {
       // Add credits to user
-      const { error } = await supabase.rpc('add_credits', {
+      const { error } = await getSupabase().rpc('add_credits', {
         p_user_id: userId,
         p_amount: credits,
         p_type: 'purchase',
@@ -115,7 +125,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   if (!userId) {
     // Try to find user by customer ID
     const customerId = subscription.customer as string;
-    const { data: sub } = await supabase
+    const { data: sub } = await getSupabase()
       .from('subscriptions')
       .select('user_id')
       .eq('stripe_customer_id', customerId)
@@ -146,7 +156,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
   // Update subscription in database
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from('subscriptions')
     .update({
       stripe_subscription_id: subscription.id,
@@ -170,7 +180,7 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
   if (!userId) return;
 
   // Downgrade to free tier
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from('subscriptions')
     .update({
       tier: 'free',
@@ -196,7 +206,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   if (!userId) return;
 
   // Get current subscription tier
-  const { data: sub } = await supabase
+  const { data: sub } = await getSupabase()
     .from('subscriptions')
     .select('tier, credits_monthly_allowance')
     .eq('user_id', userId)
@@ -205,7 +215,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   if (!sub) return;
 
   // Reset monthly credits on successful payment
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from('subscriptions')
     .update({
       credits_remaining: sub.credits_monthly_allowance,
@@ -217,7 +227,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     console.error('[Stripe Webhook] Error resetting credits:', error);
   } else {
     // Log the credit grant
-    await supabase.rpc('add_credits', {
+    await getSupabase().rpc('add_credits', {
       p_user_id: userId,
       p_amount: 0, // Just for logging, actual reset done above
       p_type: 'subscription_grant',
@@ -234,7 +244,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   if (!userId) return;
 
   // Update subscription status to past_due
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from('subscriptions')
     .update({ status: 'past_due' })
     .eq('user_id', userId);
@@ -247,7 +257,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 }
 
 async function getUserIdByCustomer(customerId: string): Promise<string | null> {
-  const { data } = await supabase
+  const { data } = await getSupabase()
     .from('subscriptions')
     .select('user_id')
     .eq('stripe_customer_id', customerId)
