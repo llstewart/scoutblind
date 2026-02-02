@@ -179,8 +179,57 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     } else {
       console.log('[Stripe Webhook] No credits to add (credits <= 0)');
     }
+  } else if (type === 'subscription') {
+    // Handle subscription checkout completion
+    const tier = session.metadata?.tier as SubscriptionTier | undefined;
+    const tierConfig = tier ? SUBSCRIPTION_TIERS[tier] : SUBSCRIPTION_TIERS.starter;
+
+    console.log(`[Stripe Webhook] Subscription checkout: ${tier} for user ${userId}`);
+
+    // Ensure user has the subscription record with credits
+    const { data: existingSub } = await getSupabase()
+      .from('subscriptions')
+      .select('id, tier, credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (existingSub) {
+      // Update existing subscription with credits if not already set
+      const { error: updateError } = await getSupabase()
+        .from('subscriptions')
+        .update({
+          tier: tier || 'starter',
+          status: 'active',
+          credits_remaining: tierConfig.credits,
+          credits_monthly_allowance: tierConfig.credits,
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        console.error('[Stripe Webhook] Error updating subscription on checkout:', updateError);
+      } else {
+        console.log(`[Stripe Webhook] Updated subscription to ${tier} with ${tierConfig.credits} credits`);
+      }
+    } else {
+      // Create subscription record
+      const { error: insertError } = await getSupabase()
+        .from('subscriptions')
+        .insert({
+          user_id: userId,
+          tier: tier || 'starter',
+          status: 'active',
+          credits_remaining: tierConfig.credits,
+          credits_monthly_allowance: tierConfig.credits,
+          credits_purchased: 0,
+        });
+
+      if (insertError) {
+        console.error('[Stripe Webhook] Error creating subscription on checkout:', insertError);
+      } else {
+        console.log(`[Stripe Webhook] Created subscription ${tier} with ${tierConfig.credits} credits`);
+      }
+    }
   }
-  // Subscription handling is done via subscription events
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
@@ -220,23 +269,42 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     ? new Date(subData.current_period_end * 1000).toISOString()
     : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
+  // Get current subscription to check if this is a new subscription or upgrade
+  const { data: currentSub } = await getSupabase()
+    .from('subscriptions')
+    .select('tier, credits_remaining')
+    .eq('user_id', actualUserId)
+    .single();
+
+  const isNewOrUpgrade = !currentSub || currentSub.tier === 'free' || currentSub.tier !== tier;
+
   // Update subscription in database
+  // If new subscription or upgrade, also grant the monthly credits
+  const updateData: Record<string, unknown> = {
+    stripe_subscription_id: subscription.id,
+    stripe_customer_id: subscription.customer as string,
+    tier: tier || 'starter',
+    status: status,
+    current_period_start: periodStart,
+    current_period_end: periodEnd,
+    credits_monthly_allowance: tierConfig.credits,
+  };
+
+  // Grant credits on new subscription or upgrade
+  if (isNewOrUpgrade && status === 'active') {
+    updateData.credits_remaining = tierConfig.credits;
+    console.log(`[Stripe Webhook] Granting ${tierConfig.credits} credits for new/upgraded subscription`);
+  }
+
   const { error } = await getSupabase()
     .from('subscriptions')
-    .update({
-      stripe_subscription_id: subscription.id,
-      tier: tier || 'starter',
-      status: status,
-      current_period_start: periodStart,
-      current_period_end: periodEnd,
-      credits_monthly_allowance: tierConfig.credits,
-    })
+    .update(updateData)
     .eq('user_id', actualUserId);
 
   if (error) {
     console.error('[Stripe Webhook] Error updating subscription:', error);
   } else {
-    console.log(`[Stripe Webhook] Updated subscription for user ${actualUserId} to ${tier}`);
+    console.log(`[Stripe Webhook] Updated subscription for user ${actualUserId} to ${tier}, credits: ${isNewOrUpgrade ? tierConfig.credits : 'unchanged'}`);
   }
 }
 
