@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SavedSearch {
   searchKey: string;
@@ -29,6 +30,7 @@ export function SavedAnalysesPanel({
   onClearHistory,
   isLoggedIn = false,
 }: SavedAnalysesPanelProps) {
+  const router = useRouter();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -115,14 +117,25 @@ export function SavedAnalysesPanel({
               {isLoggedIn ? 'Saved to your account' : 'Saved for 7 days (sign in to save permanently)'}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                router.push('/history');
+                onClose();
+              }}
+              className="px-3 py-1.5 text-xs font-medium text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 rounded-lg transition-colors"
+            >
+              View All
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -161,7 +174,8 @@ export function SavedAnalysesPanel({
                   <button
                     key={search.searchKey}
                     onClick={() => {
-                      onLoadSearch(search.niche, search.location);
+                      // Navigate to history page to view without rerunning API
+                      router.push('/history');
                       onClose();
                     }}
                     className={`w-full text-left p-4 rounded-lg border transition-all ${

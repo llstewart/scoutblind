@@ -87,6 +87,9 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+  console.log('[Stripe Webhook] handleCheckoutComplete called');
+  console.log('[Stripe Webhook] Session metadata:', JSON.stringify(session.metadata));
+
   const userId = session.metadata?.user_id;
   const type = session.metadata?.type;
 
@@ -95,24 +98,86 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     return;
   }
 
+  console.log(`[Stripe Webhook] Processing checkout for user ${userId}, type: ${type}`);
+
   if (type === 'credits') {
     // Handle one-time credit purchase
     const credits = parseInt(session.metadata?.credits || '0', 10);
+    console.log(`[Stripe Webhook] Credit purchase: ${credits} credits for user ${userId}`);
 
     if (credits > 0) {
-      // Add credits to user
-      const { error } = await getSupabase().rpc('add_credits', {
-        p_user_id: userId,
-        p_amount: credits,
-        p_type: 'purchase',
-        p_description: `Purchased ${credits} credits`,
-      });
+      // First verify the user exists in subscriptions table
+      const { data: existingSub, error: fetchError } = await getSupabase()
+        .from('subscriptions')
+        .select('id, credits_purchased, credits_remaining')
+        .eq('user_id', userId)
+        .single();
 
-      if (error) {
-        console.error('[Stripe Webhook] Error adding credits:', error);
-      } else {
-        console.log(`[Stripe Webhook] Added ${credits} credits to user ${userId}`);
+      if (fetchError) {
+        console.error('[Stripe Webhook] Error fetching subscription:', fetchError);
+        console.log('[Stripe Webhook] Creating subscription record for user...');
+
+        // Create subscription record if it doesn't exist
+        const { error: insertError } = await getSupabase()
+          .from('subscriptions')
+          .insert({
+            user_id: userId,
+            tier: 'free',
+            status: 'active',
+            credits_monthly_allowance: 5,
+            credits_remaining: 5,
+            credits_purchased: credits,
+          });
+
+        if (insertError) {
+          console.error('[Stripe Webhook] Error creating subscription:', insertError);
+          return;
+        }
+        console.log(`[Stripe Webhook] Created subscription with ${credits} purchased credits`);
+        return;
       }
+
+      console.log(`[Stripe Webhook] Current subscription: purchased=${existingSub.credits_purchased}, remaining=${existingSub.credits_remaining}`);
+
+      // Try direct update first (more reliable than RPC)
+      const { error: updateError } = await getSupabase()
+        .from('subscriptions')
+        .update({
+          credits_purchased: (existingSub.credits_purchased || 0) + credits,
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        console.error('[Stripe Webhook] Error updating credits directly:', updateError);
+
+        // Fallback to RPC
+        const { error: rpcError } = await getSupabase().rpc('add_credits', {
+          p_user_id: userId,
+          p_amount: credits,
+          p_type: 'purchase',
+          p_description: `Purchased ${credits} credits`,
+        });
+
+        if (rpcError) {
+          console.error('[Stripe Webhook] RPC add_credits also failed:', rpcError);
+          return;
+        }
+      }
+
+      // Log the transaction
+      await getSupabase()
+        .from('credit_transactions')
+        .insert({
+          user_id: userId,
+          amount: credits,
+          type: 'purchase',
+          description: `Purchased ${credits} credits`,
+          balance_after: (existingSub.credits_purchased || 0) + (existingSub.credits_remaining || 0) + credits,
+        });
+
+      console.log(`[Stripe Webhook] Successfully added ${credits} credits to user ${userId}`);
+    } else {
+      console.log('[Stripe Webhook] No credits to add (credits <= 0)');
     }
   }
   // Subscription handling is done via subscription events
