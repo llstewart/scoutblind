@@ -7,7 +7,8 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { SettingsModal } from '@/components/SettingsModal';
 import { EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
-import { calculateSeoNeedScore, getSeoNeedSummary } from '@/lib/signals';
+import { calculateSeoNeedScore, getSeoNeedSummary, getDormancyStatus } from '@/lib/signals';
+import { StatusTag } from '@/components/StatusTag';
 
 interface SavedAnalysis {
   searchKey: string;
@@ -25,7 +26,6 @@ export default function HistoryPage() {
   const [savedAnalyses, setSavedAnalyses] = useState<SavedAnalysis[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState<SavedAnalysis | null>(null);
-  const [expandedBusinesses, setExpandedBusinesses] = useState<Set<string>>(new Set());
 
   // Check if user has a paid subscription
   const isPaidSubscriber = !!subscription && subscription.tier !== 'free';
@@ -107,23 +107,14 @@ export default function HistoryPage() {
     return 'bg-zinc-700 text-zinc-400 border-zinc-600';
   };
 
-  const getSignalLabel = (score: number) => {
-    if (score >= 70) return 'High Need';
-    if (score >= 40) return 'Medium Need';
-    return 'Low Need';
-  };
+  const [sortByPriority, setSortByPriority] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
-  const toggleBusinessExpanded = (businessId: string) => {
-    setExpandedBusinesses(prev => {
-      const next = new Set(prev);
-      if (next.has(businessId)) {
-        next.delete(businessId);
-      } else {
-        next.add(businessId);
-      }
-      return next;
-    });
-  };
+  // Reset page when analysis changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedAnalysis?.searchKey]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0b]">
@@ -327,157 +318,203 @@ export default function HistoryPage() {
                     </div>
                   </div>
 
-                  {/* Business list */}
-                  <div className="space-y-2 lg:space-y-3">
-                    {selectedAnalysis.businesses
-                      .sort((a, b) => calculateSeoNeedScore(b) - calculateSeoNeedScore(a))
-                      .map((business) => {
-                        const businessId = business.placeId || business.name;
-                        const isExpanded = expandedBusinesses.has(businessId);
-                        const seoScore = calculateSeoNeedScore(business);
-                        const signals = getSeoNeedSummary(business);
+                  {/* Sort toggle */}
+                  <div className="flex items-center justify-between mb-4 px-1">
+                    <span className="text-sm text-zinc-500">
+                      {selectedAnalysis.businesses.length} businesses
+                    </span>
+                    <button
+                      onClick={() => setSortByPriority(!sortByPriority)}
+                      className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                        sortByPriority
+                          ? 'bg-violet-600 text-white'
+                          : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                      </svg>
+                      {sortByPriority ? 'Sorted by Priority' : 'Sort by Priority'}
+                    </button>
+                  </div>
 
-                        return (
-                          <div
-                            key={businessId}
-                            className="bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden"
-                          >
-                            {/* Business header - always visible */}
-                            <button
-                              onClick={() => toggleBusinessExpanded(businessId)}
-                              className="w-full p-3 lg:p-4 text-left hover:bg-zinc-800/30 transition-colors"
-                            >
-                              <div className="flex items-start justify-between gap-2 lg:gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                                    <h3 className="font-medium text-white truncate text-sm lg:text-base">{business.name}</h3>
-                                    <span className={`inline-flex w-fit px-1.5 lg:px-2 py-0.5 text-[10px] lg:text-xs font-medium rounded border ${getSignalColor(seoScore)}`}>
-                                      {seoScore} - {getSignalLabel(seoScore)}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs lg:text-sm text-zinc-500 mt-1 truncate">{business.address}</p>
-                                </div>
-                                <svg
-                                  className={`w-4 lg:w-5 h-4 lg:h-5 text-zinc-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
+                  {/* Business table */}
+                  <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-full">
+                        <thead className="bg-zinc-800/50 border-b border-zinc-700">
+                          <tr>
+                            <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                              Business
+                            </th>
+                            <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                              SEO Score
+                            </th>
+                            <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider hidden sm:table-cell">
+                              Signals
+                            </th>
+                            <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider hidden md:table-cell">
+                              Rating
+                            </th>
+                            <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider hidden md:table-cell">
+                              Reviews
+                            </th>
+                            <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider hidden lg:table-cell">
+                              Response
+                            </th>
+                            <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider hidden lg:table-cell">
+                              Visibility
+                            </th>
+                            <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider hidden xl:table-cell">
+                              Tech
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800">
+                          {(() => {
+                            const sortedBusinesses = sortByPriority
+                              ? [...selectedAnalysis.businesses].sort((a, b) => calculateSeoNeedScore(b) - calculateSeoNeedScore(a))
+                              : selectedAnalysis.businesses;
+
+                            const totalPages = Math.ceil(sortedBusinesses.length / ITEMS_PER_PAGE);
+                            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+                            const paginatedBusinesses = sortedBusinesses.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+                            return paginatedBusinesses.map((business, index) => {
+                              const seoScore = calculateSeoNeedScore(business);
+                              const signals = getSeoNeedSummary(business);
+
+                              return (
+                                <tr
+                                  key={business.placeId || business.name}
+                                  className="hover:bg-zinc-800/30 transition-colors"
                                 >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                              </div>
-                            </button>
-
-                            {/* Expanded details */}
-                            {isExpanded && (
-                              <div className="px-3 lg:px-4 pb-3 lg:pb-4 border-t border-zinc-800/50">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                                  {/* Contact Info */}
-                                  <div>
-                                    <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Contact</h4>
-                                    <div className="space-y-2">
-                                      {business.phone && (
-                                        <div className="flex items-center gap-2 text-sm">
-                                          <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                          </svg>
-                                          <a href={`tel:${business.phone}`} className="text-zinc-300 hover:text-white">
-                                            {business.phone}
-                                          </a>
-                                        </div>
-                                      )}
+                                  {/* Business name & address */}
+                                  <td className="px-4 py-3">
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-medium text-white truncate max-w-[200px]">
+                                        {business.name}
+                                      </span>
+                                      <span className="text-xs text-zinc-500 truncate max-w-[200px]">
+                                        {business.address}
+                                      </span>
                                       {business.website && (
-                                        <div className="flex items-center gap-2 text-sm">
-                                          <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                          </svg>
-                                          <a
-                                            href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-violet-400 hover:text-violet-300 truncate"
-                                          >
-                                            {business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                                          </a>
-                                        </div>
+                                        <a
+                                          href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-xs text-violet-400 hover:text-violet-300 truncate max-w-[200px] mt-0.5"
+                                        >
+                                          {business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                                        </a>
                                       )}
-                                      <div className="flex items-center gap-2 text-sm">
-                                        <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span className="text-zinc-400">{business.address}</span>
-                                      </div>
                                     </div>
-                                  </div>
+                                  </td>
+
+                                  {/* SEO Score */}
+                                  <td className="px-4 py-3">
+                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded ${getSignalColor(seoScore)}`}>
+                                      {seoScore}
+                                    </span>
+                                  </td>
 
                                   {/* Signals */}
-                                  <div>
-                                    <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Signals</h4>
-                                    <div className="space-y-2">
-                                      <div className="flex items-center justify-between text-sm">
-                                        <span className="text-zinc-500">Rating</span>
-                                        <span className="text-zinc-300">
-                                          {business.rating ? `${business.rating} / 5` : 'N/A'}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center justify-between text-sm">
-                                        <span className="text-zinc-500">Reviews</span>
-                                        <span className="text-zinc-300">{business.reviewCount || 0}</span>
-                                      </div>
-                                      {business.lastReviewDate && (
-                                        <div className="flex items-center justify-between text-sm">
-                                          <span className="text-zinc-500">Last Review</span>
-                                          <span className="text-zinc-300">
-                                            {new Date(business.lastReviewDate).toLocaleDateString()}
+                                  <td className="px-4 py-3 hidden sm:table-cell">
+                                    <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                      {signals.length > 0 ? (
+                                        signals.slice(0, 2).map((signal, i) => (
+                                          <span
+                                            key={i}
+                                            className="px-1.5 py-0.5 text-[10px] bg-rose-500/10 text-rose-400 rounded border border-rose-500/20 whitespace-nowrap"
+                                          >
+                                            {signal}
                                           </span>
-                                        </div>
+                                        ))
+                                      ) : (
+                                        <span className="text-xs text-emerald-400">Well optimized</span>
                                       )}
-                                      {business.responseRate !== undefined && (
-                                        <div className="flex items-center justify-between text-sm">
-                                          <span className="text-zinc-500">Response Rate</span>
-                                          <span className="text-zinc-300">{business.responseRate}%</span>
-                                        </div>
-                                      )}
-                                      {business.websiteTech && (
-                                        <div className="flex items-center justify-between text-sm">
-                                          <span className="text-zinc-500">Website Tech</span>
-                                          <span className="text-zinc-300">{business.websiteTech}</span>
-                                        </div>
-                                      )}
-                                      <div className="flex items-center justify-between text-sm">
-                                        <span className="text-zinc-500">SEO Optimized</span>
-                                        <span className={business.seoOptimized ? 'text-emerald-400' : 'text-zinc-500'}>
-                                          {business.seoOptimized ? 'Yes' : 'No'}
+                                      {signals.length > 2 && (
+                                        <span className="px-1.5 py-0.5 text-[10px] bg-zinc-700 text-zinc-400 rounded">
+                                          +{signals.length - 2}
                                         </span>
-                                      </div>
+                                      )}
                                     </div>
-                                  </div>
-                                </div>
+                                  </td>
 
-                                {/* SEO Need Signals */}
-                                {signals.length > 0 && (
-                                  <div className="mt-4 pt-4 border-t border-zinc-800/50">
-                                    <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
-                                      Why This Business Needs SEO Help
-                                    </h4>
-                                    <div className="flex flex-wrap gap-2">
-                                      {signals.map((signal, i) => (
-                                        <span
-                                          key={i}
-                                          className="px-2 py-1 text-xs bg-rose-500/10 text-rose-400 rounded border border-rose-500/20"
-                                        >
-                                          {signal}
-                                        </span>
-                                      ))}
+                                  {/* Rating */}
+                                  <td className="px-4 py-3 text-center hidden md:table-cell">
+                                    <span className="text-sm text-zinc-300">
+                                      {business.rating ? `${business.rating}★` : '—'}
+                                    </span>
+                                  </td>
+
+                                  {/* Reviews */}
+                                  <td className="px-4 py-3 text-center hidden md:table-cell">
+                                    <span className="text-sm text-zinc-300">
+                                      {business.reviewCount || 0}
+                                    </span>
+                                  </td>
+
+                                  {/* Response Rate */}
+                                  <td className="px-4 py-3 text-center hidden lg:table-cell">
+                                    <StatusTag status={
+                                      business.responseRate >= 70 ? 'success' :
+                                      business.responseRate >= 30 ? 'warning' : 'error'
+                                    }>
+                                      {business.responseRate}%
+                                    </StatusTag>
+                                  </td>
+
+                                  {/* Search Visibility */}
+                                  <td className="px-4 py-3 text-center hidden lg:table-cell">
+                                    <StatusTag status={business.searchVisibility ? 'success' : 'error'}>
+                                      {business.searchVisibility ? 'Ranked' : 'Not Ranked'}
+                                    </StatusTag>
+                                  </td>
+
+                                  {/* Website Tech */}
+                                  <td className="px-4 py-3 hidden xl:table-cell">
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-xs text-zinc-400 truncate max-w-[100px]">
+                                        {business.websiteTech || '—'}
+                                      </span>
+                                      {business.seoOptimized && (
+                                        <StatusTag status="success">SEO</StatusTag>
+                                      )}
                                     </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                                  </td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Pagination */}
+                    {selectedAnalysis.businesses.length > ITEMS_PER_PAGE && (
+                      <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800 bg-zinc-900/30">
+                        <span className="text-xs text-zinc-500">
+                          Page {currentPage} of {Math.ceil(selectedAnalysis.businesses.length / ITEMS_PER_PAGE)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="px-2 py-1 text-xs font-medium rounded border border-zinc-700 text-zinc-400 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Previous
+                          </button>
+                          <button
+                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(selectedAnalysis.businesses.length / ITEMS_PER_PAGE), p + 1))}
+                            disabled={currentPage >= Math.ceil(selectedAnalysis.businesses.length / ITEMS_PER_PAGE)}
+                            className="px-2 py-1 text-xs font-medium rounded border border-zinc-700 text-zinc-400 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
