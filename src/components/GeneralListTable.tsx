@@ -1,8 +1,65 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Business } from '@/lib/types';
 import { StatusTag } from './StatusTag';
+
+// Tooltip component that renders in a portal to avoid overflow clipping
+function HeaderTooltip({
+  children,
+  content
+}: {
+  children: React.ReactNode;
+  content: React.ReactNode;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 8,
+        left: Math.min(rect.left, window.innerWidth - 300), // Keep tooltip within viewport
+      });
+    }
+  }, []);
+
+  const handleMouseEnter = () => {
+    updatePosition();
+    setIsVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsVisible(false);
+  };
+
+  return (
+    <>
+      <div
+        ref={triggerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="inline-flex cursor-help"
+      >
+        {children}
+      </div>
+      {isVisible && typeof window !== 'undefined' && createPortal(
+        <div
+          className="fixed w-72 p-3 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl z-[9999] animate-in fade-in duration-150"
+          style={{ top: position.top, left: position.left }}
+          onMouseEnter={() => setIsVisible(true)}
+          onMouseLeave={() => setIsVisible(false)}
+        >
+          {content}
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
 
 interface GeneralListTableProps {
   businesses: Business[];
@@ -377,19 +434,24 @@ export function GeneralListTable({
                 Category
               </th>
               <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
-                <div className="flex items-center gap-1.5 group/tooltip relative">
+                <div className="flex items-center gap-1.5">
                   Claim Status
-                  <svg className="w-3.5 h-3.5 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all z-50">
-                    <p className="text-xs text-zinc-300 leading-relaxed">
-                      <span className="font-semibold text-emerald-400">Claimed:</span> Owner has verified and manages this listing. Harder to pitch - they&apos;re actively engaged.
-                    </p>
-                    <p className="text-xs text-zinc-300 leading-relaxed mt-2">
-                      <span className="font-semibold text-amber-400">Unclaimed:</span> No verified owner. Great opportunity - business may not know about their online presence.
-                    </p>
-                  </div>
+                  <HeaderTooltip
+                    content={
+                      <>
+                        <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                          <span className="font-semibold text-emerald-400">Claimed:</span> Owner has verified and manages this listing. Harder to pitch - they&apos;re actively engaged.
+                        </p>
+                        <p className="text-xs text-zinc-300 leading-relaxed mt-2 font-normal">
+                          <span className="font-semibold text-amber-400">Unclaimed:</span> No verified owner. Great opportunity - business may not know about their online presence.
+                        </p>
+                      </>
+                    }
+                  >
+                    <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </HeaderTooltip>
                 </div>
               </th>
               <th className={`${headerPadding} text-sm font-semibold text-foreground`}>
