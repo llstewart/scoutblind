@@ -285,6 +285,116 @@ export function GeneralListTable({
   const cellPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
   const headerPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
 
+  // Mobile Card Component
+  const MobileCard = ({ business, index }: { business: Business; index: number }) => {
+    const globalIndex = startIndex + index;
+    const isSelected = selectedBusinesses.has(globalIndex);
+
+    return (
+      <div
+        className={`p-4 border-b border-border bg-card hover:bg-muted/10 transition-colors ${isSelected ? 'bg-primary/5' : ''
+          }`}
+        onClick={() => {
+          if (onSelectionChange) handleToggleSelect(globalIndex);
+        }}
+      >
+        {/* Header: Name and Rating */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-medium text-muted-foreground flex-shrink-0">
+              {globalIndex + 1}
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-foreground truncate pr-2">
+                {business.name}
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-muted-foreground">{business.category}</span>
+                <span className="text-xs text-muted-foreground">•</span>
+                <div className="flex items-center gap-1">
+                  <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-xs font-medium text-foreground">
+                    {business.rating > 0 ? business.rating : 'N/A'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    ({business.reviewCount})
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {onSelectionChange && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => handleToggleSelect(globalIndex)}
+              className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer flex-shrink-0 ml-2"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+        </div>
+
+        {/* Contact Info */}
+        <div className="space-y-2 mb-3">
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="break-words">{business.address}</span>
+          </div>
+
+          {business.phone && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>{business.phone}</span>
+              <CopyButton text={business.phone} label="phone" />
+            </div>
+          )}
+
+          {business.website && (
+            <div className="flex items-center gap-2 text-sm">
+              <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+              <a
+                href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline hover:text-white truncate max-w-[200px]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {(() => {
+                  try {
+                    return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname;
+                  } catch {
+                    return business.website;
+                  }
+                })()}
+              </a>
+              <CopyButton text={business.website} label="website" />
+            </div>
+          )}
+        </div>
+
+        {/* Footer: Tags */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
+          <StatusTag status={business.claimed ? 'success' : 'warning'}>
+            {business.claimed ? 'Claimed' : 'Unclaimed'}
+          </StatusTag>
+          <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
+            {business.sponsored ? 'Ads' : 'No Ads'}
+          </StatusTag>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
@@ -293,17 +403,16 @@ export function GeneralListTable({
           <span className="text-sm font-medium text-foreground">
             {businesses.length} result{businesses.length !== 1 ? 's' : ''}
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="hidden md:inline text-xs text-muted-foreground">
             Use <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↑</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↓</kbd> or <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">j</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">k</kbd> to navigate
           </span>
         </div>
         <button
           onClick={() => setIsCompact(!isCompact)}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
-            isCompact
+          className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${isCompact
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -337,9 +446,8 @@ export function GeneralListTable({
 
       {/* Scroll shadow indicator */}
       <div
-        className={`absolute left-0 right-0 h-4 bg-gradient-to-b from-black/10 to-transparent z-20 pointer-events-none transition-opacity duration-200 ${
-          showTopShadow ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute left-0 right-0 h-4 bg-gradient-to-b from-black/10 to-transparent z-20 pointer-events-none transition-opacity duration-200 ${showTopShadow ? 'opacity-100' : 'opacity-0'
+          }`}
         style={{ top: onSelectionChange && selectedBusinesses.size > 0 ? '106px' : '41px' }}
       />
 
@@ -349,7 +457,15 @@ export function GeneralListTable({
         tabIndex={0}
         onFocus={() => focusedRow === null && setFocusedRow(0)}
       >
-        <table ref={tableRef} className="w-full min-w-full border-collapse text-left">
+        {/* Mobile View */}
+        <div className="block md:hidden">
+          {currentBusinesses.map((business, index) => (
+            <MobileCard key={`mobile-${index}`} business={business} index={index} />
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left">
           <thead className="sticky top-0 z-10 bg-card shadow-sm">
             <tr className="border-b border-border">
               {onSelectionChange && (
@@ -466,102 +582,101 @@ export function GeneralListTable({
               const isFocused = focusedRow === index;
 
               return (
-              <tr
-                key={index}
-                data-row-index={index}
-                onClick={() => setFocusedRow(index)}
-                className={`border-b border-border transition-colors cursor-pointer group ${
-                  isFocused ? 'bg-primary/10 ring-1 ring-inset ring-primary/30' :
-                  isSelected ? 'bg-primary/5' : 'hover:bg-muted/30'
-                }`}
-              >
-                {onSelectionChange && (
-                  <td className={cellPadding}>
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleToggleSelect(globalIndex)}
-                      className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
-                    />
+                <tr
+                  key={index}
+                  data-row-index={index}
+                  onClick={() => setFocusedRow(index)}
+                  className={`border-b border-border transition-colors cursor-pointer group ${isFocused ? 'bg-primary/10 ring-1 ring-inset ring-primary/30' :
+                      isSelected ? 'bg-primary/5' : 'hover:bg-muted/30'
+                    }`}
+                >
+                  {onSelectionChange && (
+                    <td className={cellPadding}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleToggleSelect(globalIndex)}
+                        className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+                      />
+                    </td>
+                  )}
+                  <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
+                    {globalIndex + 1}
                   </td>
-                )}
-                <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
-                  {globalIndex + 1}
-                </td>
-                <td className={`${cellPadding} text-sm font-medium text-foreground`}>
-                  <div className="flex items-center gap-2">
-                    <span className="truncate">{business.name}</span>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                      <CopyButton text={business.name} label="name" />
-                    </div>
-                  </div>
-                </td>
-                <td className={`${cellPadding} text-sm text-muted-foreground max-w-xs`}>
-                  <div className="flex items-center gap-2">
-                    <span className="truncate">{business.address}</span>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                      <CopyButton text={business.address} label="address" />
-                    </div>
-                  </div>
-                </td>
-                <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                  {business.phone ? (
+                  <td className={`${cellPadding} text-sm font-medium text-foreground`}>
                     <div className="flex items-center gap-2">
-                      <span>{business.phone}</span>
+                      <span className="truncate">{business.name}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                        <CopyButton text={business.phone} label="phone" />
+                        <CopyButton text={business.name} label="name" />
                       </div>
                     </div>
-                  ) : (
-                    <span className="text-muted-foreground/50">No Phone Listed</span>
-                  )}
-                </td>
-                <td className={`${cellPadding} text-sm`}>
-                  {business.website ? (
+                  </td>
+                  <td className={`${cellPadding} text-sm text-muted-foreground max-w-xs`}>
                     <div className="flex items-center gap-2">
-                      <a
-                        href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline hover:text-white truncate block max-w-[180px]"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {(() => {
-                          try {
-                            return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname;
-                          } catch {
-                            return business.website;
-                          }
-                        })()}
-                      </a>
+                      <span className="truncate">{business.address}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                        <CopyButton text={business.website} label="website" />
+                        <CopyButton text={business.address} label="address" />
                       </div>
                     </div>
-                  ) : (
-                    <span className="text-muted-foreground/50">No Website Listed</span>
-                  )}
-                </td>
-                <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                  {business.rating > 0 ? `${business.rating} Stars` : 'No Rating'}
-                </td>
-                <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                  {business.reviewCount} Reviews
-                </td>
-                <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                  {business.category}
-                </td>
-                <td className={cellPadding}>
-                  <StatusTag status={business.claimed ? 'success' : 'warning'}>
-                    {business.claimed ? 'Claimed' : 'Unclaimed'}
-                  </StatusTag>
-                </td>
-                <td className={cellPadding}>
-                  <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
-                    {business.sponsored ? 'Active Ads' : 'No Ads'}
-                  </StatusTag>
-                </td>
-              </tr>
+                  </td>
+                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                    {business.phone ? (
+                      <div className="flex items-center gap-2">
+                        <span>{business.phone}</span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                          <CopyButton text={business.phone} label="phone" />
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground/50">No Phone Listed</span>
+                    )}
+                  </td>
+                  <td className={`${cellPadding} text-sm`}>
+                    {business.website ? (
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline hover:text-white truncate block max-w-[180px]"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {(() => {
+                            try {
+                              return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname;
+                            } catch {
+                              return business.website;
+                            }
+                          })()}
+                        </a>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                          <CopyButton text={business.website} label="website" />
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground/50">No Website Listed</span>
+                    )}
+                  </td>
+                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                    {business.rating > 0 ? `${business.rating} Stars` : 'No Rating'}
+                  </td>
+                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                    {business.reviewCount} Reviews
+                  </td>
+                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                    {business.category}
+                  </td>
+                  <td className={cellPadding}>
+                    <StatusTag status={business.claimed ? 'success' : 'warning'}>
+                      {business.claimed ? 'Claimed' : 'Unclaimed'}
+                    </StatusTag>
+                  </td>
+                  <td className={cellPadding}>
+                    <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
+                      {business.sponsored ? 'Active Ads' : 'No Ads'}
+                    </StatusTag>
+                  </td>
+                </tr>
               );
             })}
           </tbody>
@@ -571,9 +686,8 @@ export function GeneralListTable({
       {/* Back to top button */}
       <button
         onClick={scrollToTop}
-        className={`absolute bottom-20 right-4 p-2 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-200 hover:bg-primary/90 ${
-          showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
+        className={`absolute bottom-20 right-4 p-2 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-200 hover:bg-primary/90 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}
         title="Back to top"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

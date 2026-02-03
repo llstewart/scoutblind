@@ -215,7 +215,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               }}
               onFocus={() => setShowNicheSuggestions(true)}
               placeholder="Business type"
-              className="w-24 sm:w-28 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
+              className="w-20 sm:w-28 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
               disabled={isLoading}
               autoComplete="off"
             />
@@ -239,10 +239,10 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
           </div>
 
           {/* Divider */}
-          <div className="w-px h-5 bg-zinc-700" />
+          <div className="w-px h-5 bg-zinc-700 flex-shrink-0" />
 
           {/* Location Section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -252,7 +252,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="City"
-              className="w-20 sm:w-24 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
+              className="w-16 sm:w-24 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
               disabled={isLoading}
             />
 
@@ -300,9 +300,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                             setShowRegionPicker(false);
                             setRegionSearch('');
                           }}
-                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                            region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
-                          }`}
+                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                            }`}
                         >
                           {r.name}
                         </button>
@@ -340,9 +339,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                         setRegion('');
                         setShowCountryPicker(false);
                       }}
-                      className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${
-                        country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
-                      }`}
+                      className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                        }`}
                     >
                       <span className="text-base">{c.flag}</span>
                       <span>{c.name}</span>
@@ -362,11 +360,10 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
           <button
             type="submit"
             disabled={isLoading || !isFormValid}
-            className={`ml-auto px-4 py-1.5 text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${
-              isFormValid
+            className={`ml-auto px-4 py-1.5 text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${isFormValid
                 ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25'
                 : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-            }`}
+              }`}
           >
             {isLoading ? (
               <LoadingSpinner size="sm" />
@@ -509,9 +506,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                               setShowRegionPicker(false);
                               setRegionSearch('');
                             }}
-                            className={`w-full px-3 py-2 text-left text-sm transition-colors ${
-                              region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                            }`}
+                            className={`w-full px-3 py-2 text-left text-sm transition-colors ${region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                              }`}
                           >
                             {r.name}
                           </button>
@@ -553,9 +549,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                           setRegion('');
                           setShowCountryPicker(false);
                         }}
-                        className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${
-                          country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                        }`}
+                        className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                          }`}
                       >
                         <span className="text-base">{c.flag}</span>
                         <span>{c.name}</span>
@@ -578,11 +573,10 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
           <button
             type="submit"
             disabled={isLoading || !isFormValid}
-            className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${
-              isFormValid
+            className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${isFormValid
                 ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25'
                 : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-            }`}
+              }`}
           >
             {isLoading ? (
               <>

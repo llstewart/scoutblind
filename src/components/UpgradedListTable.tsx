@@ -189,6 +189,158 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   const cellPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
   const headerPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
 
+  // Mobile Card Component for Upgraded Table
+  const MobileCard = ({ business, index }: { business: TableBusiness; index: number }) => {
+    const isPending = isPendingBusiness(business);
+    const isEnriched = !isPending && isEnrichedBusiness(business);
+    const signals = isEnriched ? getSeoNeedSummary(business as EnrichedBusiness) : [];
+    const score = isEnriched ? calculateSeoNeedScore(business as EnrichedBusiness) : 0;
+
+    return (
+      <div
+        className={`p-4 border-b border-border bg-card hover:bg-muted/10 transition-colors ${isPending ? 'bg-primary/5' : ''
+          }`}
+        onClick={() => setFocusedRow(index)}
+      >
+        {/* Header: Name, Score, Rating */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-medium text-muted-foreground flex-shrink-0">
+              {startIndex + index + 1}
+            </div>
+            <div className="min-w-0 w-full">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-semibold text-foreground truncate pr-2">
+                  {business.name}
+                </h3>
+                {isEnriched && (
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded ${score >= 70 ? 'bg-rose-500/10 text-rose-500' :
+                      score >= 40 ? 'bg-amber-500/10 text-amber-500' :
+                        'bg-emerald-500/10 text-emerald-500'
+                    }`}>
+                    Score: {score}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs text-muted-foreground">{business.category}</span>
+                <span className="text-xs text-muted-foreground">•</span>
+                <div className="flex items-center gap-1">
+                  <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-xs font-medium text-foreground">
+                    {business.rating > 0 ? business.rating : 'N/A'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    ({business.reviewCount})
+                  </span>
+                </div>
+              </div>
+
+              {/* SEO Signals Chips */}
+              {isPending ? (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <CellSpinner /> Analyzing signals...
+                </div>
+              ) : isEnriched && signals.length > 0 ? (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {signals.slice(0, 3).map((signal, i) => (
+                    <span key={i} className="inline-block px-2 py-0.5 text-[10px] bg-rose-500/10 text-rose-400 rounded border border-rose-500/20">
+                      {signal}
+                    </span>
+                  ))}
+                  {signals.length > 3 && (
+                    <span className="text-[10px] text-muted-foreground px-1 py-0.5">+{signals.length - 3} more</span>
+                  )}
+                </div>
+              ) : isEnriched ? (
+                <span className="text-xs text-emerald-400 font-medium">Well optimized</span>
+              ) : (
+                <span className="text-xs text-amber-400 font-medium">Analysis pending</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info (Compact) */}
+        <div className="space-y-1.5 mb-3 pl-9">
+          <div className="text-xs text-muted-foreground break-words">{business.address}</div>
+          <div className="flex items-center gap-4 text-xs">
+            {business.phone && (
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span>{business.phone}</span>
+              </div>
+            )}
+            {business.website && (
+              <div className="flex items-center gap-1.5">
+                <svg className="w-3 h-3 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+                <a href={business.website.startsWith('http') ? business.website : `https://${business.website}`} target="_blank" rel="noopener noreferrer" className="text-primary truncate max-w-[120px]">
+                  {(() => { try { return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname; } catch { return 'Website'; } })()}
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Metrics Grid */}
+        {isEnriched && (
+          <div className="grid grid-cols-2 gap-2 mb-3 bg-muted/20 p-2 rounded-lg ml-9 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Response Rate:</span>
+              <span className={
+                (business as EnrichedBusiness).responseRate >= 70 ? 'text-emerald-500 font-medium' :
+                  (business as EnrichedBusiness).responseRate >= 30 ? 'text-amber-500 font-medium' : 'text-rose-500 font-medium'
+              }>
+                {(business as EnrichedBusiness).responseRate}%
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Visibility:</span>
+              <span className={(business as EnrichedBusiness).searchVisibility ? 'text-emerald-500 font-medium' : 'text-rose-500 font-medium'}>
+                {(business as EnrichedBusiness).searchVisibility ? 'Ranked' : 'Not Ranked'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Last Review:</span>
+              <span className="text-foreground">
+                {(business as EnrichedBusiness).lastReviewDate ? formatDate((business as EnrichedBusiness).lastReviewDate) : 'No data'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Owner Active:</span>
+              <span className="text-foreground">
+                {(business as EnrichedBusiness).lastOwnerActivity ? formatDate((business as EnrichedBusiness).lastOwnerActivity) : 'No data'}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Footer: Tags */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50 pl-9">
+          <StatusTag status={business.claimed ? 'success' : 'warning'}>
+            {business.claimed ? 'Claimed' : 'Unclaimed'}
+          </StatusTag>
+          <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
+            {business.sponsored ? 'Ads' : 'No Ads'}
+          </StatusTag>
+          {isEnriched && (business as EnrichedBusiness).websiteTech !== 'Analysis Failed' && (
+            <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border">
+              Tech: {(business as EnrichedBusiness).websiteTech}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+
   // Show prompt to analyze when businesses exist but none have been analyzed
   if (businesses.length === 0 || (enrichedBusinesses.length === 0 && pendingCount === 0)) {
     return (
@@ -229,17 +381,16 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
           <span className="text-sm font-medium text-foreground">
             {businesses.length} result{businesses.length !== 1 ? 's' : ''}
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="hidden md:inline text-xs text-muted-foreground">
             Use <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↑</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↓</kbd> or <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">j</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">k</kbd> to navigate
           </span>
         </div>
         <button
           onClick={() => setIsCompact(!isCompact)}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
-            isCompact
+          className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${isCompact
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -319,9 +470,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
       {/* Scroll shadow indicator */}
       <div
-        className={`absolute left-0 right-0 h-4 bg-gradient-to-b from-black/10 to-transparent z-20 pointer-events-none transition-opacity duration-200 ${
-          showTopShadow ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute left-0 right-0 h-4 bg-gradient-to-b from-black/10 to-transparent z-20 pointer-events-none transition-opacity duration-200 ${showTopShadow ? 'opacity-100' : 'opacity-0'
+          }`}
         style={{ top: '140px' }}
       />
 
@@ -332,7 +482,15 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         tabIndex={0}
         onFocus={() => focusedRow === null && setFocusedRow(0)}
       >
-        <table ref={tableRef} className="w-full min-w-full border-collapse">
+        {/* Mobile View */}
+        <div className="block md:hidden">
+          {currentBusinesses.map((business, index) => (
+            <MobileCard key={`mobile-${index}`} business={business} index={index} />
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse">
           <thead className="sticky top-0 z-10 bg-card shadow-sm">
             <tr className="border-b border-border">
               <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground w-12`}>
@@ -510,10 +668,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   key={index}
                   data-row-index={index}
                   onClick={() => setFocusedRow(index)}
-                  className={`border-b border-border transition-colors cursor-pointer group ${
-                    isFocused ? 'bg-primary/10 ring-1 ring-inset ring-primary/30' :
-                    isPending ? 'bg-primary/5' : 'hover:bg-muted/30'
-                  }`}
+                  className={`border-b border-border transition-colors cursor-pointer group ${isFocused ? 'bg-primary/10 ring-1 ring-inset ring-primary/30' :
+                      isPending ? 'bg-primary/5' : 'hover:bg-muted/30'
+                    }`}
                 >
                   <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
                     {startIndex + index + 1}
@@ -781,9 +938,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
       {/* Back to top button */}
       <button
         onClick={scrollToTop}
-        className={`absolute bottom-20 right-4 p-2 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-200 hover:bg-primary/90 ${
-          showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
+        className={`absolute bottom-20 right-4 p-2 bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-200 hover:bg-primary/90 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}
         title="Back to top"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
