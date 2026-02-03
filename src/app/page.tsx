@@ -970,25 +970,6 @@ function HomeContent() {
               TrueSignal<span className="text-violet-500">.</span>
             </button>
 
-            {/* New Search button - clear results */}
-            <button
-              onClick={() => {
-                setBusinesses([]);
-                setTableBusinesses([]);
-                setSearchParams(null);
-                setError(null);
-                setWasAnalysisInterrupted(false);
-                router.replace('/');
-              }}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-600 rounded-lg transition-colors"
-              title="Start a new search"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span>New Search</span>
-            </button>
-
             {/* Business Lookup Button */}
             <button
               onClick={() => setShowLookupModal(true)}
