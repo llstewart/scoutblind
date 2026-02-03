@@ -151,10 +151,10 @@ export function LibraryTab({
       />
 
       {/* Search filter */}
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="relative">
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -165,8 +165,8 @@ export function LibraryTab({
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Filter searches..."
-            className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+            placeholder="Filter..."
+            className="w-full pl-8 pr-3 py-2 text-sm bg-zinc-800/50 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
           />
         </div>
       </div>
@@ -179,25 +179,25 @@ export function LibraryTab({
       )}
 
       {/* Grouped searches */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         {Object.entries(groupedSearches).map(([period, periodSearches]) => (
           <div key={period}>
-            <h3 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
+            <h3 className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider mb-1.5 px-1">
               {period}
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {periodSearches.map((search) => (
                 <div
                   key={search.id}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 hover:bg-zinc-800/50 transition-colors group"
+                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-zinc-900/30 hover:bg-zinc-800/50 transition-colors group"
                 >
                   {/* Delete button (edit mode) */}
                   {isEditing && onDeleteSearch && (
                     <button
                       onClick={() => onDeleteSearch(search.id)}
-                      className="p-1 text-zinc-600 hover:text-red-400 transition-colors"
+                      className="p-0.5 text-zinc-600 hover:text-red-400 transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
@@ -205,8 +205,8 @@ export function LibraryTab({
 
                   {/* Status indicator */}
                   <div
-                    className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                      search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-zinc-600'
+                    className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                      search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-zinc-700'
                     }`}
                   />
 
@@ -216,50 +216,37 @@ export function LibraryTab({
                     className="flex-1 min-w-0 text-left"
                     disabled={isEditing}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
-                          {search.niche} in {search.location}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-zinc-200 truncate">
+                          {search.niche}
                         </p>
-                        <div className="flex items-center gap-3 mt-0.5">
-                          <span className="text-xs text-zinc-500">
-                            {search.totalCount} businesses
-                          </span>
-                          {search.analyzedCount > 0 && (
-                            <>
-                              <span className="text-zinc-700">·</span>
-                              <span className="text-xs text-violet-400">
-                                {search.analyzedCount} analyzed
-                              </span>
-                            </>
-                          )}
-                        </div>
+                        <p className="text-[10px] text-zinc-600 truncate">
+                          {search.location} · {search.totalCount} found
+                          {search.analyzedCount > 0 && ` · ${search.analyzedCount} analyzed`}
+                        </p>
                       </div>
 
-                      {/* Progress indicator */}
+                      {/* Progress/status */}
                       {search.analyzedCount > 0 && search.analyzedCount < search.totalCount && (
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <div className="w-10 h-1 bg-zinc-800 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-violet-500 rounded-full"
                               style={{ width: `${(search.analyzedCount / search.totalCount) * 100}%` }}
                             />
                           </div>
-                          <span className="text-xs text-zinc-600">
-                            {Math.round((search.analyzedCount / search.totalCount) * 100)}%
-                          </span>
                         </div>
                       )}
 
-                      {/* Completed badge */}
                       {search.analyzedCount === search.totalCount && search.analyzedCount > 0 && (
-                        <span className="text-xs text-emerald-400 font-medium">Complete</span>
+                        <span className="text-[10px] text-emerald-500">Done</span>
                       )}
 
                       {/* Chevron */}
                       {!isEditing && (
                         <svg
-                          className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0"
+                          className="w-3.5 h-3.5 text-zinc-700 group-hover:text-zinc-500 transition-colors flex-shrink-0"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

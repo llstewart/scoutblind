@@ -135,40 +135,36 @@ export function SearchTab({
 
           {/* Recent Searches */}
           {recentSearches.length > 0 && (
-            <div className="border-t border-zinc-800/50 pt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium text-zinc-400">Recent Searches</h2>
-              </div>
-              <div className="space-y-2">
+            <div className="border-t border-zinc-800/30 pt-6">
+              <h2 className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider mb-2">Recent</h2>
+              <div className="space-y-1">
                 {recentSearches.slice(0, 3).map((search) => (
                   <button
                     key={search.id}
                     onClick={() => onRecentSearchClick?.(search)}
-                    className="w-full flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 hover:bg-zinc-800/50 transition-colors text-left group"
+                    className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-zinc-900/30 hover:bg-zinc-800/50 transition-colors text-left group"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                          search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-zinc-600'
+                        className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                          search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-zinc-700'
                         }`}
                       />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-xs font-medium text-zinc-300 truncate">
                           {search.niche}
                         </p>
-                        <p className="text-xs text-zinc-500 truncate">
+                        <p className="text-[10px] text-zinc-600 truncate">
                           {search.location}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-xs text-zinc-500">
-                        {search.analyzedCount > 0
-                          ? `${search.analyzedCount} analyzed`
-                          : `${search.totalCount} found`}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-[10px] text-zinc-600">
+                        {search.totalCount}
                       </span>
                       <svg
-                        className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors"
+                        className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 transition-colors"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

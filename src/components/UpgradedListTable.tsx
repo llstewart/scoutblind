@@ -20,7 +20,7 @@ interface UpgradedListTableProps {
   expectedTotal?: number;
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 25;
 
 // Copy button component
 function CopyButton({ text, label }: { text: string; label: string }) {
@@ -192,8 +192,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   const websiteAnalyzedCount = enrichedBusinesses.filter(b => b.websiteTech && b.websiteTech !== 'Analysis Failed' && b.websiteTech !== 'No Website').length;
   const websiteFailedCount = enrichedBusinesses.filter(b => b.websiteTech === 'Analysis Failed').length;
 
-  const cellPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
-  const headerPadding = isCompact ? 'py-2 px-3' : 'py-4 px-4';
+  const cellPadding = isCompact ? 'py-1.5 px-2' : 'py-2 px-3';
+  const headerPadding = isCompact ? 'py-1.5 px-2' : 'py-2 px-3';
 
   // Mobile Card Component for Upgraded Table
   const MobileCard = ({ business, index }: { business: TableBusiness; index: number }) => {
@@ -384,95 +384,59 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-foreground">
-            {businesses.length} result{businesses.length !== 1 ? 's' : ''}
-          </span>
-          <span className="hidden md:inline text-xs text-muted-foreground">
-            Use <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↑</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">↓</kbd> or <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">j</kbd> <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">k</kbd> to navigate
-          </span>
-        </div>
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800/50 bg-zinc-900/50">
+        <span className="text-xs text-zinc-400">
+          {businesses.length.toLocaleString()} analyzed
+        </span>
         <button
           onClick={() => setIsCompact(!isCompact)}
-          className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${isCompact
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground hover:text-foreground'
+          className={`hidden md:flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${isCompact
+              ? 'bg-violet-600/20 text-violet-400'
+              : 'text-zinc-500 hover:text-zinc-300'
             }`}
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          Compact
+          {isCompact ? 'Compact' : 'Dense'}
         </button>
       </div>
 
-      {/* Data Quality Banner */}
-      {(reviewDataCount < businesses.length || websiteFailedCount > 0) && (
-        <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between">
-          <div className="flex items-center gap-4 text-xs">
-            <span className="text-amber-400 font-medium">Data Quality:</span>
-            <span className="text-amber-400/90 flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Review data: {reviewDataCount}/{businesses.length}
-            </span>
-            <span className="text-amber-400/90 flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-              </svg>
-              Websites analyzed: {websiteAnalyzedCount}/{businesses.length}
-            </span>
-            {websiteFailedCount > 0 && (
-              <span className="text-amber-400/90 flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                {websiteFailedCount} failed
-              </span>
-            )}
-          </div>
-          <span className="text-xs text-amber-400/80">
-            Missing data shown as &quot;No data&quot; with hover explanations
-          </span>
+      {/* Data Quality Banner - only show if significant issues */}
+      {websiteFailedCount > 3 && (
+        <div className="px-3 py-1 bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-4 text-[10px]">
+          <span className="text-amber-400">{websiteFailedCount} websites failed analysis</span>
         </div>
       )}
 
       {/* Filter Controls */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800/50 bg-zinc-900/30">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">
-            {enrichedBusinesses.length}/{businesses.length} businesses enriched
+          <span className="text-xs text-zinc-500">
+            {enrichedBusinesses.length}/{businesses.length} enriched
           </span>
           {pendingCount > 0 && (
-            <span className="text-xs text-primary flex items-center gap-1.5">
+            <span className="text-[10px] text-violet-400 flex items-center gap-1">
               <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {pendingCount} loading...
-            </span>
-          )}
-          {pendingCount === 0 && enrichedBusinesses.length > 0 && (
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              With review data: {reviewDataCount}
+              {pendingCount} loading
             </span>
           )}
         </div>
         <button
           onClick={handleSortToggle}
           disabled={pendingCount > 0}
-          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${sortByPriority
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-card text-foreground border border-input hover:bg-muted'
+          className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-all ${sortByPriority
+            ? 'bg-violet-600 text-white'
+            : 'text-zinc-400 hover:text-white'
             } ${pendingCount > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
           </svg>
-          {pendingCount > 0 ? 'Loading...' : sortByPriority ? 'Sorted by SEO Priority' : 'Sort by SEO Priority'}
+          {sortByPriority ? 'By Priority' : 'Sort'}
         </button>
       </div>
 
@@ -498,9 +462,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         </div>
 
         {/* Desktop Table View */}
-        <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse">
-          <thead className="sticky top-0 z-10 bg-card shadow-sm">
-            <tr className="border-b border-border">
+        <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-xs">
+          <thead className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-sm">
+            <tr className="border-b border-zinc-800/50">
               <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground w-12`}>
                 #
               </th>
@@ -676,8 +640,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   key={index}
                   data-row-index={index}
                   onClick={() => setFocusedRow(index)}
-                  className={`border-b border-border transition-colors cursor-pointer group ${isFocused ? 'bg-primary/10 ring-1 ring-inset ring-primary/30' :
-                      isPending ? 'bg-primary/5' : 'hover:bg-muted/30'
+                  className={`border-b border-zinc-800/30 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
+                      isPending ? 'bg-violet-500/5' : 'hover:bg-white/[0.02]'
                     }`}
                 >
                   <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
@@ -959,36 +923,48 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-4 border-t border-border">
-          <div className="text-sm text-muted-foreground">
-            Showing {startIndex + 1}-{Math.min(endIndex, displayedBusinesses.length)} of {displayedBusinesses.length}
+        <div className="flex items-center justify-between px-3 py-2 border-t border-zinc-800/50 bg-zinc-900/30">
+          <div className="text-xs text-zinc-500 tabular-nums">
+            {startIndex + 1}–{Math.min(endIndex, displayedBusinesses.length)} of {displayedBusinesses.length.toLocaleString()}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm font-medium rounded border border-input text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Previous
+              Prev
             </button>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 text-sm font-medium rounded ${currentPage === page
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-foreground hover:bg-muted'
-                    }`}
-                >
-                  {page}
-                </button>
-              ))}
+            <div className="flex items-center">
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                let page: number;
+                if (totalPages <= 7) {
+                  page = i + 1;
+                } else if (currentPage <= 4) {
+                  page = i + 1;
+                } else if (currentPage >= totalPages - 3) {
+                  page = totalPages - 6 + i;
+                } else {
+                  page = currentPage - 3 + i;
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-6 h-6 text-xs rounded ${currentPage === page
+                      ? 'bg-violet-600 text-white'
+                      : 'text-zinc-500 hover:text-white'
+                      }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
             </div>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm font-medium rounded border border-input text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Next
             </button>
