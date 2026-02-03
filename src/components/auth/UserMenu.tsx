@@ -38,8 +38,8 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
     // Sign out from Supabase
     await supabase.auth.signOut();
 
-    // Force a hard reload to homepage (replace prevents back button returning to old state)
-    window.location.replace('/');
+    // Force a hard reload to homepage root (explicitly use origin to clear all URL params)
+    window.location.replace(window.location.origin);
   };
 
   const userInitial = user.user_metadata?.full_name?.[0] || user.email?.[0] || '?';
