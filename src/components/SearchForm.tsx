@@ -361,8 +361,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             type="submit"
             disabled={isLoading || !isFormValid}
             className={`ml-auto px-4 py-1.5 text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${isFormValid
-                ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25'
-                : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+              ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25'
+              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
               }`}
           >
             {isLoading ? (
@@ -386,11 +386,11 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   // ============================================
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="w-full max-w-lg mx-auto px-4 sm:px-0">
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 sm:p-6 space-y-4">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-3 sm:p-6 space-y-3 sm:space-y-4">
 
         {/* Niche Input */}
         <div ref={nicheInputRef} className="relative">
-          <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wide">
+          <label className="block text-[10px] sm:text-[11px] font-medium text-zinc-500 mb-1 sm:mb-1.5 uppercase tracking-wide">
             Business Type
           </label>
           <input
@@ -444,7 +444,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
 
         {/* Location Section */}
         <div>
-          <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wide">
+          <label className="block text-[10px] sm:text-[11px] font-medium text-zinc-500 mb-1 sm:mb-1.5 uppercase tracking-wide">
             Location
           </label>
 
@@ -574,8 +574,8 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             type="submit"
             disabled={isLoading || !isFormValid}
             className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${isFormValid
-                ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25'
-                : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+              ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25'
+              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
               }`}
           >
             {isLoading ? (

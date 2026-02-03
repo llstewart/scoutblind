@@ -108,9 +108,9 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div
-          className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl"
+          className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl my-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

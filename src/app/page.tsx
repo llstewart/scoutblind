@@ -752,11 +752,11 @@ function HomeContent() {
               </div>
             )}
 
-            {/* Logo */}
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+            {/* Logo - Hidden on mobile to prevent duplication with header */}
+            <h1 className="hidden md:block text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
               TrueSignal<span className="text-violet-500">.</span>
             </h1>
-            <p className="text-zinc-400 text-lg mb-10 max-w-xl mx-auto">
+            <p className="text-zinc-400 text-base md:text-lg mb-8 max-w-xl mx-auto px-4">
               Find businesses that actually need your services. Powered by real signals, not guesswork.
             </p>
 
@@ -811,23 +811,23 @@ function HomeContent() {
 
             {/* Credit Usage Info - for logged-in users */}
             {user && (
-              <p className="mt-4 text-sm text-zinc-500">
+              <p className="mt-4 text-xs sm:text-sm text-zinc-500 px-4">
                 1 credit per search &bull; 1 credit per business analysis &bull; <span className="text-violet-400">{credits} credits remaining</span>
               </p>
             )}
 
             {/* How it works */}
-            <div className="mt-16 flex items-center justify-center gap-8 text-sm text-zinc-500">
+            <div className="mt-12 md:mt-16 flex flex-wrap justify-center gap-4 md:gap-8 text-sm text-zinc-500 px-4">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-xs font-medium">1</div>
                 <span>Search niche</span>
               </div>
-              <div className="w-8 h-px bg-zinc-800" />
+              <div className="hidden sm:block w-8 h-px bg-zinc-800" />
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-xs font-medium">2</div>
                 <span>Scan market</span>
               </div>
-              <div className="w-8 h-px bg-zinc-800" />
+              <div className="hidden sm:block w-8 h-px bg-zinc-800" />
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 text-xs font-medium">3</div>
                 <span>Find signals</span>
@@ -1005,7 +1005,7 @@ function HomeContent() {
             {/* Mobile Search Toggle */}
             <button
               onClick={() => setShowMobileSearch(!showMobileSearch)}
-              className="md:hidden p-2 text-zinc-400 hover:text-white"
+              className="md:hidden p-3 text-zinc-400 hover:text-white active:scale-95 transition-all"
               title={showMobileSearch ? "Close search" : "Open search"}
             >
               {showMobileSearch ? (
