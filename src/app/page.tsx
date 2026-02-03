@@ -13,6 +13,7 @@ import { UserMenu } from '@/components/auth/UserMenu';
 import { BillingModal } from '@/components/BillingModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { BusinessLookupModal } from '@/components/BusinessLookupModal';
+import { MobileDisclaimer } from '@/components/MobileDisclaimer';
 import { useUser } from '@/hooks/useUser';
 // Note: SessionIndicator removed - replaced by UserMenu
 import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
@@ -1413,6 +1414,9 @@ function HomeContent() {
           </div>
         </div>
       )}
+
+      {/* Mobile Disclaimer */}
+      <MobileDisclaimer />
     </div>
   );
 }
