@@ -73,6 +73,7 @@ function HomeContent() {
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showLookupModal, setShowLookupModal] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [tableBusinesses, setTableBusinesses] = useState<TableBusiness[]>([]);
@@ -999,8 +1000,26 @@ function HomeContent() {
               <span>Lookup</span>
             </button>
 
-            {/* Compact Search Form */}
-            <div className="flex-1 max-w-xl">
+
+            {/* Mobile Search Toggle */}
+            <button
+              onClick={() => setShowMobileSearch(!showMobileSearch)}
+              className="md:hidden p-2 text-zinc-400 hover:text-white"
+              title={showMobileSearch ? "Close search" : "Open search"}
+            >
+              {showMobileSearch ? (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              )}
+            </button>
+
+            {/* Compact Search Form (Desktop) */}
+            <div className="hidden md:block flex-1 max-w-xl">
               <SearchForm
                 onSearch={handleSearch}
                 isLoading={isSearching}
@@ -1075,6 +1094,21 @@ function HomeContent() {
             )}
           </div>
         </div>
+
+        {/* Mobile Search Overlay */}
+        {showMobileSearch && (
+          <div className="absolute top-full left-0 right-0 bg-[#0a0a0b] border-b border-zinc-800 p-4 shadow-2xl md:hidden z-40 animate-in slide-in-from-top-2">
+            <SearchForm
+              onSearch={async (n, l) => {
+                setShowMobileSearch(false);
+                await handleSearch(n, l);
+              }}
+              isLoading={isSearching}
+              initialNiche={searchParams?.niche}
+              initialLocation={searchParams?.location}
+            />
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -1102,22 +1136,20 @@ function HomeContent() {
               <div className="flex items-center gap-1 p-1 bg-zinc-900 rounded-lg border border-zinc-800 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('general')}
-                  className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${
-                    activeTab === 'general'
-                      ? 'bg-zinc-800 text-white shadow-sm'
-                      : 'text-zinc-400 hover:text-white'
-                  }`}
+                  className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${activeTab === 'general'
+                    ? 'bg-zinc-800 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
+                    }`}
                 >
                   All Results
                   <span className="ml-1.5 sm:ml-2 text-zinc-500">({businesses.length})</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('upgraded')}
-                  className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
-                    activeTab === 'upgraded'
-                      ? 'bg-zinc-800 text-white shadow-sm'
-                      : 'text-zinc-400 hover:text-white'
-                  }`}
+                  className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
+                    ? 'bg-zinc-800 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
+                    }`}
                 >
                   <span>Lead Intel</span>
                   {isPremium ? (
@@ -1229,11 +1261,10 @@ function HomeContent() {
 
             {/* Progress Bar */}
             {isAnalyzing && analyzeProgress && (
-              <div className={`p-3 rounded-lg border ${
-                analyzeProgress.firstPageComplete
-                  ? 'bg-emerald-500/5 border-emerald-500/20'
-                  : 'bg-violet-500/5 border-violet-500/20'
-              }`}>
+              <div className={`p-3 rounded-lg border ${analyzeProgress.firstPageComplete
+                ? 'bg-emerald-500/5 border-emerald-500/20'
+                : 'bg-violet-500/5 border-violet-500/20'
+                }`}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     {/* Phase indicators */}
@@ -1241,35 +1272,30 @@ function HomeContent() {
                       {[1, 2, 3].map((phase) => (
                         <div
                           key={phase}
-                          className={`w-2 h-2 rounded-full transition-all ${
-                            phase < (analyzeProgress.phase || 0)
-                              ? 'bg-emerald-500'
-                              : phase === analyzeProgress.phase
-                                ? 'bg-violet-500 animate-pulse'
-                                : 'bg-zinc-700'
-                          }`}
+                          className={`w-2 h-2 rounded-full transition-all ${phase < (analyzeProgress.phase || 0)
+                            ? 'bg-emerald-500'
+                            : phase === analyzeProgress.phase
+                              ? 'bg-violet-500 animate-pulse'
+                              : 'bg-zinc-700'
+                            }`}
                         />
                       ))}
                     </div>
-                    <span className={`text-sm font-medium ${
-                      analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-violet-400'
-                    }`}>
+                    <span className={`text-sm font-medium ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-violet-400'
+                      }`}>
                       {analyzeProgress.message}
                     </span>
                   </div>
-                  <span className={`text-sm ${
-                    analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-violet-400'
-                  }`}>
+                  <span className={`text-sm ${analyzeProgress.firstPageComplete ? 'text-emerald-400' : 'text-violet-400'
+                    }`}>
                     {analyzeProgress.completed}/{analyzeProgress.total}
                   </span>
                 </div>
-                <div className={`h-1 rounded-full ${
-                  analyzeProgress.firstPageComplete ? 'bg-emerald-500/20' : 'bg-violet-500/20'
-                }`}>
+                <div className={`h-1 rounded-full ${analyzeProgress.firstPageComplete ? 'bg-emerald-500/20' : 'bg-violet-500/20'
+                  }`}>
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      analyzeProgress.firstPageComplete ? 'bg-emerald-500' : 'bg-violet-500'
-                    }`}
+                    className={`h-full rounded-full transition-all duration-300 ${analyzeProgress.firstPageComplete ? 'bg-emerald-500' : 'bg-violet-500'
+                      }`}
                     style={{ width: `${(analyzeProgress.completed / analyzeProgress.total) * 100}%` }}
                   />
                 </div>
@@ -1277,11 +1303,10 @@ function HomeContent() {
             )}
 
             {/* Data Table */}
-            <div className={`bg-zinc-900/50 border rounded-lg overflow-hidden ${
-              activeTab === 'upgraded' && isPremium
-                ? 'border-violet-500/20'
-                : 'border-zinc-800'
-            }`}>
+            <div className={`bg-zinc-900/50 border rounded-lg overflow-hidden ${activeTab === 'upgraded' && isPremium
+              ? 'border-violet-500/20'
+              : 'border-zinc-800'
+              }`}>
               {activeTab === 'general' ? (
                 <GeneralListTable
                   businesses={businesses}
