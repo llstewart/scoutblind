@@ -125,6 +125,12 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept keyboard events when user is typing in an input or textarea
+      const activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        return;
+      }
+
       if (!tableRef.current?.contains(document.activeElement) && focusedRow === null) return;
 
       switch (e.key) {
