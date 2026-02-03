@@ -30,16 +30,26 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
   }, []);
 
   const handleSignOut = async () => {
-    // Clear all storage FIRST before signing out
-    sessionStorage.clear();
-    localStorage.removeItem('truesignal_session');
-    localStorage.removeItem('truesignal_sid');
+    // Clear all storage FIRST
+    try {
+      sessionStorage.clear();
+      localStorage.removeItem('truesignal_session');
+      localStorage.removeItem('truesignal_sid');
+    } catch (e) {
+      console.error('Failed to clear storage:', e);
+    }
 
-    // Sign out from Supabase
-    await supabase.auth.signOut();
+    // Sign out from Supabase (don't await - we want to redirect immediately)
+    // The redirect is more important than waiting for signOut to complete
+    supabase.auth.signOut().catch((e) => {
+      console.error('Sign out error:', e);
+    });
 
-    // Force a hard reload to homepage root (explicitly use origin to clear all URL params)
-    window.location.replace(window.location.origin);
+    // Force immediate redirect - this MUST happen regardless of signOut success
+    // Use setTimeout to ensure this runs even if there are sync issues
+    setTimeout(() => {
+      window.location.href = window.location.origin;
+    }, 0);
   };
 
   const userInitial = user.user_metadata?.full_name?.[0] || user.email?.[0] || '?';

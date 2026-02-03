@@ -43,11 +43,17 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
       }
 
       // Account deleted successfully - clear all local data and redirect
-      sessionStorage.clear();
-      localStorage.removeItem('truesignal_session');
-      localStorage.removeItem('truesignal_sid');
-      // Force a hard reload to homepage root (explicitly use origin to clear all URL params)
-      window.location.replace(window.location.origin);
+      try {
+        sessionStorage.clear();
+        localStorage.removeItem('truesignal_session');
+        localStorage.removeItem('truesignal_sid');
+      } catch (e) {
+        console.error('Failed to clear storage:', e);
+      }
+      // Force immediate redirect using setTimeout to ensure it runs
+      setTimeout(() => {
+        window.location.href = window.location.origin;
+      }, 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
       setIsDeleting(false);
