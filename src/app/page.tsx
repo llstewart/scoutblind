@@ -107,17 +107,38 @@ function HomeContent() {
   useEffect(() => {
     const checkout = urlSearchParams.get('checkout');
     if (checkout === 'success') {
-      // Refresh user data to get updated credits
-      refreshUser();
-      setToastMessage('Payment successful! Your credits have been added.');
-      // Clear the query parameter
+      // Clear the query parameter first
       const params = new URLSearchParams(window.location.search);
       params.delete('checkout');
       params.delete('session_id');
       const newUrl = params.toString() ? `?${params.toString()}` : '/';
       router.replace(newUrl, { scroll: false });
-      // Auto-hide toast after 5 seconds
-      setTimeout(() => setToastMessage(null), 5000);
+
+      // Poll for credit update (webhook may take a few seconds to process)
+      const pollForCredits = async () => {
+        const initialCredits = await getCredits();
+        setToastMessage('Processing payment...');
+
+        // Poll every 1 second for up to 10 seconds
+        for (let i = 0; i < 10; i++) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const currentCredits = await getCredits();
+          if (currentCredits > initialCredits) {
+            // Credits updated!
+            await refreshUser();
+            setToastMessage(`Payment successful! ${currentCredits - initialCredits} credits added.`);
+            setTimeout(() => setToastMessage(null), 5000);
+            return;
+          }
+        }
+
+        // Timeout - credits may still be processing
+        await refreshUser();
+        setToastMessage('Payment received! Credits may take a moment to appear.');
+        setTimeout(() => setToastMessage(null), 5000);
+      };
+
+      pollForCredits();
     } else if (checkout === 'canceled') {
       setToastMessage('Checkout was canceled.');
       // Clear the query parameter
@@ -127,7 +148,7 @@ function HomeContent() {
       router.replace(newUrl, { scroll: false });
       setTimeout(() => setToastMessage(null), 3000);
     }
-  }, [urlSearchParams, refreshUser, router]);
+  }, [urlSearchParams, refreshUser, router, getCredits]);
 
   // Fetch saved searches count - only for logged-in users
   const fetchSavedCount = useCallback(async () => {
@@ -202,30 +223,46 @@ function HomeContent() {
   // Determine if we're in "results mode" (compact header) or "hero mode" (full landing)
   const hasResults = businesses.length > 0;
 
-  // Initialize session ID and restore state
+  // Initialize session ID
   useEffect(() => {
-    // Get or create persistent session ID
     const sid = getSessionId();
     setSessionId(sid);
-
-    try {
-      const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
-      if (saved) {
-        const state: SessionState = JSON.parse(saved);
-        setBusinesses(state.businesses || []);
-        setTableBusinesses(state.tableBusinesses || []);
-        setSearchParams(state.searchParams);
-        setActiveTab(state.activeTab || 'general');
-        // Check if analysis was interrupted (had partial results)
-        if (state.wasAnalyzing && state.tableBusinesses && state.tableBusinesses.length > 0) {
-          setWasAnalysisInterrupted(true);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to restore session:', e);
-    }
     setIsInitialized(true);
   }, []);
+
+  // Restore state from sessionStorage ONLY if user is logged in
+  // This prevents showing old data after logout
+  useEffect(() => {
+    if (isAuthLoading) return; // Wait for auth to load
+
+    if (user) {
+      // User is logged in - try to restore session
+      try {
+        const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        if (saved) {
+          const state: SessionState = JSON.parse(saved);
+          setBusinesses(state.businesses || []);
+          setTableBusinesses(state.tableBusinesses || []);
+          setSearchParams(state.searchParams);
+          setActiveTab(state.activeTab || 'general');
+          // Check if analysis was interrupted (had partial results)
+          if (state.wasAnalyzing && state.tableBusinesses && state.tableBusinesses.length > 0) {
+            setWasAnalysisInterrupted(true);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to restore session:', e);
+      }
+    } else {
+      // User is logged out - clear sessionStorage and reset state
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      setBusinesses([]);
+      setTableBusinesses([]);
+      setSearchParams(null);
+      setActiveTab('general');
+      setSelectedBusinesses(new Set());
+    }
+  }, [user, isAuthLoading]);
 
   // Load saved analyses from database when search params change (paid subscribers only)
   useEffect(() => {
@@ -250,8 +287,11 @@ function HomeContent() {
     }
   }, [isAuthLoading, subscription]);
 
+  // Save state to sessionStorage - ONLY when user is logged in
+  // This prevents re-saving data after logout clears it
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitialized || !user) return; // Don't save if not logged in
+
     try {
       const state: SessionState = {
         businesses,
@@ -264,7 +304,7 @@ function HomeContent() {
     } catch (e) {
       console.error('Failed to save session:', e);
     }
-  }, [businesses, tableBusinesses, searchParams, activeTab, isInitialized, isAnalyzing]);
+  }, [businesses, tableBusinesses, searchParams, activeTab, isInitialized, isAnalyzing, user]);
 
   useEffect(() => {
     if (!isInitialized || !searchParams) return;
@@ -315,14 +355,20 @@ function HomeContent() {
     }
 
     // Get fresh credits from database
-    const currentCredits = await getCredits();
+    let currentCredits = await getCredits();
 
     // Check if user has credits
     if (currentCredits < 1) {
-      setSearchParams({ niche, location });
-      setError('You need 1 credit to search. Purchase more credits to continue.');
-      setShowBillingModal(true);
-      return;
+      // Refresh and re-check in case credits were just added
+      await refreshUser();
+      currentCredits = await getCredits();
+
+      if (currentCredits < 1) {
+        setSearchParams({ niche, location });
+        setError('You need 1 credit to search. Purchase more credits to continue.');
+        setShowBillingModal(true);
+        return;
+      }
     }
 
     if (searchControllerRef.current) {
@@ -376,13 +422,19 @@ function HomeContent() {
     }
 
     // Get fresh credits from database (not stale React state)
-    const currentCredits = await getCredits();
+    let currentCredits = await getCredits();
 
     // Check if user has credits (1 credit per search)
     if (currentCredits < 1) {
-      setError('You need 1 credit to search. Purchase more credits to continue.');
-      setShowBillingModal(true);
-      return;
+      // Refresh and re-check in case credits were just added
+      await refreshUser();
+      currentCredits = await getCredits();
+
+      if (currentCredits < 1) {
+        setError('You need 1 credit to search. Purchase more credits to continue.');
+        setShowBillingModal(true);
+        return;
+      }
     }
 
     if (searchControllerRef.current) searchControllerRef.current.abort();
@@ -502,12 +554,19 @@ function HomeContent() {
     const creditsNeeded = businessesToAnalyze.length;
 
     // Get fresh credits from database (not stale React state)
-    const currentCredits = await getCredits();
+    let currentCredits = await getCredits();
 
     if (currentCredits < creditsNeeded) {
-      setError(`You need ${creditsNeeded} credits to analyze ${businessesToAnalyze.length} businesses. You have ${currentCredits} credits remaining.`);
-      setShowBillingModal(true);
-      return;
+      // Refresh user state to update UI with latest credits
+      await refreshUser();
+      // Re-check credits in case they were updated
+      currentCredits = await getCredits();
+
+      if (currentCredits < creditsNeeded) {
+        setError(`You need ${creditsNeeded} credits to analyze ${businessesToAnalyze.length} businesses. You have ${currentCredits} credits remaining.`);
+        setShowBillingModal(true);
+        return;
+      }
     }
 
     // Deduct credits (server-side will also validate)

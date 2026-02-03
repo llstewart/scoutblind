@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Check, Zap, Loader2, CreditCard, Sparkles } from 'lucide-react';
 import { SUBSCRIPTION_TIERS, CREDIT_PACKS } from '@/lib/pricing';
+import { useUser } from '@/hooks/useUser';
 
 interface BillingModalProps {
   isOpen: boolean;
@@ -16,6 +17,24 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
   const [activeTab, setActiveTab] = useState<'plans' | 'credits'>('plans');
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [freshCredits, setFreshCredits] = useState<number | null>(null);
+
+  // Use the useUser hook to get fresh credits
+  const { getCredits } = useUser();
+
+  // Fetch fresh credits when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      getCredits().then(credits => {
+        setFreshCredits(credits);
+      });
+    } else {
+      setFreshCredits(null); // Reset when closed
+    }
+  }, [isOpen, getCredits]);
+
+  // Use fresh credits if available, otherwise fall back to props
+  const displayCredits = freshCredits !== null ? freshCredits : creditsRemaining;
 
   if (!isOpen) return null;
 
@@ -125,7 +144,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
               {SUBSCRIPTION_TIERS[currentTier as keyof typeof SUBSCRIPTION_TIERS]?.name || 'Free'}
               <span className="hidden sm:inline">{' '}&bull;{' '}</span>
               <span className="sm:hidden"> · </span>
-              {creditsRemaining} credits
+              {displayCredits} credits
             </p>
           </div>
           <button
