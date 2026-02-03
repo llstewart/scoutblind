@@ -50,6 +50,7 @@ async function runAnalysis({ endpoint, businesses, niche, location }) {
 
     const decoder = new TextDecoder();
     let buffer = '';
+    let completeSent = false; // Track if we already sent COMPLETE
 
     while (true) {
       const { done, value } = await reader.read();
@@ -109,7 +110,10 @@ async function runAnalysis({ endpoint, businesses, niche, location }) {
                 payload: { message: data.message }
               });
             } else if (data.type === 'complete') {
-              self.postMessage({ type: 'COMPLETE' });
+              if (!completeSent) {
+                self.postMessage({ type: 'COMPLETE' });
+                completeSent = true;
+              }
             }
           } catch (parseError) {
             console.error('[Worker] Failed to parse SSE data:', parseError);
@@ -118,8 +122,10 @@ async function runAnalysis({ endpoint, businesses, niche, location }) {
       }
     }
 
-    // Send final complete message
-    self.postMessage({ type: 'COMPLETE' });
+    // Only send COMPLETE if we haven't already (fallback for streams without explicit complete)
+    if (!completeSent) {
+      self.postMessage({ type: 'COMPLETE' });
+    }
 
   } catch (error) {
     self.postMessage({
