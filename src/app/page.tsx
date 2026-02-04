@@ -1070,6 +1070,16 @@ function HomeContent() {
     />
   );
 
+  // Handler to clear results and start new search
+  const handleNewSearch = () => {
+    setBusinesses([]);
+    setTableBusinesses([]);
+    setSearchParams(null);
+    setIsViewingSavedSearch(false);
+    setError(null);
+    router.replace('/');
+  };
+
   // Build the results component (when we have results)
   const resultsComponent = hasResults ? (
     <div className="space-y-4 p-4">
@@ -1307,16 +1317,6 @@ function HomeContent() {
       </div>
     </div>
   ) : null;
-
-  // Handler to clear results and start new search
-  const handleNewSearch = () => {
-    setBusinesses([]);
-    setTableBusinesses([]);
-    setSearchParams(null);
-    setIsViewingSavedSearch(false);
-    setError(null);
-    router.replace('/');
-  };
 
   // Search Tab content
   const searchTabContent = (
