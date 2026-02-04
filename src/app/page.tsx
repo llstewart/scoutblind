@@ -407,15 +407,17 @@ function HomeContent() {
 
   useEffect(() => {
     if (!isInitialized || !searchParams) return;
+    // Don't update URL when viewing saved search (navigation handles URL separately)
+    if (isViewingSavedSearch) return;
     const params = new URLSearchParams();
     params.set('niche', searchParams.niche);
     params.set('location', searchParams.location);
-    params.set('tab', activeTab);
+    params.set('view', activeTab); // Use 'view' to avoid collision with navigation 'tab'
     const newUrl = `?${params.toString()}`;
     if (window.location.search !== newUrl) {
       router.replace(newUrl, { scroll: false });
     }
-  }, [searchParams, activeTab, isInitialized, router]);
+  }, [searchParams, activeTab, isInitialized, router, isViewingSavedSearch]);
 
   useEffect(() => {
     if (!isInitialized || isAuthLoading) return;
@@ -423,9 +425,9 @@ function HomeContent() {
     if (isViewingSavedSearch) return;
     const niche = urlSearchParams.get('niche');
     const location = urlSearchParams.get('location');
-    const tab = urlSearchParams.get('tab') as TabType | null;
+    const view = urlSearchParams.get('view') as TabType | null; // Use 'view' param for results tab
     if (niche && location && businesses.length === 0 && !isSearching) {
-      if (tab) setActiveTab(tab);
+      if (view) setActiveTab(view);
       handleSearchFromUrl(niche, location);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1456,6 +1458,25 @@ function HomeContent() {
         }}
         // Force Library tab when viewing saved search to avoid race condition with URL update
         forceTab={isViewingSavedSearch && hasResults ? 'library' : undefined}
+        // Reset state when user explicitly navigates to a different tab
+        onTabChange={(tab) => {
+          if (tab === 'search' && isViewingSavedSearch) {
+            // User is navigating to Search tab while viewing a saved search
+            // Reset all search-related state for a fresh search
+            setBusinesses([]);
+            setTableBusinesses([]);
+            setSearchParams(null);
+            setIsViewingSavedSearch(false);
+            setError(null);
+            setActiveTab('general');
+          } else if (tab === 'library' && isViewingSavedSearch) {
+            // Navigating back to library list while viewing a search
+            setSearchParams(null);
+            setBusinesses([]);
+            setTableBusinesses([]);
+            setIsViewingSavedSearch(false);
+          }
+        }}
       >
         {{
           search: searchTabContent,

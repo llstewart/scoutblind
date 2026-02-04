@@ -38,14 +38,17 @@ export function useAppNavigation(): UseAppNavigationReturn {
     if (tab === 'search') {
       // Remove tab param for search (it's the default)
       params.delete('tab');
-    } else {
-      params.set('tab', tab);
-    }
-
-    // Keep other params like niche, location if on search tab
-    if (tab !== 'search') {
+      // Also clear search-related params when switching to search tab
+      // This ensures a clean state for new searches
       params.delete('niche');
       params.delete('location');
+      params.delete('view');
+    } else {
+      params.set('tab', tab);
+      // Clear search params when navigating away
+      params.delete('niche');
+      params.delete('location');
+      params.delete('view');
     }
 
     const newUrl = params.toString() ? `?${params.toString()}` : '/';

@@ -29,6 +29,8 @@ interface AppShellProps {
   // Force a specific tab to show (overrides URL-based navigation)
   // Use this to avoid race conditions when programmatically switching tabs
   forceTab?: AppTab;
+  // Callback when user explicitly navigates to a tab (not from URL restore)
+  onTabChange?: (tab: AppTab) => void;
 }
 
 export function AppShell({
@@ -40,15 +42,22 @@ export function AppShell({
   userName,
   onSearchSelect,
   forceTab,
+  onTabChange,
 }: AppShellProps) {
   const { activeTab: urlTab, setActiveTab } = useAppNavigation();
 
   // Use forceTab if provided (to avoid race conditions), otherwise use URL-based tab
   const activeTab = forceTab || urlTab;
 
+  // Wrap setActiveTab to also call onTabChange callback
+  const handleTabChange = (tab: AppTab) => {
+    setActiveTab(tab);
+    onTabChange?.(tab);
+  };
+
   const handleSearchSelect = (searchId: string) => {
     onSearchSelect?.(searchId);
-    setActiveTab('search');
+    handleTabChange('search');
   };
 
   return (
@@ -56,7 +65,7 @@ export function AppShell({
       {/* Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onSearchSelect={handleSearchSelect}
         recentSearches={recentSearches}
         credits={credits}
@@ -85,7 +94,7 @@ export function AppShell({
       {/* Mobile Bottom Navigation */}
       <BottomNav
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         libraryCount={libraryCount}
       />
     </div>
