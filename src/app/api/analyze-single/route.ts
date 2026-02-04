@@ -7,6 +7,7 @@ import { classifyLocationType } from '@/utils/address';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { checkRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
+import { deductCredits } from '@/lib/credits';
 
 interface AnalyzeSingleRequest {
   business: Business;
@@ -73,6 +74,24 @@ export async function POST(request: NextRequest) {
       creditsRequired: 1
     }, { status: 402 });
   }
+
+  // CRITICAL: Deduct credit SERVER-SIDE before starting analysis
+  const deductResult = await deductCredits(
+    user.id,
+    1,
+    'Single business analysis (Business Lookup)'
+  );
+
+  if (!deductResult.success) {
+    return NextResponse.json({
+      error: deductResult.error || 'Failed to deduct credit',
+      insufficientCredits: true,
+      creditsRemaining: deductResult.creditsRemaining,
+      creditsRequired: 1
+    }, { status: 402 });
+  }
+
+  console.log(`[Analyze Single] Deducted 1 credit for user ${user.id.slice(0, 8)} (${deductResult.creditsRemaining} remaining)`);
 
   try {
     const body: AnalyzeSingleRequest = await request.json();
@@ -168,6 +187,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       business: enrichedBusiness,
+      creditsDeducted: 1,
+      creditsRemaining: deductResult.creditsRemaining,
     });
   } catch (error) {
     console.error('[Analyze Single] Error:', error);

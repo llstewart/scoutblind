@@ -26,7 +26,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  const { deductCredit, getCredits, user, credits } = useUser();
+  const { refreshUser, user, credits } = useUser();
 
   const handleSearch = async () => {
     if (!businessName.trim() || !location.trim()) return;
@@ -37,7 +37,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
     setEnrichedBusiness(null);
 
     try {
-      // Search for the specific business (free - no credit cost)
+      // Search for the specific business (costs 1 credit - server-side deduction)
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,11 +49,22 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
       });
 
       if (!response.ok) {
-        throw new Error('Search failed');
+        const errorData = await response.json();
+        if (errorData.insufficientCredits) {
+          setError('Insufficient credits. Please purchase more.');
+          setState('error');
+          return;
+        }
+        throw new Error(errorData.error || 'Search failed');
       }
 
       const data = await response.json();
       const businesses: Business[] = data.businesses || [];
+
+      // Refresh UI to show updated credits (server deducted 1 credit)
+      if (!data.cached) {
+        refreshUser();
+      }
 
       if (businesses.length === 0) {
         setState('not-found');
@@ -69,6 +80,25 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
 
       setFoundBusiness(bestMatch);
       setState('found');
+
+      // Auto-save the found business to library (general list)
+      if (user && bestMatch) {
+        try {
+          await fetch('/api/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              niche: businessName.trim(),
+              location: location.trim(),
+              businesses: [bestMatch],
+            }),
+          });
+          console.log('[Lookup] Auto-saved business to library');
+          onSaved?.(); // Notify parent to refresh library
+        } catch (saveErr) {
+          console.error('[Lookup] Failed to auto-save:', saveErr);
+        }
+      }
     } catch (err) {
       console.error('Lookup error:', err);
       setError('Failed to search. Please try again.');
@@ -83,22 +113,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
     setError(null);
 
     try {
-      // Check if user has credits
-      const currentCredits = await getCredits();
-      if (currentCredits < 1) {
-        setError('Insufficient credits. Please purchase more.');
-        setState('found');
-        return;
-      }
-
-      // Deduct credit before analysis
-      const creditDeducted = await deductCredit(1);
-      if (!creditDeducted) {
-        setError('Failed to process credit. Please try again.');
-        setState('found');
-        return;
-      }
-
+      // Credits are now deducted server-side in /api/analyze-single
       const response = await fetch('/api/analyze-single', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,7 +132,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
           return;
         }
         if (errorData.insufficientCredits) {
-          setError('Insufficient credits. Please purchase more.');
+          setError(`Insufficient credits. You have ${errorData.creditsRemaining} but need ${errorData.creditsRequired}.`);
           setState('found');
           return;
         }
@@ -127,7 +142,29 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
       const data = await response.json();
       setEnrichedBusiness(data.business);
       setState('complete');
-      setIsSaved(false); // Reset save state for new analysis
+      setIsSaved(true); // Mark as saved since we auto-save now
+
+      // Refresh UI to show updated credits (server deducted 1 credit)
+      refreshUser();
+
+      // Auto-save the enriched business to library (merges with existing)
+      if (user && data.business) {
+        try {
+          await fetch('/api/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              niche: businessName.trim(),
+              location: location.trim(),
+              businesses: [data.business],
+            }),
+          });
+          console.log('[Lookup] Auto-saved enriched business to library');
+          onSaved?.(); // Notify parent to refresh library
+        } catch (saveErr) {
+          console.error('[Lookup] Failed to auto-save enriched:', saveErr);
+        }
+      }
     } catch (err) {
       console.error('Analysis error:', err);
       setError('Failed to analyze. Please try again.');
