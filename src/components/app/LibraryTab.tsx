@@ -282,8 +282,19 @@ export function LibraryTab({
                   {/* Status indicator */}
                   <div
                     className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-zinc-700'
+                      search.analyzedCount === search.totalCount && search.analyzedCount > 0
+                        ? 'bg-green-500' // Fully analyzed
+                        : search.analyzedCount > 0
+                          ? 'bg-violet-500' // Partially analyzed
+                          : 'bg-zinc-700' // Not analyzed
                     }`}
+                    title={
+                      search.analyzedCount === search.totalCount && search.analyzedCount > 0
+                        ? 'Fully analyzed'
+                        : search.analyzedCount > 0
+                          ? 'Partially analyzed'
+                          : 'Not analyzed'
+                    }
                   />
 
                   {/* Content - clickable */}
@@ -304,14 +315,16 @@ export function LibraryTab({
 
                       {/* Stats */}
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        {search.analyzedCount > 0 ? (
-                          <span className="text-[10px] text-violet-400 font-medium">
-                            {search.analyzedCount} analyzed
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-zinc-600">
-                            {search.totalCount} found
-                          </span>
+                        <span className="text-[10px] text-zinc-500">
+                          {search.totalCount} found
+                        </span>
+                        {search.analyzedCount > 0 && (
+                          <>
+                            <span className="text-[10px] text-zinc-700">·</span>
+                            <span className="text-[10px] text-violet-400 font-medium">
+                              {search.analyzedCount} analyzed
+                            </span>
+                          </>
                         )}
 
                         {/* Chevron */}

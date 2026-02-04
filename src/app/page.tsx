@@ -225,13 +225,12 @@ function HomeContent() {
         // Transform analyses object to list format for LibraryTab
         const searchesList = Object.entries(analyses).map(([key, value]: [string, any]) => {
           const [niche, location] = key.split('|');
-          const businesses = value.businesses || [];
           return {
             id: key,
             niche: niche || '',
             location: location || '',
-            totalCount: businesses.length,
-            analyzedCount: businesses.filter((b: any) => isEnrichedBusiness(b)).length,
+            totalCount: value.businessCount || 0,
+            analyzedCount: value.analyzedCount || 0,
             createdAt: new Date(value.createdAt || Date.now()),
             lastAccessed: new Date(value.lastAccessed || Date.now()),
           };
@@ -250,9 +249,9 @@ function HomeContent() {
     }
   }, [user]);
 
-  // Load saved analyses for current search - only for paid subscribers
+  // Load saved search from library - loads both general list and analyzed businesses
   const loadSavedAnalyses = useCallback(async (niche: string, location: string) => {
-    // Only load enriched data for paid subscribers
+    // Only load for paid subscribers (free users get 403 from API anyway)
     if (!user || !subscription || subscription.tier === 'free') return;
     setIsLoadingSaved(true);
     try {
@@ -262,11 +261,23 @@ function HomeContent() {
       if (response.ok) {
         const data = await response.json();
         if (data.businesses && data.businesses.length > 0) {
-          // Filter to only include actually enriched businesses
-          const enrichedBusinesses = data.businesses.filter((b: any) => isEnrichedBusiness(b));
+          const allBusinesses = data.businesses as (Business | EnrichedBusiness)[];
+          const enrichedBusinesses = allBusinesses.filter((b: any) => isEnrichedBusiness(b));
+
+          // Set ALL businesses for "All Results" tab (includes both basic and enriched)
+          // This ensures the count matches what's shown in library
+          setBusinesses(allBusinesses as Business[]);
+
+          // Set only enriched businesses for "Lead Intel" tab
+          setTableBusinesses(enrichedBusinesses as EnrichedBusiness[]);
+
+          console.log(`[Session] Loaded saved search: ${allBusinesses.length} total, ${enrichedBusinesses.length} analyzed`);
+
+          // Auto-switch to Lead Intel if there are analyzed businesses
           if (enrichedBusinesses.length > 0) {
-            console.log(`[Session] Loaded ${enrichedBusinesses.length} previously analyzed businesses`);
-            setTableBusinesses(enrichedBusinesses);
+            setActiveTab('upgraded');
+          } else {
+            setActiveTab('general');
           }
         }
         setIsSessionConnected(true);
@@ -279,26 +290,37 @@ function HomeContent() {
     }
   }, [user, subscription]);
 
-  // Save analyses to database - only for logged-in users
-  const saveAnalysesToSession = useCallback(async (businesses: EnrichedBusiness[]) => {
-    if (!user || !searchParams) return;
+  // Save businesses to database - works for both General List and Analyzed businesses
+  const saveToLibrary = useCallback(async (
+    businessesToSave: (Business | EnrichedBusiness)[],
+    niche: string,
+    location: string
+  ) => {
+    if (!user) return;
     try {
       await fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          niche: searchParams.niche,
-          location: searchParams.location,
-          businesses,
+          niche,
+          location,
+          businesses: businessesToSave,
         }),
       });
-      console.log(`[Session] Saved ${businesses.length} analyzed businesses`);
-      // Refresh saved count
+      console.log(`[Session] Saved ${businessesToSave.length} businesses to library`);
+      // Refresh library list and count
       fetchSavedCount();
+      fetchSavedSearchesList();
     } catch (error) {
-      console.error('[Session] Failed to save analyses:', error);
+      console.error('[Session] Failed to save to library:', error);
     }
-  }, [user, searchParams, fetchSavedCount]);
+  }, [user, fetchSavedCount, fetchSavedSearchesList]);
+
+  // Legacy wrapper for analysis saves (uses current searchParams)
+  const saveAnalysesToSession = useCallback(async (businesses: EnrichedBusiness[]) => {
+    if (!searchParams) return;
+    await saveToLibrary(businesses, searchParams.niche, searchParams.location);
+  }, [searchParams, saveToLibrary]);
 
   // Determine if we're in "results mode" (compact header) or "hero mode" (full landing)
   // Has results if we have businesses from search OR enriched data from saved search
@@ -565,8 +587,11 @@ function HomeContent() {
         refreshUser();
       }
 
-      // Refresh library list (no URL params - state is in React, not URL)
-      fetchSavedSearchesList();
+      // AUTO-SAVE: Save General List to library immediately
+      // This ensures users don't lose their search even if they close the tab
+      if (data.businesses && data.businesses.length > 0) {
+        saveToLibrary(data.businesses, niche, location);
+      }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
@@ -634,18 +659,15 @@ function HomeContent() {
     if (isLoadingSaved) return;
 
     setSearchParams({ niche, location });
-    setActiveTab('upgraded');
     setIsViewingSavedSearch(true); // Mark as viewing saved search
     setError(null);
 
-    // Clear existing data and load saved analyses directly (no API search)
-    setBusinesses([]); // General list empty for saved search view
-    setTableBusinesses([]); // Will be populated by loadSavedAnalyses
+    // Clear existing data before loading (loadSavedAnalyses will populate both lists)
+    setBusinesses([]);
+    setTableBusinesses([]);
 
-    // Navigate to library tab (no search params in URL - cleaner, no loops)
-    router.replace('/?tab=library');
-
-    // Load the saved analyzed businesses directly (no credit cost)
+    // Load the saved search (includes both general list and analyzed businesses)
+    // This will also set the appropriate active tab based on data
     await loadSavedAnalyses(niche, location);
   };
 
@@ -838,17 +860,17 @@ function HomeContent() {
       switch (type) {
         case 'STARTED':
           // Server deducted credits at start - track this to prevent double-deduction
-          if (payload.serverSideDeduction) {
+          if (payload?.serverSideDeduction) {
             serverDeductedCredits = true;
             console.log(`[Analysis] Server deducted ${payload.creditsDeducted} credits (${payload.creditsRemaining} remaining)`);
           }
           setAnalyzeProgress(prev => ({
             ...prev,
             completed: 0,
-            total: payload.total,
+            total: payload?.total || businessesToAnalyze.length,
             phase: 1,
             totalPhases: 3,
-            message: payload.message || 'Starting analysis...',
+            message: payload?.message || 'Starting analysis...',
           }));
           break;
 
@@ -946,7 +968,7 @@ function HomeContent() {
 
         case 'COMPLETE':
           // Server already deducted credits - just refresh UI
-          if (payload.serverSideDeduction) {
+          if (payload?.serverSideDeduction) {
             serverDeductedCredits = true;
           }
           await cleanup();

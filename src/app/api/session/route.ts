@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     // Get all saved searches for user
     const { data } = await supabase
       .from('saved_analyses')
-      .select('niche, location, businesses, business_count, updated_at')
+      .select('niche, location, businesses, business_count, created_at, updated_at')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
 
@@ -75,25 +75,30 @@ export async function GET(request: NextRequest) {
       location: string;
       businesses: (Business | EnrichedBusiness)[];
       businessCount: number;
-      analyzedAt: string;
+      createdAt: string;
+      lastAccessed: string;
       hasEnrichedData: boolean;
+      analyzedCount: number;
     }> = {};
 
     for (const row of data || []) {
       const searchKey = getSearchKey(row.niche, row.location);
       const businesses = row.businesses as (Business | EnrichedBusiness)[];
       // Check if any business has enriched data (has lastReviewDate or responseRate)
-      const hasEnrichedData = businesses.some(b =>
+      const enrichedBusinesses = businesses.filter(b =>
         'lastReviewDate' in b || 'responseRate' in b || 'searchVisibility' in b
       );
+      const hasEnrichedData = enrichedBusinesses.length > 0;
 
       analyses[searchKey] = {
         niche: row.niche,
         location: row.location,
         businesses,
         businessCount: row.business_count,
-        analyzedAt: row.updated_at,
+        createdAt: row.created_at,
+        lastAccessed: row.updated_at,
         hasEnrichedData,
+        analyzedCount: enrichedBusinesses.length,
       };
     }
 
