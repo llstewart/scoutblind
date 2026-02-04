@@ -453,7 +453,9 @@ function HomeContent() {
     const normalizedNiche = niche.toLowerCase().trim();
     const normalizedLocation = location.toLowerCase().trim();
 
-    // Deduplicate: If same search is already in-flight, ignore this request
+    // CRITICAL: Set in-flight marker IMMEDIATELY to prevent race conditions
+    // This must happen BEFORE any async operations to prevent double-clicks
+    // from triggering multiple searches
     if (
       inFlightSearchRef.current &&
       inFlightSearchRef.current.niche === normalizedNiche &&
@@ -463,8 +465,12 @@ function HomeContent() {
       return;
     }
 
+    // Mark as in-flight BEFORE any async work
+    inFlightSearchRef.current = { niche: normalizedNiche, location: normalizedLocation };
+
     // Require sign-in for all searches
     if (!user) {
+      inFlightSearchRef.current = null; // Clear marker on early exit
       setAuthMode('signup');
       setShowAuthModal(true);
       return;
@@ -476,6 +482,7 @@ function HomeContent() {
       currentCredits = await getCredits();
     } catch (err) {
       console.error('[Search] Error fetching credits:', err);
+      inFlightSearchRef.current = null; // Clear marker on error
       setError('Unable to verify credits. Please refresh the page and try again.');
       return;
     }
@@ -491,34 +498,42 @@ function HomeContent() {
       }
 
       if (currentCredits < 1) {
+        inFlightSearchRef.current = null; // Clear marker on early exit
         setError('You need 1 credit to search. Purchase more credits to continue.');
         setShowBillingModal(true);
         return;
       }
     }
 
-    if (searchControllerRef.current) searchControllerRef.current.abort();
-    if (analyzeControllerRef.current) analyzeControllerRef.current.abort();
+    // Don't abort if we're already searching (shouldn't happen with dedup, but be safe)
+    if (searchControllerRef.current && !searchControllerRef.current.signal.aborted) {
+      console.log('[Search] Aborting previous search controller');
+      searchControllerRef.current.abort();
+    }
+    if (analyzeControllerRef.current && !analyzeControllerRef.current.signal.aborted) {
+      analyzeControllerRef.current.abort();
+    }
 
     const controller = new AbortController();
     searchControllerRef.current = controller;
 
+    console.log('[Search] Starting search for:', normalizedNiche, normalizedLocation);
     setIsSearching(true);
     setIsAnalyzing(false);
     setError(null);
     setSearchParams({ niche, location });
     setIsViewingSavedSearch(false); // Fresh search, not viewing saved
 
-    // Mark search as in-flight (deduplication)
-    inFlightSearchRef.current = { niche: normalizedNiche, location: normalizedLocation };
-
     try {
+      console.log('[Search] Sending API request...');
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ niche, location }),
         signal: controller.signal,
       });
+
+      console.log('[Search] API response received, status:', response.status);
 
       if (!response.ok) {
         const data = await response.json();
@@ -533,6 +548,8 @@ function HomeContent() {
       }
 
       const data = await response.json();
+
+      console.log('[Search] Search successful, received', data.businesses?.length, 'businesses, cached:', data.cached);
 
       // Only clear and update on SUCCESS
       setBusinesses(data.businesses);
@@ -582,6 +599,7 @@ function HomeContent() {
       setError(errorMessage);
       // No credits deducted on failure
     } finally {
+      console.log('[Search] Search completed (finally block)');
       setIsSearching(false);
       inFlightSearchRef.current = null; // Clear in-flight marker
     }
