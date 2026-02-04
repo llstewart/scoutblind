@@ -615,6 +615,7 @@ function HomeContent() {
       setSelectedBusinesses(new Set());
       setIsCached(data.cached || false);
       setActiveTab('general');
+      setIsViewingSavedSearch(false);
 
       // Deduct credit only on SUCCESS and only if not cached (fresh search)
       if (!data.cached) {
@@ -624,6 +625,10 @@ function HomeContent() {
         }
         refreshUser();
       }
+
+      // Refresh library list and switch to Library tab to show results
+      fetchSavedSearchesList();
+      router.replace(`/?niche=${encodeURIComponent(niche)}&location=${encodeURIComponent(location)}&tab=library`);
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
@@ -694,8 +699,8 @@ function HomeContent() {
     setBusinesses([]); // General list empty for saved search view
     setTableBusinesses([]); // Will be populated by loadSavedAnalyses
 
-    // Update URL for bookmarking/sharing
-    router.replace(`?niche=${encodeURIComponent(niche)}&location=${encodeURIComponent(location)}&tab=upgraded`);
+    // Update URL - switch to library tab to show results there
+    router.replace(`/?niche=${encodeURIComponent(niche)}&location=${encodeURIComponent(location)}&tab=library`);
 
     // Load the saved analyzed businesses directly (no credit cost)
     await loadSavedAnalyses(niche, location);
@@ -1318,34 +1323,34 @@ function HomeContent() {
     </div>
   ) : null;
 
-  // Search Tab content
+  // Handler to go back to library list
+  const handleBackToLibraryList = () => {
+    setSearchParams(null);
+    setBusinesses([]);
+    setTableBusinesses([]);
+    setIsViewingSavedSearch(false);
+    router.replace('/?tab=library');
+  };
+
+  // Search Tab content - always clean, just the search form
   const searchTabContent = (
     <>
       {isSearching ? (
         <div className="py-16">
-          <LoadingState message="Searching businesses..." />
-        </div>
-      ) : isLoadingSaved && isViewingSavedSearch ? (
-        <div className="py-16">
-          <LoadingState message="Loading saved search..." />
+          <LoadingState message="Scanning Google Business Profiles..." />
         </div>
       ) : (
         <SearchTab
           searchForm={searchFormComponent}
-          results={resultsComponent}
           recentSearches={recentSearches}
           onRecentSearchClick={(search) => handleLoadFromHistory(search.niche, search.location)}
           onLookupClick={() => setShowLookupModal(true)}
-          onNewSearch={handleNewSearch}
-          hasResults={hasResults}
           credits={credits}
-          isViewingSavedSearch={isViewingSavedSearch}
-          savedSearchNiche={searchParams?.niche}
-          savedSearchLocation={searchParams?.location}
+          isSearching={isSearching}
         />
       )}
-      {/* Error in hero state */}
-      {!hasResults && error && (
+      {/* Error display */}
+      {error && (
         <div className="max-w-2xl mx-auto px-4">
           <div className="p-4 bg-red-500/10 rounded-lg text-red-400 text-sm">
             {error}
@@ -1355,7 +1360,7 @@ function HomeContent() {
     </>
   );
 
-  // Library Tab content
+  // Library Tab content - includes results when viewing a search
   const libraryTabContent = (
     <LibraryTab
       searches={savedSearchesList}
@@ -1363,6 +1368,11 @@ function HomeContent() {
       onSearchClick={handleLibrarySearchClick}
       onDeleteSearch={handleDeleteSearch}
       onClearAll={handleClearAllSearches}
+      // Detail view props
+      activeSearch={hasResults ? searchParams : null}
+      resultsContent={hasResults ? resultsComponent : undefined}
+      onBackToList={handleBackToLibraryList}
+      isLoadingResults={isLoadingSaved}
     />
   );
 

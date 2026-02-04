@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { TabContent, TabHeader } from './AppShell';
+import { useState, useMemo, ReactNode } from 'react';
+import { TabContent } from './AppShell';
 
 interface SavedSearch {
   id: string;
@@ -19,6 +19,11 @@ interface LibraryTabProps {
   onSearchClick: (search: SavedSearch) => void;
   onDeleteSearch?: (searchId: string) => void;
   onClearAll?: () => void;
+  // For detail view
+  activeSearch?: { niche: string; location: string } | null;
+  resultsContent?: ReactNode;
+  onBackToList?: () => void;
+  isLoadingResults?: boolean;
 }
 
 // Helper to group searches by time period
@@ -68,6 +73,10 @@ export function LibraryTab({
   onSearchClick,
   onDeleteSearch,
   onClearAll,
+  activeSearch,
+  resultsContent,
+  onBackToList,
+  isLoadingResults = false,
 }: LibraryTabProps) {
   const [searchFilter, setSearchFilter] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -83,11 +92,72 @@ export function LibraryTab({
 
   const groupedSearches = useMemo(() => groupSearchesByTime(filteredSearches), [filteredSearches]);
 
+  // ==================== DETAIL VIEW ====================
+  if (activeSearch && resultsContent) {
+    return (
+      <div className="min-h-full flex flex-col">
+        {/* Header for detail view */}
+        <div className="sticky top-0 z-40 bg-[#0f0f10]/95 backdrop-blur-sm border-b border-zinc-800/50">
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-3">
+              {/* Back button */}
+              <button
+                onClick={onBackToList}
+                className="p-1.5 -ml-1.5 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800/50"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              {/* Search info */}
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm font-medium text-white truncate">
+                  {activeSearch.niche}
+                </h2>
+                <p className="text-xs text-zinc-500 truncate">
+                  {activeSearch.location}
+                </p>
+              </div>
+
+              {/* GMB Signal badge */}
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-violet-500/10 rounded-md">
+                <svg className="w-3.5 h-3.5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span className="text-[10px] font-medium text-violet-400 uppercase tracking-wide">GMB Signals</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Results content */}
+        <div className="flex-1">
+          {isLoadingResults ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="text-center">
+                <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-sm text-zinc-500">Loading GMB analysis data...</p>
+              </div>
+            </div>
+          ) : (
+            resultsContent
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ==================== LIST VIEW ====================
+
   // Loading state
   if (isLoading) {
     return (
       <TabContent>
-        <TabHeader title="Library" subtitle="Your saved searches and analyses" />
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-white">Library</h1>
+          <p className="text-xs text-zinc-500 mt-1">Your GMB prospect research</p>
+        </div>
         <div className="flex items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
         </div>
@@ -99,16 +169,19 @@ export function LibraryTab({
   if (searches.length === 0) {
     return (
       <TabContent>
-        <TabHeader title="Library" subtitle="Your saved searches and analyses" />
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-white">Library</h1>
+          <p className="text-xs text-zinc-500 mt-1">Your GMB prospect research</p>
+        </div>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-zinc-800/50 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          <div className="w-14 h-14 rounded-xl bg-zinc-800/50 flex items-center justify-center mb-4">
+            <svg className="w-7 h-7 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-white mb-2">No searches yet</h3>
-          <p className="text-sm text-zinc-500 max-w-sm">
-            Your searches will appear here. Go to the Search tab to find businesses in your target market.
+          <h3 className="text-base font-medium text-white mb-1">No prospects yet</h3>
+          <p className="text-xs text-zinc-500 max-w-xs">
+            Search for businesses in the Search tab to find prospects with weak GMB presence.
           </p>
         </div>
       </TabContent>
@@ -117,44 +190,47 @@ export function LibraryTab({
 
   return (
     <TabContent>
-      <TabHeader
-        title="Library"
-        subtitle={`${searches.length} saved ${searches.length === 1 ? 'search' : 'searches'}`}
-        actions={
-          <div className="flex items-center gap-2">
-            {onClearAll && searches.length > 0 && (
-              <button
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to clear all saved searches? This cannot be undone.')) {
-                    onClearAll();
-                  }
-                }}
-                className="px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-red-400 transition-colors"
-              >
-                Clear all
-              </button>
-            )}
-            {onDeleteSearch && (
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                  isEditing
-                    ? 'bg-violet-500/10 text-violet-400'
-                    : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                {isEditing ? 'Done' : 'Edit'}
-              </button>
-            )}
-          </div>
-        }
-      />
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h1 className="text-xl font-bold text-white">Library</h1>
+          <p className="text-xs text-zinc-500 mt-0.5">
+            {searches.length} {searches.length === 1 ? 'market' : 'markets'} researched
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {onClearAll && searches.length > 0 && (
+            <button
+              onClick={() => {
+                if (window.confirm('Clear all saved research? This cannot be undone.')) {
+                  onClearAll();
+                }
+              }}
+              className="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-red-400 transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+          {onDeleteSearch && (
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className={`px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+                isEditing
+                  ? 'bg-violet-500/10 text-violet-400'
+                  : 'text-zinc-500 hover:text-white'
+              }`}
+            >
+              {isEditing ? 'Done' : 'Edit'}
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Search filter */}
       <div className="mb-4">
         <div className="relative">
           <svg
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -165,8 +241,8 @@ export function LibraryTab({
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Filter..."
-            className="w-full pl-8 pr-3 py-2 text-sm bg-zinc-800/50 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+            placeholder="Filter markets..."
+            className="w-full pl-8 pr-3 py-2 text-xs bg-zinc-800/50 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
           />
         </div>
       </div>
@@ -174,7 +250,7 @@ export function LibraryTab({
       {/* No results for filter */}
       {filteredSearches.length === 0 && searchFilter && (
         <div className="text-center py-8">
-          <p className="text-zinc-500">No searches match &quot;{searchFilter}&quot;</p>
+          <p className="text-xs text-zinc-500">No markets match &quot;{searchFilter}&quot;</p>
         </div>
       )}
 
@@ -189,7 +265,7 @@ export function LibraryTab({
               {periodSearches.map((search) => (
                 <div
                   key={search.id}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-zinc-900/30 hover:bg-zinc-800/50 transition-colors group"
+                  className="flex items-center gap-2 px-2.5 py-2.5 rounded-lg bg-zinc-900/30 hover:bg-zinc-800/50 transition-colors group"
                 >
                   {/* Delete button (edit mode) */}
                   {isEditing && onDeleteSearch && (
@@ -205,7 +281,7 @@ export function LibraryTab({
 
                   {/* Status indicator */}
                   <div
-                    className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-zinc-700'
                     }`}
                   />
@@ -218,42 +294,38 @@ export function LibraryTab({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-zinc-200 truncate">
+                        <p className="text-sm font-medium text-zinc-200 truncate">
                           {search.niche}
                         </p>
-                        <p className="text-[10px] text-zinc-600 truncate">
-                          {search.location} · {search.totalCount} found
-                          {search.analyzedCount > 0 && ` · ${search.analyzedCount} analyzed`}
+                        <p className="text-[10px] text-zinc-500 truncate">
+                          {search.location}
                         </p>
                       </div>
 
-                      {/* Progress/status */}
-                      {search.analyzedCount > 0 && search.analyzedCount < search.totalCount && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <div className="w-10 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-violet-500 rounded-full"
-                              style={{ width: `${(search.analyzedCount / search.totalCount) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
+                      {/* Stats */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {search.analyzedCount > 0 ? (
+                          <span className="text-[10px] text-violet-400 font-medium">
+                            {search.analyzedCount} analyzed
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-zinc-600">
+                            {search.totalCount} found
+                          </span>
+                        )}
 
-                      {search.analyzedCount === search.totalCount && search.analyzedCount > 0 && (
-                        <span className="text-[10px] text-emerald-500">Done</span>
-                      )}
-
-                      {/* Chevron */}
-                      {!isEditing && (
-                        <svg
-                          className="w-3.5 h-3.5 text-zinc-700 group-hover:text-zinc-500 transition-colors flex-shrink-0"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      )}
+                        {/* Chevron */}
+                        {!isEditing && (
+                          <svg
+                            className="w-4 h-4 text-zinc-700 group-hover:text-zinc-500 transition-colors"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        )}
+                      </div>
                     </div>
                   </button>
                 </div>
