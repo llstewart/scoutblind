@@ -298,7 +298,8 @@ function HomeContent() {
   }, [user, searchParams, fetchSavedCount]);
 
   // Determine if we're in "results mode" (compact header) or "hero mode" (full landing)
-  const hasResults = businesses.length > 0;
+  // Has results if we have businesses from search OR enriched data from saved search
+  const hasResults = businesses.length > 0 || (isViewingSavedSearch && tableBusinesses.length > 0);
 
   // Initialize session ID
   useEffect(() => {
@@ -398,6 +399,8 @@ function HomeContent() {
 
   useEffect(() => {
     if (!isInitialized || isAuthLoading) return;
+    // Don't trigger search when viewing saved search (we load data directly, no API call)
+    if (isViewingSavedSearch) return;
     const niche = urlSearchParams.get('niche');
     const location = urlSearchParams.get('location');
     const tab = urlSearchParams.get('tab') as TabType | null;
@@ -406,7 +409,7 @@ function HomeContent() {
       handleSearchFromUrl(niche, location);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialized, isAuthLoading, urlSearchParams, businesses.length, isSearching, user]);
+  }, [isInitialized, isAuthLoading, urlSearchParams, businesses.length, isSearching, user, isViewingSavedSearch]);
 
   // Warn user before leaving page during analysis
   useEffect(() => {
@@ -680,15 +683,22 @@ function HomeContent() {
     setShowUpgradeModal(false);
   };
 
-  // Load a search from saved history
+  // Load a search from saved history (no credit cost - just loads saved data)
   const handleLoadFromHistory = async (niche: string, location: string) => {
     setSearchParams({ niche, location });
     setActiveTab('upgraded');
     setIsViewingSavedSearch(true); // Mark as viewing saved search
-    // Search will be triggered by URL params, and saved analyses will load via useEffect
+    setError(null);
+
+    // Clear existing data and load saved analyses directly (no API search)
+    setBusinesses([]); // General list empty for saved search view
+    setTableBusinesses([]); // Will be populated by loadSavedAnalyses
+
+    // Update URL for bookmarking/sharing
     router.replace(`?niche=${encodeURIComponent(niche)}&location=${encodeURIComponent(location)}&tab=upgraded`);
-    // Trigger a fresh search to populate the general list
-    handleSearch(niche, location);
+
+    // Load the saved analyzed businesses directly (no credit cost)
+    await loadSavedAnalyses(niche, location);
   };
 
   // Handle clicking a search from Library tab
@@ -1130,8 +1140,8 @@ function HomeContent() {
             <span className="hidden sm:inline">Export</span>
           </button>
 
-          {/* Analyze Button */}
-          {activeTab === 'general' && (
+          {/* Analyze Button - only show when we have businesses to analyze */}
+          {activeTab === 'general' && businesses.length > 0 && (
             isPremium ? (
               <button
                 onClick={handleAnalyze}
@@ -1240,11 +1250,32 @@ function HomeContent() {
         : ''
         }`}>
         {activeTab === 'general' ? (
-          <GeneralListTable
-            businesses={businesses}
-            selectedBusinesses={selectedBusinesses}
-            onSelectionChange={setSelectedBusinesses}
-          />
+          isViewingSavedSearch && businesses.length === 0 ? (
+            // Viewing saved search - no general list available
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-medium text-zinc-300 mb-1">Viewing Saved Search</h3>
+              <p className="text-xs text-zinc-500 max-w-xs mb-4">
+                This is your saved analysis data. Run a new search to see all results.
+              </p>
+              <button
+                onClick={handleNewSearch}
+                className="px-4 py-2 text-xs font-medium text-violet-400 hover:text-violet-300 transition-colors"
+              >
+                Start New Search
+              </button>
+            </div>
+          ) : (
+            <GeneralListTable
+              businesses={businesses}
+              selectedBusinesses={selectedBusinesses}
+              onSelectionChange={setSelectedBusinesses}
+            />
+          )
         ) : !isPremium ? (
           <PremiumGate
             onUpgradeClick={handleUpgradeClick}
@@ -1293,6 +1324,10 @@ function HomeContent() {
       {isSearching ? (
         <div className="py-16">
           <LoadingState message="Searching businesses..." />
+        </div>
+      ) : isLoadingSaved && isViewingSavedSearch ? (
+        <div className="py-16">
+          <LoadingState message="Loading saved search..." />
         </div>
       ) : (
         <SearchTab
