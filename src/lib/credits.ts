@@ -163,21 +163,20 @@ export async function deductCredits(
     return deductCreditsWithRetry(userId, amount, description, 1);
   }
 
-  // Log the transaction
-
-  await (supabase as any)
-    .from('credit_transactions')
-    .insert({
-      user_id: userId,
-      amount: -amount, // Negative for deduction
-      type: 'usage',
-      description,
-      balance_after: updated.credits_remaining + updated.credits_purchased,
-    })
-    .catch((err: Error) => {
-      // Don't fail the deduction if logging fails
-      console.error('[Credits] Failed to log transaction:', err);
-    });
+  // Log the transaction (don't fail deduction if logging fails)
+  try {
+    await (supabase as any)
+      .from('credit_transactions')
+      .insert({
+        user_id: userId,
+        amount: -amount, // Negative for deduction
+        type: 'usage',
+        description,
+        balance_after: updated.credits_remaining + updated.credits_purchased,
+      });
+  } catch (err) {
+    console.error('[Credits] Failed to log transaction:', err);
+  }
 
   console.log(`[Credits] Deducted ${amount} credits from user ${userId.slice(0, 8)}: ${totalCredits} -> ${updated.credits_remaining + updated.credits_purchased}`);
 
@@ -276,16 +275,19 @@ async function deductCreditsWithRetry(
   }
 
 
-  await (supabase as any)
-    .from('credit_transactions')
-    .insert({
-      user_id: userId,
-      amount: -amount,
-      type: 'usage',
-      description,
-      balance_after: updated.credits_remaining + updated.credits_purchased,
-    })
-    .catch((err: Error) => console.error('[Credits] Failed to log transaction:', err));
+  try {
+    await (supabase as any)
+      .from('credit_transactions')
+      .insert({
+        user_id: userId,
+        amount: -amount,
+        type: 'usage',
+        description,
+        balance_after: updated.credits_remaining + updated.credits_purchased,
+      });
+  } catch (err) {
+    console.error('[Credits] Failed to log transaction:', err);
+  }
 
   console.log(`[Credits] Deducted ${amount} credits from user ${userId.slice(0, 8)} (retry ${attempt})`);
 
@@ -347,17 +349,19 @@ export async function refundCredits(
   }
 
   // Log the refund
-
-  await (supabase as any)
-    .from('credit_transactions')
-    .insert({
-      user_id: userId,
-      amount: amount, // Positive for refund
-      type: 'refund',
-      description,
-      balance_after: refunded.credits_remaining + refunded.credits_purchased,
-    })
-    .catch((err: Error) => console.error('[Credits] Failed to log refund:', err));
+  try {
+    await (supabase as any)
+      .from('credit_transactions')
+      .insert({
+        user_id: userId,
+        amount: amount, // Positive for refund
+        type: 'refund',
+        description,
+        balance_after: refunded.credits_remaining + refunded.credits_purchased,
+      });
+  } catch (err) {
+    console.error('[Credits] Failed to log refund:', err);
+  }
 
   console.log(`[Credits] Refunded ${amount} credits to user ${userId.slice(0, 8)}`);
 

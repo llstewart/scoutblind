@@ -4,7 +4,7 @@ import { SearchRequest, SearchResponse, Business } from '@/lib/types';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { checkRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
-import { deductCredits } from '@/lib/credits';
+import { deductCredits, refundCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
 
 export async function POST(request: NextRequest) {
@@ -69,7 +69,22 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Search API] Deducted 1 credit for user ${user.id.slice(0, 8)} (${deductResult.creditsRemaining} remaining)`);
 
-    const businesses = await searchGoogleMaps(body.niche, body.location, 25);
+    // Call Outscraper API - if this fails, we need to refund the credit
+    let businesses: Business[];
+    try {
+      businesses = await searchGoogleMaps(body.niche, body.location, 25);
+    } catch (searchError) {
+      // Outscraper failed - refund the credit
+      console.error('[Search API] Outscraper failed, refunding credit:', searchError);
+      await refundCredits(
+        user.id,
+        1,
+        `Refund: Search failed for "${body.niche}" in "${body.location}"`
+      );
+
+      // Re-throw to be caught by outer catch
+      throw searchError;
+    }
 
     // Cache the results
     await cache.set(cacheKey, businesses, CACHE_TTL.SEARCH_RESULTS);
