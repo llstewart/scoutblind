@@ -1065,13 +1065,15 @@ function HomeContent() {
   // ============================================
 
   // Build the search form component
+  // Search form should be clean when viewing saved searches (those show in Library)
+  // Only show initial values for active/new searches
   const searchFormComponent = (
     <SearchForm
       onSearch={handleSearch}
       isLoading={isSearching}
-      initialNiche={searchParams?.niche}
-      initialLocation={searchParams?.location}
-      compact={hasResults}
+      initialNiche={isViewingSavedSearch ? undefined : searchParams?.niche}
+      initialLocation={isViewingSavedSearch ? undefined : searchParams?.location}
+      compact={false} // Search tab form is never compact
     />
   );
 
@@ -1405,6 +1407,8 @@ function HomeContent() {
             handleLoadFromHistory(search.niche, search.location);
           }
         }}
+        // Force Library tab when viewing saved search to avoid race condition with URL update
+        forceTab={isViewingSavedSearch && hasResults ? 'library' : undefined}
       >
         {{
           search: searchTabContent,

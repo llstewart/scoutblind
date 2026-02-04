@@ -26,6 +26,9 @@ interface AppShellProps {
   tier: string;
   userName?: string;
   onSearchSelect?: (searchId: string) => void;
+  // Force a specific tab to show (overrides URL-based navigation)
+  // Use this to avoid race conditions when programmatically switching tabs
+  forceTab?: AppTab;
 }
 
 export function AppShell({
@@ -36,8 +39,12 @@ export function AppShell({
   tier,
   userName,
   onSearchSelect,
+  forceTab,
 }: AppShellProps) {
-  const { activeTab, setActiveTab } = useAppNavigation();
+  const { activeTab: urlTab, setActiveTab } = useAppNavigation();
+
+  // Use forceTab if provided (to avoid race conditions), otherwise use URL-based tab
+  const activeTab = forceTab || urlTab;
 
   const handleSearchSelect = (searchId: string) => {
     onSearchSelect?.(searchId);
