@@ -15,22 +15,13 @@ interface SavedSearch {
 }
 
 interface AppShellProps {
-  children: {
-    search: ReactNode;
-    library: ReactNode;
-    account: ReactNode;
-  };
+  children: ReactNode;
   recentSearches?: SavedSearch[];
   libraryCount?: number;
   credits: number;
   tier: string;
   userName?: string;
   onSearchSelect?: (searchId: string) => void;
-  // Force a specific tab to show (overrides URL-based navigation)
-  // Use this to avoid race conditions when programmatically switching tabs
-  forceTab?: AppTab;
-  // Callback when user explicitly navigates to a tab (not from URL restore)
-  onTabChange?: (tab: AppTab) => void;
 }
 
 export function AppShell({
@@ -41,23 +32,16 @@ export function AppShell({
   tier,
   userName,
   onSearchSelect,
-  forceTab,
-  onTabChange,
 }: AppShellProps) {
-  const { activeTab: urlTab, setActiveTab } = useAppNavigation();
-
-  // Use forceTab if provided (to avoid race conditions), otherwise use URL-based tab
-  const activeTab = forceTab || urlTab;
-
-  // Wrap setActiveTab to also call onTabChange callback
-  const handleTabChange = (tab: AppTab) => {
-    setActiveTab(tab);
-    onTabChange?.(tab);
-  };
+  const { activeTab, setActiveTab } = useAppNavigation();
 
   const handleSearchSelect = (searchId: string) => {
     onSearchSelect?.(searchId);
-    handleTabChange('search');
+    // Don't change tabs - saved searches are viewed in the Library tab
+    // If not already on library, navigate there
+    if (activeTab !== 'library') {
+      setActiveTab('library');
+    }
   };
 
   return (
@@ -65,7 +49,7 @@ export function AppShell({
       {/* Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        onTabChange={handleTabChange}
+        onTabChange={setActiveTab}
         onSearchSelect={handleSearchSelect}
         recentSearches={recentSearches}
         credits={credits}
@@ -84,9 +68,7 @@ export function AppShell({
               </div>
             }
           >
-            {activeTab === 'search' && children.search}
-            {activeTab === 'library' && children.library}
-            {activeTab === 'account' && children.account}
+            {children}
           </Suspense>
         </div>
       </main>
@@ -94,7 +76,7 @@ export function AppShell({
       {/* Mobile Bottom Navigation */}
       <BottomNav
         activeTab={activeTab}
-        onTabChange={handleTabChange}
+        onTabChange={setActiveTab}
         libraryCount={libraryCount}
       />
     </div>

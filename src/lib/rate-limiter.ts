@@ -63,18 +63,42 @@ export class Semaphore {
 }
 
 /**
+ * Check if an error is a DNS/network resolution error
+ * These errors need longer delays as they indicate infrastructure issues
+ */
+export function isDnsError(error: Error): boolean {
+  const message = error.message || '';
+  const cause = (error as any).cause?.message || (error as any).cause?.code || '';
+
+  return (
+    message.includes('ENOTFOUND') ||
+    message.includes('getaddrinfo') ||
+    message.includes('DNS') ||
+    message.includes('EAI_AGAIN') ||
+    cause.includes('ENOTFOUND') ||
+    cause.includes('getaddrinfo')
+  );
+}
+
+/**
  * Calculate delay with exponential backoff and jitter
+ * DNS errors get extra delay since they need infrastructure to recover
  */
 export function calculateBackoffDelay(
   attempt: number,
-  options: RetryOptions
+  options: RetryOptions,
+  error?: Error
 ): number {
   const exponentialDelay = Math.min(
     options.baseDelayMs * Math.pow(2, attempt),
     options.maxDelayMs
   );
   const jitter = Math.random() * options.jitterMs;
-  return exponentialDelay + jitter;
+
+  // DNS errors get 50% extra delay to allow infrastructure to recover
+  const dnsMultiplier = error && isDnsError(error) ? 1.5 : 1;
+
+  return Math.round(exponentialDelay * dnsMultiplier + jitter);
 }
 
 /**
@@ -102,7 +126,8 @@ export async function withRetry<T>(
       lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt < opts.maxRetries) {
-        const delayMs = calculateBackoffDelay(attempt, opts);
+        // Pass error to calculate delay - DNS errors get longer delays
+        const delayMs = calculateBackoffDelay(attempt, opts, lastError);
         onRetry?.(attempt + 1, lastError, delayMs);
         await sleep(delayMs);
       }

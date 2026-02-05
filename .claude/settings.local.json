@@ -17,7 +17,13 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(dir:*)",
-      "Bash(npx next build:*)"
+      "Bash(npx next build:*)",
+      "Bash(nslookup:*)",
+      "WebSearch",
+      "WebFetch(domain:app.outscraper.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:outscraper.com)"
     ]
   }
 }

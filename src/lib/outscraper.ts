@@ -1,23 +1,34 @@
 import { Business } from './types';
 import { withRetry, Semaphore, sleep, RetryOptions } from './rate-limiter';
 
-const OUTSCRAPER_SEARCH_URL = 'https://api.app.outscraper.com/maps/search-v3';
-const OUTSCRAPER_REVIEWS_URL = 'https://api.app.outscraper.com/maps/reviews-v3';
+// Outscraper has multiple API endpoints for redundancy (from their official Python SDK)
+// We try them in order if one fails
+// Note: api.outscraper.net is currently the primary working endpoint (as of Feb 2025)
+const OUTSCRAPER_API_URLS = [
+  'https://api.outscraper.net',           // Primary - currently working
+  'https://api.app.outscraper.com',       // Fallback 1
+  'https://api.app.outscraper.cloud',     // Fallback 2
+];
+
+const SEARCH_ENDPOINT = '/maps/search-v3';
+const REVIEWS_ENDPOINT = '/maps/reviews-v3';
 
 // Rate limiting configuration for Outscraper API
 const SEARCH_API_TIMEOUT_MS = 30000; // 30 seconds for search
 const REVIEWS_API_TIMEOUT_MS = 20000; // 20 seconds (reduced from 45s)
 
+// Retry options optimized for serverless DNS issues
+// DNS failures need longer delays to allow resolution to recover
 const SEARCH_RETRY_OPTIONS: Partial<RetryOptions> = {
-  maxRetries: 2,
-  baseDelayMs: 1000,
-  maxDelayMs: 3000,
-  jitterMs: 300,
+  maxRetries: 3,        // 4 total attempts
+  baseDelayMs: 2000,    // Start with 2s delay
+  maxDelayMs: 8000,     // Cap at 8s
+  jitterMs: 500,        // Add randomness to avoid thundering herd
 };
 const REVIEWS_RETRY_OPTIONS: Partial<RetryOptions> = {
-  maxRetries: 2,
-  baseDelayMs: 1500,
-  maxDelayMs: 5000,
+  maxRetries: 3,        // 4 total attempts
+  baseDelayMs: 2000,
+  maxDelayMs: 8000,
   jitterMs: 500,
 };
 
@@ -75,6 +86,7 @@ interface OutscraperReviewsResponse {
 
 /**
  * Internal function to make a single search API request
+ * Tries multiple API URLs for redundancy (like Outscraper's official SDK)
  */
 async function searchGoogleMapsInternal(
   searchQuery: string,
@@ -87,37 +99,57 @@ async function searchGoogleMapsInternal(
     async: 'false',
   });
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), SEARCH_API_TIMEOUT_MS);
+  let lastError: Error | null = null;
 
-  try {
-    const response = await fetch(`${OUTSCRAPER_SEARCH_URL}?${params}`, {
-      method: 'GET',
-      headers: {
-        'X-API-KEY': apiKey,
-      },
-      signal: controller.signal,
-    });
+  // Try each API URL in order
+  for (const baseUrl of OUTSCRAPER_API_URLS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), SEARCH_API_TIMEOUT_MS);
 
-    clearTimeout(timeoutId);
+    try {
+      const url = `${baseUrl}${SEARCH_ENDPOINT}?${params}`;
+      console.log(`[Outscraper] Trying: ${baseUrl}`);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Outscraper API error: ${response.status} - ${errorText}`);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey,
+          'client': 'TrueSignal',
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Outscraper API error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      // Outscraper returns results in a nested array structure
+      const places: OutscraperRawPlace[] = data.data?.[0] || data.data || [];
+
+      console.log(`[Outscraper] Found ${places.length} places via ${baseUrl}`);
+
+      return places.map(parseOutscraperPlace);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Log the failure and try next URL
+      console.log(`[Outscraper] Failed with ${baseUrl}: ${lastError.message}`);
+
+      // Continue to next URL unless it's a non-recoverable error (like bad API key)
+      if (lastError.message.includes('401') || lastError.message.includes('403')) {
+        throw lastError; // Don't retry auth errors
+      }
     }
-
-    const data = await response.json();
-
-    // Outscraper returns results in a nested array structure
-    const places: OutscraperRawPlace[] = data.data?.[0] || data.data || [];
-
-    console.log(`[Outscraper] Found ${places.length} places`);
-
-    return places.map(parseOutscraperPlace);
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
   }
+
+  // All URLs failed
+  throw lastError || new Error('All Outscraper API endpoints failed');
 }
 
 export async function searchGoogleMaps(
@@ -179,6 +211,7 @@ function parseOutscraperPlace(place: OutscraperRawPlace): Business {
 
 /**
  * Internal function to make a single reviews API request
+ * Tries multiple API URLs for redundancy (like Outscraper's official SDK)
  */
 async function fetchReviewsInternal(
   placeIdOrName: string,
@@ -192,112 +225,128 @@ async function fetchReviewsInternal(
     async: 'false',
   });
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REVIEWS_API_TIMEOUT_MS);
+  let lastError: Error | null = null;
 
-  try {
-    const response = await fetch(`${OUTSCRAPER_REVIEWS_URL}?${params}`, {
-      method: 'GET',
-      headers: {
-        'X-API-KEY': apiKey,
-      },
-      signal: controller.signal,
-    });
+  // Try each API URL in order
+  for (const baseUrl of OUTSCRAPER_API_URLS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REVIEWS_API_TIMEOUT_MS);
 
-    clearTimeout(timeoutId);
+    try {
+      const url = `${baseUrl}${REVIEWS_ENDPOINT}?${params}`;
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey,
+          'client': 'TrueSignal',
+        },
+        signal: controller.signal,
+      });
 
-    const data = await response.json();
+      clearTimeout(timeoutId);
 
-    // Outscraper returns results in various nested structures - handle them all
-    let place: OutscraperReviewsResponse | null = null;
-
-    if (data.data?.[0]?.[0]) {
-      place = data.data[0][0];
-    } else if (data.data?.[0] && !Array.isArray(data.data[0])) {
-      place = data.data[0];
-    } else if (Array.isArray(data.data) && data.data.length > 0) {
-      place = data.data[0];
-    } else if (data.reviews_data) {
-      place = data;
-    }
-
-    if (!place) {
-      // Return empty but valid result - no data found
-      return {
-        lastReviewDate: null,
-        lastOwnerActivity: null,
-        responseRate: 0,
-        reviewCount: 0,
-      };
-    }
-
-    const reviews = place.reviews_data || [];
-
-    if (reviews.length === 0) {
-      return {
-        lastReviewDate: null,
-        lastOwnerActivity: null,
-        responseRate: 0,
-        reviewCount: 0,
-      };
-    }
-
-    // Calculate last review date
-    let lastReviewDate: Date | null = null;
-    for (const review of reviews) {
-      if (review.review_datetime_utc) {
-        const reviewDate = new Date(review.review_datetime_utc);
-        if (!lastReviewDate || reviewDate > lastReviewDate) {
-          lastReviewDate = reviewDate;
-        }
-      } else if (review.review_timestamp) {
-        const reviewDate = new Date(review.review_timestamp * 1000);
-        if (!lastReviewDate || reviewDate > lastReviewDate) {
-          lastReviewDate = reviewDate;
-        }
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
-    }
 
-    // Calculate last owner activity and response rate
-    let lastOwnerActivity: Date | null = null;
-    let repliedCount = 0;
+      const data = await response.json();
 
-    for (const review of reviews) {
-      if (review.owner_answer && review.owner_answer.trim().length > 0) {
-        repliedCount++;
+      // Outscraper returns results in various nested structures - handle them all
+      let place: OutscraperReviewsResponse | null = null;
 
-        if (review.owner_answer_timestamp_datetime_utc) {
-          const replyDate = new Date(review.owner_answer_timestamp_datetime_utc);
-          if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
-            lastOwnerActivity = replyDate;
+      if (data.data?.[0]?.[0]) {
+        place = data.data[0][0];
+      } else if (data.data?.[0] && !Array.isArray(data.data[0])) {
+        place = data.data[0];
+      } else if (Array.isArray(data.data) && data.data.length > 0) {
+        place = data.data[0];
+      } else if (data.reviews_data) {
+        place = data;
+      }
+
+      if (!place) {
+        // Return empty but valid result - no data found
+        return {
+          lastReviewDate: null,
+          lastOwnerActivity: null,
+          responseRate: 0,
+          reviewCount: 0,
+        };
+      }
+
+      const reviews = place.reviews_data || [];
+
+      if (reviews.length === 0) {
+        return {
+          lastReviewDate: null,
+          lastOwnerActivity: null,
+          responseRate: 0,
+          reviewCount: 0,
+        };
+      }
+
+      // Calculate last review date
+      let lastReviewDate: Date | null = null;
+      for (const review of reviews) {
+        if (review.review_datetime_utc) {
+          const reviewDate = new Date(review.review_datetime_utc);
+          if (!lastReviewDate || reviewDate > lastReviewDate) {
+            lastReviewDate = reviewDate;
           }
-        } else if (review.owner_answer_timestamp) {
-          const replyDate = new Date(review.owner_answer_timestamp * 1000);
-          if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
-            lastOwnerActivity = replyDate;
+        } else if (review.review_timestamp) {
+          const reviewDate = new Date(review.review_timestamp * 1000);
+          if (!lastReviewDate || reviewDate > lastReviewDate) {
+            lastReviewDate = reviewDate;
           }
         }
       }
+
+      // Calculate last owner activity and response rate
+      let lastOwnerActivity: Date | null = null;
+      let repliedCount = 0;
+
+      for (const review of reviews) {
+        if (review.owner_answer && review.owner_answer.trim().length > 0) {
+          repliedCount++;
+
+          if (review.owner_answer_timestamp_datetime_utc) {
+            const replyDate = new Date(review.owner_answer_timestamp_datetime_utc);
+            if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
+              lastOwnerActivity = replyDate;
+            }
+          } else if (review.owner_answer_timestamp) {
+            const replyDate = new Date(review.owner_answer_timestamp * 1000);
+            if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
+              lastOwnerActivity = replyDate;
+            }
+          }
+        }
+      }
+
+      const responseRate = reviews.length > 0
+        ? Math.round((repliedCount / reviews.length) * 100)
+        : 0;
+
+      return {
+        lastReviewDate,
+        lastOwnerActivity,
+        responseRate,
+        reviewCount: reviews.length,
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Continue to next URL unless it's a non-recoverable error
+      if (lastError.message.includes('401') || lastError.message.includes('403')) {
+        throw lastError; // Don't retry auth errors
+      }
     }
-
-    const responseRate = reviews.length > 0
-      ? Math.round((repliedCount / reviews.length) * 100)
-      : 0;
-
-    return {
-      lastReviewDate,
-      lastOwnerActivity,
-      responseRate,
-      reviewCount: reviews.length,
-    };
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
   }
+
+  // All URLs failed
+  throw lastError || new Error('All Outscraper API endpoints failed');
 }
 
 /**

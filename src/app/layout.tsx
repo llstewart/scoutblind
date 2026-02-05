@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Locus - Market Intelligence for SEO Agencies',
+  title: 'TrueSignal - Market Intelligence for SEO Agencies',
   description: 'Identify high-propensity leads with Hidden Signals analysis',
 };
 
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-background text-foreground font-sans">
-        <main className="min-h-screen">{children}</main>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
 export type AppTab = 'search' | 'library' | 'account';
 
@@ -15,72 +15,48 @@ interface UseAppNavigationReturn {
 
 export function useAppNavigation(): UseAppNavigationReturn {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  // Initialize from URL or default to 'search'
-  const getInitialTab = (): AppTab => {
-    const tabParam = searchParams.get('tab');
-    if (tabParam === 'library' || tabParam === 'account') {
-      return tabParam;
-    }
+  // Derive active tab from pathname
+  const getActiveTab = (): AppTab => {
+    if (pathname === '/library') return 'library';
+    if (pathname === '/account') return 'account';
     return 'search';
   };
 
-  const [activeTab, setActiveTabState] = useState<AppTab>(getInitialTab);
+  const activeTab = getActiveTab();
 
-  // Sync URL when tab changes
+  // Navigate to a specific tab via route
   const setActiveTab = useCallback((tab: AppTab) => {
-    setActiveTabState(tab);
-
-    // Update URL without full navigation
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (tab === 'search') {
-      // Remove tab param for search (it's the default)
-      params.delete('tab');
-      // Also clear search-related params when switching to search tab
-      // This ensures a clean state for new searches
-      params.delete('niche');
-      params.delete('location');
-      params.delete('view');
-    } else {
-      params.set('tab', tab);
-      // Clear search params when navigating away
-      params.delete('niche');
-      params.delete('location');
-      params.delete('view');
+    switch (tab) {
+      case 'library':
+        router.push('/library');
+        break;
+      case 'account':
+        router.push('/account');
+        break;
+      case 'search':
+      default:
+        router.push('/');
+        break;
     }
-
-    const newUrl = params.toString() ? `?${params.toString()}` : '/';
-    router.replace(newUrl, { scroll: false });
-  }, [router, searchParams]);
-
-  // Sync state when URL changes externally
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    if (tabParam === 'library' || tabParam === 'account') {
-      setActiveTabState(tabParam);
-    } else {
-      setActiveTabState('search');
-    }
-  }, [searchParams]);
+  }, [router]);
 
   const navigateToSearch = useCallback((searchId?: string) => {
-    setActiveTabState('search');
     if (searchId) {
-      router.replace(`/?search=${searchId}`, { scroll: false });
+      router.push(`/?search=${searchId}`);
     } else {
-      router.replace('/', { scroll: false });
+      router.push('/');
     }
   }, [router]);
 
   const navigateToLibrary = useCallback(() => {
-    setActiveTab('library');
-  }, [setActiveTab]);
+    router.push('/library');
+  }, [router]);
 
   const navigateToAccount = useCallback(() => {
-    setActiveTab('account');
-  }, [setActiveTab]);
+    router.push('/account');
+  }, [router]);
 
   return {
     activeTab,
