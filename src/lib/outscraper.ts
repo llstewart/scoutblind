@@ -8,16 +8,18 @@ const OUTSCRAPER_REVIEWS_URL = 'https://api.app.outscraper.com/maps/reviews-v3';
 const SEARCH_API_TIMEOUT_MS = 30000; // 30 seconds for search
 const REVIEWS_API_TIMEOUT_MS = 20000; // 20 seconds (reduced from 45s)
 
+// Retry options optimized for serverless DNS issues
+// DNS failures need longer delays to allow resolution to recover
 const SEARCH_RETRY_OPTIONS: Partial<RetryOptions> = {
-  maxRetries: 2,
-  baseDelayMs: 1000,
-  maxDelayMs: 3000,
-  jitterMs: 300,
+  maxRetries: 3,        // 4 total attempts
+  baseDelayMs: 2000,    // Start with 2s delay
+  maxDelayMs: 8000,     // Cap at 8s
+  jitterMs: 500,        // Add randomness to avoid thundering herd
 };
 const REVIEWS_RETRY_OPTIONS: Partial<RetryOptions> = {
-  maxRetries: 2,
-  baseDelayMs: 1500,
-  maxDelayMs: 5000,
+  maxRetries: 3,        // 4 total attempts
+  baseDelayMs: 2000,
+  maxDelayMs: 8000,
   jitterMs: 500,
 };
 
