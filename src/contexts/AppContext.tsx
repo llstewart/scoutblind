@@ -6,7 +6,7 @@ import { useUser } from '@/hooks/useUser';
 import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
-type TabType = 'general' | 'upgraded';
+type TabType = 'general' | 'upgraded' | 'market';
 
 const SESSION_STORAGE_KEY = 'truesignal_session';
 const PERSISTENT_SESSION_ID_KEY = 'truesignal_sid';

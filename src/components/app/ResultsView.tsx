@@ -1,11 +1,14 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useAppContext } from '@/contexts/AppContext';
 import { GeneralListTable } from '@/components/GeneralListTable';
 import { UpgradedListTable } from '@/components/UpgradedListTable';
 import { PremiumGate } from '@/components/PremiumGate';
 import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/types';
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
+
+const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
 
 export function ResultsView() {
   const {
@@ -89,6 +92,18 @@ export function ResultsView() {
               <span className="text-zinc-500">({tableBusinesses.length})</span>
             )}
           </button>
+          <button
+            onClick={() => setActiveTab('market')}
+            className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
+              ? 'bg-zinc-800 text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white'
+              }`}
+          >
+            <span>Market</span>
+            <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400">
+              NEW
+            </span>
+          </button>
         </div>
 
         {/* Actions */}
@@ -118,7 +133,7 @@ export function ResultsView() {
                 exportGeneralListToCSV(businesses, searchParams?.niche, searchParams?.location);
               }
             }}
-            disabled={activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b))}
+            disabled={activeTab === 'market' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
             className="px-3 py-2 text-sm font-medium rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-all flex items-center gap-2 disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,7 +246,12 @@ export function ResultsView() {
         </div>
       )}
 
-      {/* Data Table */}
+      {/* Data Table / Market Dashboard */}
+      {activeTab === 'market' ? (
+        <div className="bg-zinc-900/30 rounded-xl shadow-lg shadow-black/20 p-4">
+          <MarketDashboard />
+        </div>
+      ) : (
       <div className={`bg-zinc-900/60 rounded-xl shadow-lg shadow-black/20 overflow-hidden ${activeTab === 'upgraded' && isPremium
         ? 'ring-1 ring-violet-500/20'
         : ''
@@ -281,10 +301,15 @@ export function ResultsView() {
           />
         )}
       </div>
+      )}
 
       {/* Footer Summary */}
       <div className="text-center text-sm text-zinc-500 pb-4">
-        {activeTab === 'general' ? (
+        {activeTab === 'market' ? (
+          <span>
+            Market insights for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
+          </span>
+        ) : activeTab === 'general' ? (
           <span>
             Showing {businesses.length} businesses for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
           </span>
