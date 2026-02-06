@@ -21,7 +21,7 @@ const faqItems = [
   },
   {
     q: 'Is the data accurate?',
-    a: 'We pull data directly from Google Maps and business profiles in real-time. Signals like review counts, response rates, and rankings reflect current public data. We don\'t guarantee 100% accuracy but our data is consistently reliable.',
+    a: 'TrueSignal employs high-performance algorithms that integrate real-time GMB data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence. We prioritize high-integrity data to ensure you are always working with a reliable competitive advantage.',
   },
   {
     q: 'Can I export my data?',
@@ -354,7 +354,7 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
                 onClick={onSignUp}
                 className="w-full py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
               >
-                Start Free Trial
+                Start Now
               </button>
             </div>
 
@@ -379,7 +379,7 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
                 onClick={onSignUp}
                 className="w-full py-2 text-sm font-medium text-white bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
               >
-                Start Free Trial
+                Start Now
               </button>
             </div>
           </div>
