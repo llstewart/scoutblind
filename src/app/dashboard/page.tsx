@@ -149,7 +149,10 @@ function DashboardContent() {
         <SearchTab
           searchForm={searchFormComponent}
           recentSearches={recentSearches}
-          onRecentSearchClick={(search) => handleLoadFromHistory(search.niche, search.location)}
+          onRecentSearchClick={(search) => {
+            handleLoadFromHistory(search.niche, search.location);
+            router.push('/library');
+          }}
           onLookupClick={() => setShowLookupModal(true)}
           credits={credits}
           isSearching={isSearching}
