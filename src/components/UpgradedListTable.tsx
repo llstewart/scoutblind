@@ -10,6 +10,10 @@ import {
   sortBySeoPriority,
   getSeoNeedSummary,
   calculateSeoNeedScore,
+  SIGNAL_CATEGORY_COLORS,
+  SIGNAL_CATEGORY_LABELS,
+  type CategorizedSignals,
+  type SignalCategory,
 } from '@/lib/signals';
 
 interface UpgradedListTableProps {
@@ -199,8 +203,13 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   const MobileCard = ({ business, index }: { business: TableBusiness; index: number }) => {
     const isPending = isPendingBusiness(business);
     const isEnriched = !isPending && isEnrichedBusiness(business);
-    const signals = isEnriched ? getSeoNeedSummary(business as EnrichedBusiness) : [];
+    const categorizedSignals = isEnriched ? getSeoNeedSummary(business as EnrichedBusiness) : { groups: [], totalCount: 0 };
     const score = isEnriched ? calculateSeoNeedScore(business as EnrichedBusiness) : 0;
+
+    // Flatten signals with category info for mobile display
+    const flatSignals = categorizedSignals.groups.flatMap(g =>
+      g.signals.map(s => ({ category: g.category, text: s }))
+    );
 
     return (
       <div
@@ -250,15 +259,19 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <CellSpinner /> Analyzing signals...
                 </div>
-              ) : isEnriched && signals.length > 0 ? (
+              ) : isEnriched && flatSignals.length > 0 ? (
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {signals.slice(0, 3).map((signal, i) => (
-                    <span key={i} className="inline-block px-2 py-0.5 text-[10px] bg-rose-500/10 text-rose-400 rounded border border-rose-500/20">
-                      {signal}
-                    </span>
-                  ))}
-                  {signals.length > 3 && (
-                    <span className="text-[10px] text-muted-foreground px-1 py-0.5">+{signals.length - 3} more</span>
+                  {flatSignals.slice(0, 3).map((signal, i) => {
+                    const colors = SIGNAL_CATEGORY_COLORS[signal.category];
+                    return (
+                      <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded border ${colors.bg} ${colors.border}`}>
+                        <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
+                        <span className={colors.text}>{signal.text}</span>
+                      </span>
+                    );
+                  })}
+                  {flatSignals.length > 3 && (
+                    <span className="text-[10px] text-muted-foreground px-1 py-0.5">+{flatSignals.length - 3} more</span>
                   )}
                 </div>
               ) : isEnriched ? (
@@ -631,9 +644,14 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             {currentBusinesses.map((business, index) => {
               const isPending = isPendingBusiness(business);
               const isEnriched = !isPending && isEnrichedBusiness(business);
-              const signals = isEnriched ? getSeoNeedSummary(business as EnrichedBusiness) : [];
+              const categorizedSignals = isEnriched ? getSeoNeedSummary(business as EnrichedBusiness) : { groups: [], totalCount: 0 };
               const score = isEnriched ? calculateSeoNeedScore(business as EnrichedBusiness) : 0;
               const isFocused = focusedRow === index;
+
+              // Flatten signals with category info for expand/collapse
+              const flatSignals = categorizedSignals.groups.flatMap(g =>
+                g.signals.map(s => ({ category: g.category, text: s }))
+              );
 
               return (
                 <tr
@@ -673,17 +691,21 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                             </span>
                           </span>
                         )}
-                        {signals.length > 0 ? (
+                        {flatSignals.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {(expandedSignals.has(startIndex + index) ? signals : signals.slice(0, 3)).map((signal, i) => (
-                              <span
-                                key={i}
-                                className="inline-block px-2 py-0.5 text-xs bg-rose-500/10 text-rose-400 rounded"
-                              >
-                                {signal}
-                              </span>
-                            ))}
-                            {signals.length > 3 && (
+                            {(expandedSignals.has(startIndex + index) ? flatSignals : flatSignals.slice(0, 3)).map((signal, i) => {
+                              const colors = SIGNAL_CATEGORY_COLORS[signal.category];
+                              return (
+                                <span
+                                  key={i}
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded ${colors.bg}`}
+                                >
+                                  <span className={`text-[10px] font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
+                                  <span className={colors.text}>{signal.text}</span>
+                                </span>
+                              );
+                            })}
+                            {flatSignals.length > 3 && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -693,7 +715,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                               >
                                 {expandedSignals.has(startIndex + index)
                                   ? 'Show less'
-                                  : `+${signals.length - 3} more`}
+                                  : `+${flatSignals.length - 3} more`}
                               </button>
                             )}
                           </div>
