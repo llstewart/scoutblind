@@ -25,7 +25,9 @@
       "WebFetch(domain:pypi.org)",
       "WebFetch(domain:outscraper.com)",
       "Bash(ls:*)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(node -e:*)",
+      "Bash(del:*)"
     ]
   }
 }

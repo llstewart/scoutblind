@@ -25,7 +25,7 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
         <Link href="/" className="text-xl font-bold text-white">
           Scoutblind<span className="text-violet-500">.</span>
         </Link>
-        <div className="flex items-center gap-3">
+        <nav aria-label="Main navigation" className="flex items-center gap-3">
           {isLoggedIn ? (
             <Link
               href="/dashboard"
@@ -67,7 +67,7 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
               )}
             </>
           )}
-        </div>
+        </nav>
       </div>
     </header>
   );

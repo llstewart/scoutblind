@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   keywords: ['SEO prospecting', 'Google Business Profile', 'GMB signals', 'SEO leads', 'local SEO', 'SEO agency tool', 'lead generation', 'business intelligence'],
   authors: [{ name: 'Scoutblind' }],
   creator: 'Scoutblind',
+  alternates: {
+    canonical: siteUrl,
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -21,27 +24,11 @@ export const metadata: Metadata = {
     siteName: 'Scoutblind',
     title: 'Scoutblind - Find SEO Prospects in Half the Time',
     description: 'Scan Google Business Profiles to find businesses with weak SEO presence. The signals you hunt for — automated.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Scoutblind - Market Intelligence for SEO Agencies',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Scoutblind - Find SEO Prospects in Half the Time',
     description: 'Scan Google Business Profiles to find businesses with weak SEO presence. The signals you hunt for — automated.',
-    images: ['/og-image.png'],
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '32x32' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
   other: {
