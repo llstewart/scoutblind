@@ -203,12 +203,12 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
             </div>
 
             <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-white mb-4 tracking-tight leading-[1.1]">
-              These businesses need SEO help.{' '}
-              <span className="text-violet-400">Someone will pitch them.</span>
+              Find SEO prospects{' '}
+              <span className="text-violet-400">in half the time</span>
             </h1>
 
             <p className="text-base md:text-lg text-zinc-400 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Every market has businesses with unclaimed profiles, dead review pages, and zero local ranking. Scoutblind finds them before you waste hours looking manually.
+              Scan Google Business Profiles to identify businesses with weak GMB presence, poor review engagement, and local SEO gaps. The signals you hunt for — automated.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3 mb-8">
@@ -494,45 +494,7 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
       </section>
 
       {/* ────────────────────────────────────────────────────────────────
-          3. SOCIAL PROOF — Real voices, not vanity metrics
-          ──────────────────────────────────────────────────────────────── */}
-      <section className="py-10 border-t border-zinc-800/50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-xl border border-zinc-800/40 bg-zinc-900/30">
-              <p className="text-sm text-zinc-300 leading-relaxed mb-4">
-                &ldquo;I used to spend 3-4 hours manually checking GMB profiles before a pitch. Scoutblind gives me a better list in one search. Closed two new clients in my first week using it.&rdquo;
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center">
-                  <span className="text-xs font-bold text-violet-400">JR</span>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-zinc-300">Jake R.</p>
-                  <p className="text-[11px] text-zinc-600">SEO Agency Owner</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-5 rounded-xl border border-zinc-800/40 bg-zinc-900/30">
-              <p className="text-sm text-zinc-300 leading-relaxed mb-4">
-                &ldquo;The unclaimed profile detection alone is worth it. I found 8 unclaimed businesses in one market — that&apos;s 8 warm leads that practically sell themselves.&rdquo;
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                  <span className="text-xs font-bold text-emerald-400">MT</span>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-zinc-300">Maria T.</p>
-                  <p className="text-[11px] text-zinc-600">Local SEO Consultant</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ────────────────────────────────────────────────────────────────
-          4. HOW IT WORKS — Simple 3-step process
+          3. HOW IT WORKS — Simple 3-step process
           ──────────────────────────────────────────────────────────────── */}
       <section className="py-12 md:py-16 border-t border-zinc-800/50">
         <div className="max-w-3xl mx-auto px-4">
@@ -569,100 +531,7 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
       </section>
 
       {/* ────────────────────────────────────────────────────────────────
-          5. PRICING — Convert
-          ──────────────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-12 md:py-16 border-t border-zinc-800/50 bg-zinc-900/30">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white text-center mb-2">
-            Simple, Transparent Pricing
-          </h2>
-          <p className="text-sm text-zinc-500 text-center mb-10">
-            One scan could pay for a year of Scoutblind.
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Free */}
-            <div className="p-5 rounded-xl border border-zinc-800/50 bg-zinc-800/20">
-              <h3 className="text-sm font-semibold text-white mb-1">Free</h3>
-              <div className="mb-4">
-                <span className="text-2xl font-bold text-white">$0</span>
-              </div>
-              <ul className="space-y-2 mb-6">
-                {['5 market scans', 'Full signal analysis', 'CSV export', 'Search history'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs text-zinc-400">
-                    <svg className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={onSignUp}
-                className="w-full py-2 text-sm font-medium text-white bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
-              >
-                Start Free
-              </button>
-            </div>
-
-            {/* Starter */}
-            <div className="p-5 rounded-xl border border-violet-500/30 bg-violet-500/[0.05] relative">
-              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-violet-600 text-white text-[10px] font-semibold rounded-full uppercase tracking-wider">
-                Most Popular
-              </div>
-              <h3 className="text-sm font-semibold text-white mb-1">Starter</h3>
-              <div className="mb-4">
-                <span className="text-2xl font-bold text-white">$29</span>
-                <span className="text-xs text-zinc-500">/mo</span>
-              </div>
-              <ul className="space-y-2 mb-6">
-                {['50 scans/month', 'Everything in Free', 'Priority support', 'Saved search library'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs text-zinc-400">
-                    <svg className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={onSignUp}
-                className="w-full py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
-              >
-                Start Now
-              </button>
-            </div>
-
-            {/* Pro */}
-            <div className="p-5 rounded-xl border border-zinc-800/50 bg-zinc-800/20">
-              <h3 className="text-sm font-semibold text-white mb-1">Pro</h3>
-              <div className="mb-4">
-                <span className="text-2xl font-bold text-white">$79</span>
-                <span className="text-xs text-zinc-500">/mo</span>
-              </div>
-              <ul className="space-y-2 mb-6">
-                {['200 scans/month', 'Everything in Starter', 'Bulk analysis', 'API access (coming soon)'].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs text-zinc-400">
-                    <svg className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={onSignUp}
-                className="w-full py-2 text-sm font-medium text-white bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
-              >
-                Start Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ────────────────────────────────────────────────────────────────
-          6. FAQ — Handle objections
+          4. FAQ — Handle objections
           ──────────────────────────────────────────────────────────────── */}
       <section className="py-12 md:py-16 border-t border-zinc-800/50">
         <div className="max-w-2xl mx-auto px-4">
@@ -711,7 +580,7 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
       </section>
 
       {/* ────────────────────────────────────────────────────────────────
-          7. FINAL CTA — Loss-framed close
+          5. FINAL CTA — Loss-framed close
           ──────────────────────────────────────────────────────────────── */}
       <section className="py-14 md:py-20 border-t border-zinc-800/50 bg-gradient-to-b from-violet-500/[0.03] to-transparent">
         <div className="max-w-2xl mx-auto px-4 text-center">

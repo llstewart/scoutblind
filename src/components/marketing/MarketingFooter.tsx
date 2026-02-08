@@ -25,7 +25,7 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/#pricing" className="text-xs text-zinc-500 hover:text-white transition-colors">
+                <Link href="/pricing" className="text-xs text-zinc-500 hover:text-white transition-colors">
                   Pricing
                 </Link>
               </li>
