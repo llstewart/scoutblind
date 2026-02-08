@@ -188,68 +188,41 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
     <div className="min-h-screen bg-[#0f0f10] flex flex-col">
       <MarketingHeader onSignIn={onSignIn} onSignUp={onSignUp} />
 
-      {/* ────────────────────────────────────────────────────────────────
-          1. HERO — Pain + product visual
-          ──────────────────────────────────────────────────────────────── */}
-      <section className="relative flex-1 flex items-center px-4 py-16 md:py-20 lg:py-24 overflow-hidden">
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="relative flex-1 flex items-center px-4 py-20 md:py-28 lg:py-32 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-violet-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="relative max-w-6xl mx-auto w-full grid lg:grid-cols-[1fr,1.15fr] gap-10 lg:gap-14 items-center">
+        <div className="relative max-w-6xl mx-auto w-full grid lg:grid-cols-[1fr,1.15fr] gap-12 lg:gap-16 items-center">
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-5 bg-violet-500/10 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-              <span className="text-xs font-medium text-violet-400">Real-time GMB Signal Analysis</span>
-            </div>
-
-            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-white mb-4 tracking-tight leading-[1.1]">
+            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-white mb-5 tracking-tight leading-[1.1]">
               Find SEO prospects{' '}
               <span className="text-violet-400">in half the time</span>
             </h1>
 
-            <p className="text-base md:text-lg text-zinc-400 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base md:text-lg text-zinc-400 mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               Scan Google Business Profiles to identify businesses with weak GMB presence, poor review engagement, and local SEO gaps. The signals you hunt for — automated.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3 mb-8">
+            <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3">
               <button
                 onClick={onSignUp}
-                className="w-full sm:w-auto px-6 py-3 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
               >
-                <span>Scan Your First Market Free</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                Scan Your First Market Free
               </button>
               <button
                 onClick={onSignIn}
-                className="w-full sm:w-auto px-6 py-3 text-base font-medium text-zinc-400 hover:text-white transition-colors"
+                className="w-full sm:w-auto px-6 py-3 text-base font-medium text-zinc-500 hover:text-white transition-colors"
               >
                 Sign in
               </button>
             </div>
 
-            <p className="text-xs text-zinc-600 mb-6 text-center lg:text-left">No credit card required. 5 free scans.</p>
-
-            <div className="flex items-center justify-center lg:justify-start gap-8 text-sm">
-              <div className="text-center lg:text-left">
-                <div className="text-xl font-bold text-white">20+</div>
-                <div className="text-xs text-zinc-500">Leads per scan</div>
-              </div>
-              <div className="w-px h-8 bg-zinc-800" />
-              <div className="text-center lg:text-left">
-                <div className="text-xl font-bold text-white">10+</div>
-                <div className="text-xs text-zinc-500">Signals analyzed</div>
-              </div>
-              <div className="w-px h-8 bg-zinc-800" />
-              <div className="text-center lg:text-left">
-                <div className="text-xl font-bold text-white">&lt;60s</div>
-                <div className="text-xs text-zinc-500">Per scan</div>
-              </div>
-            </div>
+            <p className="text-xs text-zinc-600 mt-4 text-center lg:text-left">No credit card required. 5 free scans.</p>
           </div>
 
-          {/* Right: Glossy Mock Table */}
+          {/* Right: Mock Table */}
           <div className="relative order-2">
             <div className="absolute -inset-6 bg-violet-500/[0.04] rounded-3xl blur-3xl pointer-events-none" />
 
@@ -257,19 +230,19 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
               <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.12] to-transparent" />
               <div className="absolute top-0 left-[15%] right-[15%] h-20 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
 
-              {/* Table header — frames as opportunity */}
+              {/* Table header */}
               <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
                 <div className="flex items-center gap-3">
                   <h3 className="text-sm font-semibold text-white">Plumbers in Austin, TX</h3>
                   <span className="px-2 py-0.5 text-[10px] font-medium bg-rose-500/10 text-rose-400 rounded-full">12 high-opportunity</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span className="text-[10px] text-emerald-400 font-medium">Live</span>
                 </div>
               </div>
 
-              {/* Desktop table — signals framed as "why they need you" */}
+              {/* Desktop table */}
               <div className="hidden lg:block">
                 <table className="w-full text-xs">
                   <thead>
@@ -362,10 +335,10 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
                 ))}
               </div>
 
-              {/* Bottom fade with hook */}
+              {/* Bottom fade */}
               <div className="relative h-12 bg-gradient-to-t from-[#141417] to-transparent">
                 <div className="absolute bottom-2 inset-x-0 text-center">
-                  <span className="text-[11px] text-zinc-500">+ 21 more businesses with weak SEO&hellip;</span>
+                  <span className="text-[11px] text-zinc-600">+ 21 more results</span>
                 </div>
               </div>
             </div>
@@ -373,23 +346,23 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
         </div>
       </section>
 
-      {/* ────────────────────────────────────────────────────────────────
-          2. CHARTS — Frame as "what you're not seeing"
-          ──────────────────────────────────────────────────────────────── */}
-      <section className="py-12 md:py-16 border-t border-zinc-800/50 bg-zinc-900/30">
+      {/* ── CHARTS ───────────────────────────────────────────────────── */}
+      <section className="py-16 md:py-24 border-t border-zinc-800/40">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white text-center mb-2">
-            This is one scan of one market.
-          </h2>
-          <p className="text-sm text-zinc-400 text-center mb-10 max-w-lg mx-auto">
-            Imagine what your top 5 niches look like. Every scan surfaces gaps your competitors haven&apos;t found yet.
-          </p>
+          <div className="max-w-xl mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+              This is one scan of one market.
+            </h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Every scan surfaces opportunity breakdowns, claim gaps, and market health scores. Run it on your top niches and see what you&apos;ve been missing.
+            </p>
+          </div>
 
-          <div ref={chartsRef} className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div ref={chartsRef} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Chart 1: Opportunity Breakdown */}
             <div
-              className={`bg-zinc-900/60 rounded-xl p-5 shadow-lg shadow-black/20 border border-zinc-800/40 transition-all duration-700 ease-out ${
-                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              className={`rounded-xl p-5 border border-zinc-800/40 bg-zinc-900/40 transition-all duration-700 ease-out ${
+                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
             >
               <div className="mb-4">
@@ -417,14 +390,14 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
 
             {/* Chart 2: Claim Status (Donut) */}
             <div
-              className={`bg-zinc-900/60 rounded-xl p-5 shadow-lg shadow-black/20 border border-zinc-800/40 transition-all duration-700 ease-out ${
-                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              className={`rounded-xl p-5 border border-zinc-800/40 bg-zinc-900/40 transition-all duration-700 ease-out ${
+                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{ transitionDelay: chartsVisible ? '150ms' : '0ms' }}
             >
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-zinc-200">Unclaimed Profiles</h3>
-                <p className="text-xs text-rose-400/80 mt-0.5">40% have no owner — easy pitch</p>
+                <p className="text-xs text-rose-400/80 mt-0.5">40% have no owner</p>
               </div>
               <div className="h-[200px]">
                 {chartsVisible && (
@@ -461,8 +434,8 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
 
             {/* Chart 3: Avg Market Health (Radar) */}
             <div
-              className={`bg-zinc-900/60 rounded-xl p-5 shadow-lg shadow-black/20 border border-zinc-800/40 transition-all duration-700 ease-out ${
-                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              className={`rounded-xl p-5 border border-zinc-800/40 bg-zinc-900/40 transition-all duration-700 ease-out ${
+                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{ transitionDelay: chartsVisible ? '300ms' : '0ms' }}
             >
@@ -485,44 +458,84 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Nudge below charts */}
-          <p className="text-center text-xs text-zinc-600 mt-6">
-            This data is from a single scan that took under 60 seconds.
+      {/* ── SIGNALS ─────────────────────────────────────────────────── */}
+      <section className="py-16 md:py-24 border-t border-zinc-800/40">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="max-w-xl mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+              What we analyze
+            </h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Every scan checks the signals that matter for SEO prospecting. The same things you&apos;d check manually — done in seconds across an entire market.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-x-12 gap-y-5">
+            {[
+              { signal: 'Profile claim status', desc: 'Unclaimed profiles are the easiest pitch in local SEO.' },
+              { signal: 'Local pack ranking', desc: 'Where they show up in map results — or if they don\'t.' },
+              { signal: 'Review response rate', desc: 'How often the owner replies to customer reviews.' },
+              { signal: 'Owner activity recency', desc: 'Days since their last review reply or post.' },
+              { signal: 'Review count and rating', desc: 'Total reviews and average star rating.' },
+              { signal: 'Website presence', desc: 'Whether they have a website linked to their profile.' },
+              { signal: 'SEO tool detection', desc: 'Whether their site runs any SEO or analytics tools.' },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-3 py-2">
+                <div className="w-1 rounded-full bg-zinc-800 shrink-0 mt-1" style={{ height: '14px' }} />
+                <div>
+                  <span className="text-sm font-medium text-zinc-200">{item.signal}</span>
+                  <p className="text-xs text-zinc-500 mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-zinc-600 mt-8">
+            + additional signals including posting frequency, category optimization, photo count, and more.
           </p>
         </div>
       </section>
 
-      {/* ────────────────────────────────────────────────────────────────
-          3. HOW IT WORKS — Simple 3-step process
-          ──────────────────────────────────────────────────────────────── */}
-      <section className="py-12 md:py-16 border-t border-zinc-800/50">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white text-center mb-2">
-            How It Works
-          </h2>
-          <p className="text-sm text-zinc-500 text-center mb-10">
-            Three steps. No setup. No learning curve.
-          </p>
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
+      <section className="py-16 md:py-24 border-t border-zinc-800/40">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid md:grid-cols-[1fr,1.5fr] gap-12 md:gap-16 items-start">
+            <div className="md:sticky md:top-24">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                Three steps,<br />no learning curve.
+              </h2>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                You don&apos;t need a tutorial. Enter a market, read the signals, close the deal.
+              </p>
+            </div>
 
-          <div className="relative">
-            {/* Connecting line between steps (desktop) */}
-            <div className="hidden md:block absolute top-5 left-[20%] right-[20%] h-px bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800" />
-
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="space-y-10">
               {[
-                { step: '1', title: 'Pick a Market', desc: 'Enter any niche + location. "Plumbers in Austin" — done.' },
-                { step: '2', title: 'We Scan Everything', desc: 'Review rates, response times, rankings, claim status, and 10+ more signals. In under 60 seconds.' },
-                { step: '3', title: 'Pitch the Weak Ones', desc: 'Export a prioritized list of businesses that need SEO help — sorted by who needs it most.' },
+                {
+                  num: '01',
+                  title: 'Pick a market',
+                  desc: 'Enter any niche and location. "Plumbers in Austin" — that\'s all it takes to start a scan.',
+                },
+                {
+                  num: '02',
+                  title: 'Read the signals',
+                  desc: 'Review rates, response times, rankings, claim status, website quality — 10+ signals analyzed per business.',
+                },
+                {
+                  num: '03',
+                  title: 'Export and pitch',
+                  desc: 'Download a prioritized prospect list. Every business is sorted by who needs SEO help most.',
+                },
               ].map((item, i) => (
-                <div key={i} className="text-center relative">
-                  <div className="w-10 h-10 mx-auto mb-4 rounded-full bg-[#0f0f10] border border-zinc-800 flex items-center justify-center relative z-10">
-                    <span className="text-sm font-bold text-violet-400">{item.step}</span>
+                <div key={i} className="flex gap-5">
+                  <span className="text-sm font-medium text-zinc-700 mt-0.5 shrink-0 w-6">{item.num}</span>
+                  <div>
+                    <h3 className="text-base font-semibold text-white mb-1.5">{item.title}</h3>
+                    <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
                   </div>
-                  <h3 className="text-sm font-semibold text-white mb-1.5">{item.title}</h3>
-                  <p className="text-xs text-zinc-500 leading-relaxed max-w-[220px] mx-auto">
-                    {item.desc}
-                  </p>
                 </div>
               ))}
             </div>
@@ -530,28 +543,23 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
         </div>
       </section>
 
-      {/* ────────────────────────────────────────────────────────────────
-          4. FAQ — Handle objections
-          ──────────────────────────────────────────────────────────────── */}
-      <section className="py-12 md:py-16 border-t border-zinc-800/50">
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <section className="py-16 md:py-24 border-t border-zinc-800/40">
         <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white text-center mb-2">
-            Frequently Asked Questions
+          <h2 className="text-lg font-semibold text-white mb-6">
+            Frequently asked questions
           </h2>
-          <p className="text-sm text-zinc-500 text-center mb-8">
-            Quick answers to common questions
-          </p>
 
-          <div className="space-y-3">
+          <div className="divide-y divide-zinc-800/50">
             {faqItems.map((item, i) => (
-              <div key={i} className="border border-zinc-800/50 rounded-lg overflow-hidden">
+              <div key={i}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-800/20 transition-colors"
+                  className="w-full flex items-center justify-between py-4 text-left group"
                 >
-                  <span className="text-sm font-medium text-white pr-4">{item.q}</span>
+                  <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors pr-4">{item.q}</span>
                   <svg
-                    className={`w-4 h-4 text-zinc-500 flex-shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 text-zinc-600 flex-shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -560,44 +568,39 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
                   </svg>
                 </button>
                 {openFaq === i && (
-                  <div className="px-4 pb-4">
-                    <p className="text-xs text-zinc-400 leading-relaxed">{item.a}</p>
+                  <div className="pb-4">
+                    <p className="text-sm text-zinc-500 leading-relaxed">{item.a}</p>
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          <div className="text-center mt-6">
+          <div className="mt-6">
             <Link
               href="/faq"
-              className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
+              className="text-sm text-zinc-500 hover:text-white transition-colors"
             >
-              View all FAQs &rarr;
+              View all questions
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ────────────────────────────────────────────────────────────────
-          5. FINAL CTA — Loss-framed close
-          ──────────────────────────────────────────────────────────────── */}
-      <section className="py-14 md:py-20 border-t border-zinc-800/50 bg-gradient-to-b from-violet-500/[0.03] to-transparent">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
+      {/* ── FINAL CTA ────────────────────────────────────────────────── */}
+      <section className="py-20 md:py-28 border-t border-zinc-800/40">
+        <div className="max-w-xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Every day you prospect manually is a day someone else closes the deal.
           </h2>
-          <p className="text-sm text-zinc-400 mb-8 max-w-md mx-auto">
-            5 free scans. No credit card. See what&apos;s hiding in your market in under 60 seconds.
+          <p className="text-sm text-zinc-500 mb-8">
+            5 free scans. No credit card required.
           </p>
           <button
             onClick={onSignUp}
-            className="px-8 py-3.5 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30 inline-flex items-center gap-2"
+            className="px-8 py-3.5 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
           >
-            <span>Scan Your First Market Free</span>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
+            Get started
           </button>
         </div>
       </section>
