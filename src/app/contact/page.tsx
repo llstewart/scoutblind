@@ -60,7 +60,7 @@ export default function ContactPage() {
           {/* Left: Info */}
           <div className="md:col-span-2 space-y-6">
             <div>
-              <h3 className="text-sm font-semibold text-white mb-2">Email</h3>
+              <h2 className="text-sm font-semibold text-white mb-2">Email</h2>
               <a
                 href="mailto:support@scoutblind.com"
                 className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
@@ -69,11 +69,11 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white mb-2">Response Time</h3>
+              <h2 className="text-sm font-semibold text-white mb-2">Response Time</h2>
               <p className="text-sm text-zinc-500">We typically respond within 24 hours on business days.</p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white mb-2">Common Topics</h3>
+              <h2 className="text-sm font-semibold text-white mb-2">Common Topics</h2>
               <ul className="text-sm text-zinc-500 space-y-1">
                 <li>
                   <a href="/faq" className="text-violet-400 hover:text-violet-300 transition-colors">
@@ -110,7 +110,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {result?.error && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                  <div role="alert" className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
                     {result.error}
                   </div>
                 )}
@@ -126,7 +126,7 @@ export default function ContactPage() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                     placeholder="Your name"
                   />
                 </div>
@@ -142,7 +142,7 @@ export default function ContactPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -155,7 +155,7 @@ export default function ContactPage() {
                     id="subject"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                   >
                     {subjects.map((s) => (
                       <option key={s} value={s}>
@@ -176,7 +176,7 @@ export default function ContactPage() {
                     required
                     maxLength={5000}
                     rows={5}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors resize-none"
+                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors resize-none"
                     placeholder="How can we help?"
                   />
                 </div>

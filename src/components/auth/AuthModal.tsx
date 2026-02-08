@@ -105,23 +105,29 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
         onClick={onClose}
+        onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
+        role="presentation"
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-modal-title"
           className="w-full max-w-md bg-zinc-900 rounded-2xl shadow-2xl shadow-black/40 my-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4">
-            <h2 className="text-xl font-semibold text-white">
+            <h2 id="auth-modal-title" className="text-xl font-semibold text-white">
               {mode === 'signin' && 'Welcome back'}
               {mode === 'signup' && 'Create account'}
               {mode === 'forgot' && 'Reset password'}
             </h2>
             <button
               onClick={onClose}
+              aria-label="Close dialog"
               className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
             >
               <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,7 +139,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
           {/* Content */}
           <div className="p-6">
             {message ? (
-              <div className="text-center py-4">
+              <div className="text-center py-4" role="status">
                 <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -194,7 +200,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
 
                 {/* Error Display */}
                 {error && (
-                  <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                  <div role="alert" className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
                     {error}
                   </div>
                 )}
@@ -203,28 +209,30 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
                 {mode === 'signin' && (
                   <form onSubmit={handleEmailSignIn} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signin-email" className="block text-sm font-medium text-zinc-400 mb-1.5">
                         Email
                       </label>
                       <input
+                        id="signin-email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signin-password" className="block text-sm font-medium text-zinc-400 mb-1.5">
                         Password
                       </label>
                       <input
+                        id="signin-password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="••••••••"
                       />
                     </div>
@@ -251,42 +259,45 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
                 {mode === 'signup' && (
                   <form onSubmit={handleEmailSignUp} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signup-name" className="block text-sm font-medium text-zinc-400 mb-1.5">
                         Full Name
                       </label>
                       <input
+                        id="signup-name"
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="John Doe"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signup-email" className="block text-sm font-medium text-zinc-400 mb-1.5">
                         Email
                       </label>
                       <input
+                        id="signup-email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signup-password" className="block text-sm font-medium text-zinc-400 mb-1.5">
                         Password
                       </label>
                       <input
+                        id="signup-password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={6}
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="••••••••"
                       />
                       <p className="mt-1 text-xs text-zinc-500">Minimum 6 characters</p>
@@ -308,15 +319,16 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
                       Enter your email and we&apos;ll send you a link to reset your password.
                     </p>
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="forgot-email" className="block text-sm font-medium text-zinc-400 mb-1.5">
                         Email
                       </label>
                       <input
+                        id="forgot-email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>

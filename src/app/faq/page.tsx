@@ -59,6 +59,7 @@ export default function FaqPage() {
             <div key={i} className="border border-zinc-800/50 rounded-lg overflow-hidden">
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                aria-expanded={openIndex === i}
                 className="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-800/20 transition-colors"
               >
                 <span className="text-sm font-medium text-white pr-4">{item.q}</span>

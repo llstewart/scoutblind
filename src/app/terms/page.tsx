@@ -16,7 +16,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-white mb-3">1. Acceptance of Terms</h2>
             <p>
-              By creating an account or using Scoutblind (&quot;the Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service. We may update these terms from time to time, and continued use constitutes acceptance of any changes.
+              By creating an account or using Scoutblind (&quot;the Service&quot;), operated by Scoutblind LLC, you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service. We may update these terms from time to time, and continued use constitutes acceptance of any changes.
             </p>
           </section>
 
@@ -97,7 +97,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-white mb-3">9. Governing Law</h2>
             <p>
-              These Terms shall be governed by and construed in accordance with the laws of the United States. Any disputes shall be resolved in the courts of applicable jurisdiction.
+              These Terms shall be governed by and construed in accordance with the laws of the State of Maryland, United States, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be resolved in the state or federal courts located in Maryland.
             </p>
           </section>
 

@@ -517,11 +517,12 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
               <div key={i}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  aria-expanded={openFaq === i}
                   className="w-full flex items-center justify-between py-4 text-left group"
                 >
                   <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors pr-4">{item.q}</span>
                   <svg
-                    className={`w-4 h-4 text-zinc-600 flex-shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 text-zinc-500 flex-shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
