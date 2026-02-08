@@ -461,44 +461,6 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
         </div>
       </section>
 
-      {/* ── SIGNALS ─────────────────────────────────────────────────── */}
-      <section className="py-16 md:py-24 border-t border-zinc-800/40">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="max-w-xl mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-              What we analyze
-            </h2>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Every scan checks the signals that matter for SEO prospecting. The same things you&apos;d check manually — done in seconds across an entire market.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-x-12 gap-y-5">
-            {[
-              { signal: 'Profile claim status', desc: 'Unclaimed profiles are the easiest pitch in local SEO.' },
-              { signal: 'Local pack ranking', desc: 'Where they show up in map results — or if they don\'t.' },
-              { signal: 'Review response rate', desc: 'How often the owner replies to customer reviews.' },
-              { signal: 'Owner activity recency', desc: 'Days since their last review reply or post.' },
-              { signal: 'Review count and rating', desc: 'Total reviews and average star rating.' },
-              { signal: 'Website presence', desc: 'Whether they have a website linked to their profile.' },
-              { signal: 'SEO tool detection', desc: 'Whether their site runs any SEO or analytics tools.' },
-            ].map((item, i) => (
-              <div key={i} className="flex gap-3 py-2">
-                <div className="w-1 rounded-full bg-zinc-800 shrink-0 mt-1" style={{ height: '14px' }} />
-                <div>
-                  <span className="text-sm font-medium text-zinc-200">{item.signal}</span>
-                  <p className="text-xs text-zinc-500 mt-0.5">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-xs text-zinc-600 mt-8">
-            + additional signals including posting frequency, category optimization, photo count, and more.
-          </p>
-        </div>
-      </section>
-
       {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
       <section className="py-16 md:py-24 border-t border-zinc-800/40">
         <div className="max-w-4xl mx-auto px-4">
