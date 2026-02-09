@@ -35,6 +35,12 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
             </Link>
           ) : (
             <>
+              <Link
+                href="/pricing"
+                className="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+              >
+                Pricing
+              </Link>
               {onSignIn ? (
                 <button
                   onClick={onSignIn}

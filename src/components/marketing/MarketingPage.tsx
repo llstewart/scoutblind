@@ -212,24 +212,26 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
               }}
               className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2"
             >
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  placeholder="Niche (e.g. Plumbers)"
-                  className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Location (e.g. Austin, TX)"
-                  className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
-                />
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    placeholder="Niche (e.g. Plumbers)"
+                    className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Location (e.g. Austin, TX)"
+                    className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="sm:self-end px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+                >
+                  Scan market
+                </button>
               </div>
-              <button
-                type="submit"
-                className="w-full px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
-              >
-                Scan market
-              </button>
             </form>
 
             <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">

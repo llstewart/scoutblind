@@ -1,18 +1,85 @@
 'use client';
 
+import { useState } from 'react';
+import { useAppContext } from '@/contexts/AppContext';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 
 export default function PricingPage() {
+  const {
+    showAuthModal,
+    setShowAuthModal,
+    authMode,
+    setAuthMode,
+  } = useAppContext();
+
+  const openSignUp = () => {
+    setAuthMode('signup');
+    setShowAuthModal(true);
+  };
+
+  const openSignIn = () => {
+    setAuthMode('signin');
+    setShowAuthModal(true);
+  };
+
+  const steps = [
+    {
+      step: '1',
+      title: 'Search',
+      description: 'Enter a niche and location to scan Google Business Profiles in any market.',
+    },
+    {
+      step: '2',
+      title: 'Analyze',
+      description: 'Get SEO signals, review gaps, and visibility scores for every business found.',
+    },
+    {
+      step: '3',
+      title: 'Export',
+      description: 'Download your results to CSV and start outreach with qualified leads.',
+    },
+  ];
+
   return (
-    <MarketingLayout>
+    <MarketingLayout onSignIn={openSignIn} onSignUp={openSignUp}>
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
         <h1 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-sm text-zinc-500 text-center mb-10">
+        <p className="text-sm text-zinc-500 text-center mb-12">
           One scan could pay for a year of Scoutblind.
         </p>
 
+        {/* How It Works */}
+        <div className="mb-14">
+          <h2 className="text-lg font-semibold text-white text-center mb-8">How it works</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {steps.map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="w-9 h-9 rounded-full bg-violet-600/20 text-violet-400 text-sm font-bold flex items-center justify-center mx-auto mb-3">
+                  {s.step}
+                </div>
+                <h3 className="text-sm font-semibold text-white mb-1">{s.title}</h3>
+                <p className="text-xs text-zinc-500 leading-relaxed">{s.description}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <button
+              onClick={openSignUp}
+              className="px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+            >
+              Try it free
+            </button>
+            <p className="text-xs text-zinc-600 mt-2">No credit card required. 5 free scans.</p>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-zinc-800/50 mb-12" />
+
+        {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Free */}
           <div className="p-6 rounded-xl border border-zinc-800/50 bg-zinc-800/20">
@@ -31,12 +98,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <a
-              href="/"
+            <button
+              onClick={openSignUp}
               className="block w-full py-2.5 text-sm font-medium text-white bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors text-center"
             >
               Start Free
-            </a>
+            </button>
           </div>
 
           {/* Starter */}
@@ -60,12 +127,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <a
-              href="/"
+            <button
+              onClick={openSignUp}
               className="block w-full py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors text-center"
             >
               Start Now
-            </a>
+            </button>
           </div>
 
           {/* Pro */}
@@ -86,12 +153,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <a
-              href="/"
+            <button
+              onClick={openSignUp}
               className="block w-full py-2.5 text-sm font-medium text-white bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors text-center"
             >
               Start Now
-            </a>
+            </button>
           </div>
         </div>
 
@@ -109,6 +176,12 @@ export default function PricingPage() {
           </p>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode={authMode}
+      />
     </MarketingLayout>
   );
 }
