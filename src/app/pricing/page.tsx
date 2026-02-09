@@ -51,34 +51,6 @@ export default function PricingPage() {
           One scan could pay for a year of Scoutblind.
         </p>
 
-        {/* How It Works */}
-        <div className="mb-14">
-          <h2 className="text-lg font-semibold text-white text-center mb-8">How it works</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {steps.map((s) => (
-              <div key={s.step} className="text-center">
-                <div className="w-9 h-9 rounded-full bg-violet-600/20 text-violet-400 text-sm font-bold flex items-center justify-center mx-auto mb-3">
-                  {s.step}
-                </div>
-                <h3 className="text-sm font-semibold text-white mb-1">{s.title}</h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">{s.description}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <button
-              onClick={openSignUp}
-              className="px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
-            >
-              Try it free
-            </button>
-            <p className="text-xs text-zinc-600 mt-2">No credit card required. 5 free scans.</p>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-zinc-800/50 mb-12" />
-
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Free */}
@@ -159,6 +131,34 @@ export default function PricingPage() {
             >
               Start Now
             </button>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-zinc-800/50 mt-14 mb-12" />
+
+        {/* How It Works */}
+        <div className="mb-12">
+          <h2 className="text-lg font-semibold text-white text-center mb-8">How it works</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {steps.map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="w-9 h-9 rounded-full bg-violet-600/20 text-violet-400 text-sm font-bold flex items-center justify-center mx-auto mb-3">
+                  {s.step}
+                </div>
+                <h3 className="text-sm font-semibold text-white mb-1">{s.title}</h3>
+                <p className="text-xs text-zinc-500 leading-relaxed">{s.description}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <button
+              onClick={openSignUp}
+              className="px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+            >
+              Try it free
+            </button>
+            <p className="text-xs text-zinc-600 mt-2">No credit card required. 5 free scans.</p>
           </div>
         </div>
 
