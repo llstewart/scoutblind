@@ -200,26 +200,47 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
               <span className="text-violet-400">in half the time</span>
             </h1>
 
-            <p className="text-base md:text-lg text-zinc-400 mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base md:text-lg text-zinc-400 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               Scan Google Business Profiles to identify businesses with weak GMB presence, poor review engagement, and local SEO gaps. The signals you hunt for — automated.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3">
-              <button
-                onClick={onSignUp}
-                className="w-full sm:w-auto px-6 py-3 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
-              >
-                Scan Your First Market Free
-              </button>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSignUp();
+              }}
+              className="max-w-lg mx-auto lg:mx-0"
+            >
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  placeholder="Niche (e.g. Plumbers)"
+                  className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Location (e.g. Austin, TX)"
+                  className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
+                />
+                <button
+                  type="submit"
+                  className="px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors whitespace-nowrap"
+                >
+                  Scan market
+                </button>
+              </div>
+            </form>
+
+            <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">
+              <p className="text-xs text-zinc-600">No credit card required. 5 free scans.</p>
+              <span className="text-xs text-zinc-700">·</span>
               <button
                 onClick={onSignIn}
-                className="w-full sm:w-auto px-6 py-3 text-base font-medium text-zinc-500 hover:text-white transition-colors"
+                className="text-xs text-zinc-500 hover:text-white transition-colors"
               >
                 Sign in
               </button>
             </div>
-
-            <p className="text-xs text-zinc-600 mt-4 text-center lg:text-left">No credit card required. 5 free scans.</p>
           </div>
 
           {/* Right: Mock Table */}
