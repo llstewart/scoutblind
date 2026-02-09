@@ -264,9 +264,9 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
                 </div>
               </div>
 
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs min-w-[520px]">
+              {/* Desktop table */}
+              <div className="hidden lg:block">
+                <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-white/[0.04]">
                       <th className="text-left py-2 px-3 text-[10px] font-semibold text-zinc-500 uppercase tracking-wider w-8">#</th>
@@ -320,6 +320,41 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="block lg:hidden divide-y divide-white/[0.04]">
+                {MOCK_BUSINESSES.slice(0, 3).map((biz, i) => (
+                  <div key={i} className="px-4 py-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-zinc-600 font-medium">{i + 1}.</span>
+                        <span className="text-sm font-medium text-white">{biz.name}</span>
+                      </div>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        biz.score >= 70 ? 'bg-rose-500/10 text-rose-400' :
+                        biz.score >= 40 ? 'bg-amber-500/10 text-amber-400' :
+                        'bg-emerald-500/10 text-emerald-400'
+                      }`}>
+                        {biz.score}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {biz.signals.slice(0, 2).map((signal, j) => {
+                        const colors = SIGNAL_CATEGORY_COLORS[signal.category];
+                        return (
+                          <span key={j} className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded ${colors.bg}`}>
+                            <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
+                            <span className={colors.text}>{signal.text}</span>
+                          </span>
+                        );
+                      })}
+                      {biz.signals.length > 2 && (
+                        <span className="text-[10px] text-zinc-500 px-1 py-0.5">+{biz.signals.length - 2} more</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* Bottom fade */}
