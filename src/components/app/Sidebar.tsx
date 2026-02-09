@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { AppTab } from '@/hooks/useAppNavigation';
+import { useAppContext } from '@/contexts/AppContext';
 
 interface SavedSearch {
   id: string;
@@ -33,6 +34,7 @@ export function Sidebar({
   userName,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { setShowBillingModal, setShowSettingsModal } = useAppContext();
 
   const tierColors: Record<string, string> = {
     free: 'text-zinc-400 bg-zinc-800',
@@ -164,7 +166,10 @@ export function Sidebar({
       {!isCollapsed && (
         <div className="p-3 border-t border-zinc-800/50 space-y-3">
           {/* Credits */}
-          <div className="flex items-center justify-between px-2 py-1.5 bg-zinc-800/50 rounded-lg">
+          <button
+            onClick={() => setShowBillingModal(true)}
+            className="w-full flex items-center justify-between px-2 py-1.5 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
+          >
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -174,16 +179,19 @@ export function Sidebar({
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tierColors[tier] || tierColors.free}`}>
               {tier.toUpperCase()}
             </span>
-          </div>
+          </button>
 
           {/* User */}
           {userName && (
-            <div className="flex items-center gap-2 px-2">
+            <button
+              onClick={() => setShowSettingsModal(true)}
+              className="w-full flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-zinc-800/50 transition-colors cursor-pointer"
+            >
               <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs font-medium">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <span className="text-sm text-zinc-400 truncate">{userName}</span>
-            </div>
+            </button>
           )}
 
           {/* Footer links */}
@@ -199,9 +207,12 @@ export function Sidebar({
       {isCollapsed && (
         <div className="p-2 border-t border-zinc-800/50">
           <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-zinc-800/50 flex items-center justify-center">
+            <button
+              onClick={() => setShowBillingModal(true)}
+              className="w-8 h-8 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors flex items-center justify-center"
+            >
               <span className="text-xs font-bold text-violet-400">{credits}</span>
-            </div>
+            </button>
           </div>
         </div>
       )}
