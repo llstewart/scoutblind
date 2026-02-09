@@ -30,13 +30,6 @@ export const SUBSCRIPTION_TIERS = {
     priceYearly: 1990,
     features: ['1000 credits per month', 'SEO Signals Pro analysis', 'All signals', 'Dedicated support'],
   },
-  test: {
-    name: 'Test',
-    credits: 3,
-    priceMonthly: 1,
-    priceYearly: 10,
-    features: ['3 credits per month', 'Stripe test plan'],
-  },
 } as const;
 
 export const CREDIT_PACKS = {
@@ -59,11 +52,6 @@ export const CREDIT_PACKS = {
     name: '250 Credits',
     credits: 250,
     price: 99,
-  },
-  credit_test: {
-    name: '3 Credits',
-    credits: 3,
-    price: 1,
   },
 } as const;
 
