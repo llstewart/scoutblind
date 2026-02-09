@@ -5,7 +5,7 @@ import { batchCheckVisibility } from '@/lib/visibility';
 import { classifyLocationType } from '@/utils/address';
 import { fetchBatchReviews, ReviewData } from '@/lib/outscraper';
 import { Semaphore, sleep } from '@/lib/rate-limiter';
-import { checkRateLimit } from '@/lib/api-rate-limit';
+import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 
 // Configuration
@@ -43,6 +43,10 @@ export async function POST(request: NextRequest) {
       requiresAuth: true
     }, { status: 401 });
   }
+
+  // Per-user rate limit
+  const userRateLimitResponse = await checkUserRateLimit(user.id, 'analyze');
+  if (userRateLimitResponse) return userRateLimitResponse;
 
   // Check subscription tier - only paid users can analyze
   const { data: subscription } = await supabase
