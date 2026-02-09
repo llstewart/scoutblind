@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 interface AuthModalProps {
@@ -21,6 +21,19 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
   const [showPassword, setShowPassword] = useState(false);
 
   const supabase = createClient();
+
+  // Sync mode when modal opens with a new defaultMode
+  useEffect(() => {
+    if (isOpen) {
+      setMode(defaultMode);
+      setEmail('');
+      setPassword('');
+      setFullName('');
+      setError(null);
+      setMessage(null);
+      setShowPassword(false);
+    }
+  }, [isOpen, defaultMode]);
 
   const switchMode = (newMode: 'signin' | 'signup' | 'forgot') => {
     setMode(newMode);

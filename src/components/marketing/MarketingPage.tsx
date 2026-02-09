@@ -210,7 +210,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
                 e.preventDefault();
                 onSearchSignUp();
               }}
-              className="max-w-md mx-auto lg:mx-0"
+              className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2"
             >
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
@@ -226,7 +226,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
               </div>
               <button
                 type="submit"
-                className="w-full mt-2 px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+                className="w-full px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
               >
                 Scan market
               </button>
