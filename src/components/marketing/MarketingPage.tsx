@@ -227,7 +227,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
                 </div>
                 <button
                   type="submit"
-                  className="sm:self-end px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+                  className="w-full px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
                 >
                   Scan market
                 </button>
