@@ -14,6 +14,7 @@ import { MarketingFooter } from './MarketingFooter';
 interface MarketingPageProps {
   onSignIn: () => void;
   onSignUp: () => void;
+  onSearchSignUp: () => void;
 }
 
 const faqItems = [
@@ -163,7 +164,7 @@ const MOCK_RADAR_DATA = [
   { axis: 'Local Ranking', value: 10 },
 ];
 
-export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
+export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingPageProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [chartsVisible, setChartsVisible] = useState(false);
   const chartsRef = useRef<HTMLDivElement>(null);
@@ -207,9 +208,9 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                onSignUp();
+                onSearchSignUp();
               }}
-              className="max-w-lg mx-auto lg:mx-0"
+              className="max-w-md mx-auto lg:mx-0"
             >
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
@@ -222,13 +223,13 @@ export function MarketingPage({ onSignIn, onSignUp }: MarketingPageProps) {
                   placeholder="Location (e.g. Austin, TX)"
                   className="flex-1 px-4 py-3 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
                 />
-                <button
-                  type="submit"
-                  className="px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors whitespace-nowrap"
-                >
-                  Scan market
-                </button>
               </div>
+              <button
+                type="submit"
+                className="w-full mt-2 px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+              >
+                Scan market
+              </button>
             </form>
 
             <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">

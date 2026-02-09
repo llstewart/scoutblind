@@ -7,9 +7,10 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultMode?: 'signin' | 'signup';
+  signupHeading?: string;
 }
 
-export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeading }: AuthModalProps) {
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(defaultMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -132,7 +133,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
           <div className="flex items-center justify-between px-6 py-4">
             <h2 id="auth-modal-title" className="text-xl font-semibold text-white">
               {mode === 'signin' && 'Welcome back'}
-              {mode === 'signup' && 'Create account'}
+              {mode === 'signup' && (signupHeading || 'Create account')}
               {mode === 'forgot' && 'Reset password'}
             </h2>
             <button
