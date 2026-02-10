@@ -34,7 +34,7 @@ export function ResultsView() {
   } = useAppContext();
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="flex flex-col h-full p-4 gap-4">
       {/* Search Context Header */}
       {searchParams && !isViewingSavedSearch && (
         <div className="flex items-center gap-2 text-sm text-zinc-400">
@@ -248,7 +248,7 @@ export function ResultsView() {
 
       {/* Data Table / Market Dashboard */}
       {activeTab === 'market' ? (
-        <div className="bg-zinc-900/30 rounded-xl shadow-lg shadow-black/20 p-4">
+        <div className="flex-1 min-h-0 bg-zinc-900/30 rounded-xl shadow-lg shadow-black/20 p-4 overflow-y-auto">
           <MarketDashboard />
         </div>
       ) : (
