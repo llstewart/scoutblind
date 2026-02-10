@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
+const jsonLdApp = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'Scoutblind',
@@ -79,6 +79,15 @@ const jsonLd = {
   ],
 };
 
+const jsonLdOrg = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Scoutblind',
+  url: siteUrl,
+  logo: `${siteUrl}/icon-512.png`,
+  sameAs: [],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -89,7 +98,11 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdApp) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
         />
       </head>
       <body className="min-h-screen bg-background text-foreground font-sans">
