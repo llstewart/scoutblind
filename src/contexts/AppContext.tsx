@@ -193,6 +193,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
 
+  const onboardingCheckedRef = useRef(false);
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
   const analyzeWorkerRef = useRef<Worker | null>(null);
@@ -360,10 +361,13 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
-      // Show onboarding for users who signed up less than 2 minutes ago
-      const createdAt = new Date(user.created_at).getTime();
-      if (Date.now() - createdAt < 2 * 60 * 1000) {
-        setShowOnboardingModal(true);
+      // Show onboarding for users who signed up less than 2 minutes ago (once per session)
+      if (!onboardingCheckedRef.current) {
+        onboardingCheckedRef.current = true;
+        const createdAt = new Date(user.created_at).getTime();
+        if (Date.now() - createdAt < 2 * 60 * 1000) {
+          setShowOnboardingModal(true);
+        }
       }
 
       try {
