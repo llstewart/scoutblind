@@ -3,6 +3,7 @@ import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 export const metadata = {
   title: 'Privacy Policy',
   description: 'How Scoutblind collects, uses, and protects your data. Learn about our third-party services, cookies, and your data rights.',
+  alternates: { canonical: '/privacy' },
 };
 
 export default function PrivacyPage() {

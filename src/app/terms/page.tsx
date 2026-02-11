@@ -3,6 +3,7 @@ import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 export const metadata = {
   title: 'Terms of Service',
   description: 'Terms and conditions for using Scoutblind. Read our acceptable use policy, billing terms, and data disclaimers.',
+  alternates: { canonical: '/terms' },
 };
 
 export default function TermsPage() {
