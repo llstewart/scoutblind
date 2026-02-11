@@ -360,8 +360,9 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
-      // Show onboarding for first-time users
-      if (!localStorage.getItem('scoutblind_onboarded')) {
+      // Show onboarding for users who signed up less than 2 minutes ago
+      const createdAt = new Date(user.created_at).getTime();
+      if (Date.now() - createdAt < 2 * 60 * 1000) {
         setShowOnboardingModal(true);
       }
 

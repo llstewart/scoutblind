@@ -104,10 +104,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Onboarding Modal */}
       <OnboardingModal
         isOpen={showOnboardingModal}
-        onClose={() => {
-          localStorage.setItem('scoutblind_onboarded', 'true');
-          setShowOnboardingModal(false);
-        }}
+        onClose={() => setShowOnboardingModal(false)}
       />
 
       {/* Toast Notification */}
