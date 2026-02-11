@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { X, Search, BarChart3, Rocket, Sparkles, MapPin, Globe, Star, ChevronRight } from 'lucide-react';
+import { X, ChevronRight } from 'lucide-react';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -33,102 +33,122 @@ const SLIDES = [
 
 function WelcomeVisual() {
   return (
-    <div className="relative flex items-center justify-center w-full h-40">
-      <div className="absolute w-32 h-32 rounded-full bg-violet-500/10 animate-pulse" />
-      <div className="absolute w-24 h-24 rounded-full bg-violet-500/5" />
-      <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
-        <Sparkles className="w-8 h-8 text-white" />
+    <div className="relative flex items-center justify-center w-full h-44">
+      {/* Layered gradient orbs */}
+      <div className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-violet-600/20 to-purple-600/10 blur-2xl" />
+      <div className="absolute w-24 h-24 rounded-full bg-gradient-to-tr from-violet-500/15 to-fuchsia-500/10 blur-xl" style={{ top: '10%', right: '25%' }} />
+      {/* Stylized wordmark */}
+      <div className="relative">
+        <span className="text-4xl font-black tracking-tight bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+          SB
+        </span>
+        <div className="absolute -inset-3 rounded-2xl bg-violet-500/5 border border-violet-500/10" />
       </div>
-      <Sparkles className="absolute top-4 right-16 w-4 h-4 text-violet-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
-      <Sparkles className="absolute bottom-6 left-20 w-3 h-3 text-purple-400 animate-pulse" style={{ animationDelay: '1s' }} />
     </div>
   );
 }
 
 function SearchVisual() {
   return (
-    <div className="relative flex items-center justify-center w-full h-40">
-      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700/50 shadow-lg">
-        <Search className="w-4 h-4 text-zinc-500" />
-        <span className="text-sm text-zinc-400">plumber</span>
-        <div className="w-px h-4 bg-zinc-700" />
-        <MapPin className="w-4 h-4 text-zinc-500" />
-        <span className="text-sm text-zinc-400">Austin, TX</span>
-        <div className="ml-2 px-3 py-1 rounded-lg bg-violet-600 text-xs text-white font-medium">Scan</div>
-      </div>
-      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-1">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="w-1.5 h-1.5 rounded-full bg-violet-500/60 animate-bounce"
-            style={{ animationDelay: `${i * 0.15}s` }}
-          />
-        ))}
+    <div className="relative flex flex-col items-center justify-center w-full h-44 gap-3">
+      {/* Mini app mockup */}
+      <div className="w-full max-w-xs">
+        <div className="rounded-xl bg-zinc-800/80 border border-zinc-700/40 p-3 shadow-lg shadow-black/20">
+          {/* Fake search bar */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/80 border border-zinc-700/30">
+              <span className="text-xs text-zinc-400">plumber</span>
+            </div>
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/80 border border-zinc-700/30">
+              <span className="text-xs text-zinc-400">Austin, TX</span>
+            </div>
+          </div>
+          <div className="w-full py-1.5 rounded-lg bg-violet-600 text-center">
+            <span className="text-[11px] font-semibold text-white">Scan Market</span>
+          </div>
+        </div>
+        {/* Fake results preview */}
+        <div className="mt-2 mx-2 space-y-1">
+          {[72, 58, 45].map((w, i) => (
+            <div key={i} className="flex items-center gap-2 opacity-60" style={{ opacity: 0.7 - i * 0.2 }}>
+              <div className="w-5 h-5 rounded bg-zinc-800 border border-zinc-700/30" />
+              <div className="h-2 rounded-full bg-zinc-700/50" style={{ width: `${w}%` }} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
 function AnalyzeVisual() {
-  const badges = [
-    { label: 'GBP', color: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
-    { label: 'Rank', color: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
-    { label: 'Web', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
-    { label: 'Rep', color: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
+  const signals = [
+    { label: 'GBP', score: 3, max: 5, fill: 'bg-blue-500' },
+    { label: 'Rank', score: 1, max: 5, fill: 'bg-amber-500' },
+    { label: 'Web', score: 4, max: 5, fill: 'bg-emerald-500' },
+    { label: 'Rep', score: 2, max: 5, fill: 'bg-rose-500' },
   ];
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-40 gap-3">
-      <div className="flex items-center gap-2">
-        {badges.map((badge) => (
-          <span
-            key={badge.label}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${badge.color}`}
-          >
-            {badge.label}
-          </span>
-        ))}
-      </div>
-      <div className="flex items-center gap-2 mt-1">
-        <BarChart3 className="w-4 h-4 text-violet-400" />
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-zinc-500 font-medium">SEO Need Score</span>
-          <div className="w-24 h-2 rounded-full bg-zinc-800 overflow-hidden">
-            <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-violet-500 to-purple-500" />
+    <div className="relative flex flex-col items-center justify-center w-full h-44">
+      {/* Mini analysis card */}
+      <div className="w-full max-w-xs rounded-xl bg-zinc-800/80 border border-zinc-700/40 p-4 shadow-lg shadow-black/20">
+        {/* Business name placeholder */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-7 h-7 rounded-lg bg-zinc-700/60" />
+          <div>
+            <div className="h-2 w-24 rounded-full bg-zinc-600/60 mb-1" />
+            <div className="h-1.5 w-16 rounded-full bg-zinc-700/40" />
           </div>
-          <span className="text-xs font-bold text-violet-400">75</span>
+          <div className="ml-auto text-right">
+            <span className="text-lg font-black text-violet-400">75</span>
+            <div className="text-[9px] text-zinc-500 -mt-0.5">SEO Need</div>
+          </div>
+        </div>
+        {/* Signal bars */}
+        <div className="space-y-1.5">
+          {signals.map((s) => (
+            <div key={s.label} className="flex items-center gap-2">
+              <span className="text-[10px] text-zinc-500 w-8 font-medium">{s.label}</span>
+              <div className="flex-1 h-1.5 rounded-full bg-zinc-900/80 overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${s.fill} transition-all`}
+                  style={{ width: `${(s.score / s.max) * 100}%` }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function ExportVisual() {
+function ReadyVisual() {
   return (
-    <div className="relative flex items-center justify-center w-full h-40">
-      <div className="absolute w-28 h-28 rounded-full bg-violet-500/10 animate-pulse" />
-      <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
-        <Rocket className="w-7 h-7 text-white" />
-      </div>
-      <div className="absolute top-6 right-16">
-        <div className="px-2 py-1 rounded-md bg-emerald-500/15 border border-emerald-500/20">
-          <span className="text-[10px] font-semibold text-emerald-400">5 free credits</span>
-        </div>
+    <div className="relative flex items-center justify-center w-full h-44">
+      {/* Background glow */}
+      <div className="absolute w-36 h-36 rounded-full bg-gradient-to-br from-violet-600/15 to-purple-600/10 blur-2xl" />
+      {/* Big credit number */}
+      <div className="relative flex flex-col items-center">
+        <span className="text-7xl font-black bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent leading-none">
+          5
+        </span>
+        <span className="text-xs font-semibold text-zinc-500 tracking-widest uppercase mt-1">free credits</span>
       </div>
     </div>
   );
 }
 
-const VISUALS: Record<string, () => JSX.Element> = {
+const VISUALS: Record<string, () => React.JSX.Element> = {
   welcome: WelcomeVisual,
   search: SearchVisual,
   analyze: AnalyzeVisual,
-  export: ExportVisual,
+  export: ReadyVisual,
 };
 
 export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [direction, setDirection] = useState<'next' | 'prev'>('next');
 
   const isLastSlide = currentSlide === SLIDES.length - 1;
 
@@ -137,7 +157,6 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
       onClose();
       return;
     }
-    setDirection('next');
     setCurrentSlide((prev) => prev + 1);
   }, [isLastSlide, onClose]);
 
@@ -146,9 +165,8 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   }, [onClose]);
 
   const handleDotClick = useCallback((index: number) => {
-    setDirection(index > currentSlide ? 'next' : 'prev');
     setCurrentSlide(index);
-  }, [currentSlide]);
+  }, []);
 
   if (!isOpen) return null;
 
