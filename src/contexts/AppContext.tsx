@@ -75,6 +75,8 @@ interface AppContextValue {
   setShowSettingsModal: (show: boolean) => void;
   showLookupModal: boolean;
   setShowLookupModal: (show: boolean) => void;
+  showOnboardingModal: boolean;
+  setShowOnboardingModal: (show: boolean) => void;
 
   // Search State
   businesses: Business[];
@@ -161,6 +163,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showLookupModal, setShowLookupModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [tableBusinesses, setTableBusinesses] = useState<TableBusiness[]>([]);
@@ -357,6 +360,11 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
+      // Show onboarding for first-time users
+      if (!localStorage.getItem('scoutblind_onboarded')) {
+        setShowOnboardingModal(true);
+      }
+
       try {
         const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (saved) {
@@ -926,6 +934,8 @@ export function AppProvider({ children }: AppProviderProps) {
     setShowSettingsModal,
     showLookupModal,
     setShowLookupModal,
+    showOnboardingModal,
+    setShowOnboardingModal,
 
     // Search State
     businesses,
