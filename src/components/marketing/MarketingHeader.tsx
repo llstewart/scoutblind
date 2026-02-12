@@ -38,6 +38,12 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
             <>
               {/* Desktop nav */}
               <Link
+                href="/features"
+                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+              >
+                Features
+              </Link>
+              <Link
                 href="/pricing"
                 className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
               >
@@ -99,6 +105,13 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
       {/* Mobile dropdown */}
       {menuOpen && !isLoggedIn && (
         <div className="sm:hidden absolute top-full left-0 right-0 bg-zinc-900 border-t border-zinc-800/50 px-4 py-3 flex flex-col gap-1">
+          <Link
+            href="/features"
+            onClick={() => setMenuOpen(false)}
+            className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
+          >
+            Features
+          </Link>
           <Link
             href="/pricing"
             onClick={() => setMenuOpen(false)}

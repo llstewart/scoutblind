@@ -20,7 +20,7 @@ export function MarketingFooter() {
             <h4 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">Product</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-xs text-zinc-500 hover:text-white transition-colors">
+                <Link href="/features" className="text-xs text-zinc-500 hover:text-white transition-colors">
                   Features
                 </Link>
               </li>

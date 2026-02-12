@@ -28,7 +28,9 @@
       "Bash(xargs cat:*)",
       "Bash(node -e:*)",
       "Bash(del:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(copy:*)",
+      "Bash(where:*)"
     ]
   }
 }

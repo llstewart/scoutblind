@@ -164,26 +164,41 @@ const MOCK_RADAR_DATA = [
   { axis: 'Local Ranking', value: 10 },
 ];
 
-export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingPageProps) {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [chartsVisible, setChartsVisible] = useState(false);
-  const chartsRef = useRef<HTMLDivElement>(null);
+// ─── Scroll-reveal hook (fires once) ────────────────────────────────
+function useReveal(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const node = chartsRef.current;
+    const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setChartsVisible(true);
+          setVisible(true);
           observer.disconnect();
         }
       },
-      { threshold: 0.15 },
+      { threshold },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [threshold]);
+
+  return { ref, visible };
+}
+
+export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingPageProps) {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Scroll-reveal refs
+  const charts = useReveal(0.15);
+  const painPoint = useReveal(0.2);
+  const counterBar = useReveal(0.3);
+  const howItWorks = useReveal(0.15);
+  const exportPreview = useReveal(0.2);
+  const faqReveal = useReveal(0.15);
+  const ctaReveal = useReveal(0.2);
 
   return (
     <div className="min-h-screen bg-[#0f0f10] flex flex-col">
@@ -370,6 +385,57 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
         </div>
       </section>
 
+      {/* ── PAIN POINT ─────────────────────────────────────────────── */}
+      <section className="py-20 md:py-28">
+        <div ref={painPoint.ref} className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className={`text-2xl md:text-3xl font-bold text-white mb-3 transition-all duration-700 ease-out ${painPoint.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Hours of manual research, done in minutes.
+          </h2>
+          <p className={`text-sm text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-10 transition-all duration-700 ease-out delay-100 ${painPoint.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Stop scrolling Google Maps one listing at a time. Scoutblind scans an entire market in one click.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
+            {[
+              { value: '4 min', label: 'Average scan time' },
+              { value: '25+', label: 'Businesses per scan' },
+              { value: '10+', label: 'Signals per business' },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                className={`transition-all duration-700 ease-out ${painPoint.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                style={{ transitionDelay: painPoint.visible ? `${200 + i * 100}ms` : '0ms' }}
+              >
+                <div className="text-3xl md:text-4xl font-bold text-white">{stat.value}</div>
+                <div className="text-xs text-zinc-500 mt-1">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── COUNTER BAR ────────────────────────────────────────────── */}
+      <section className="py-10">
+        <div ref={counterBar.ref} className="max-w-3xl mx-auto px-4">
+          <div className={`flex items-center justify-center gap-6 sm:gap-10 transition-all duration-700 ease-out ${counterBar.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className="text-center">
+              <div className="text-lg sm:text-xl font-bold text-white">1,000+</div>
+              <div className="text-[11px] text-zinc-500 mt-0.5">Businesses scanned</div>
+            </div>
+            <div className="w-px h-8 bg-zinc-800" />
+            <div className="text-center">
+              <div className="text-lg sm:text-xl font-bold text-white">100+</div>
+              <div className="text-[11px] text-zinc-500 mt-0.5">Markets analyzed</div>
+            </div>
+            <div className="w-px h-8 bg-zinc-800" />
+            <div className="text-center">
+              <div className="text-lg sm:text-xl font-bold text-white">10,000+</div>
+              <div className="text-[11px] text-zinc-500 mt-0.5">Signals checked</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── CHARTS ───────────────────────────────────────────────────── */}
       <section className="py-16 md:py-24 border-t border-zinc-800/40">
         <div className="max-w-5xl mx-auto px-4">
@@ -382,11 +448,11 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
             </p>
           </div>
 
-          <div ref={chartsRef} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div ref={charts.ref} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Chart 1: Opportunity Breakdown */}
             <div
               className={`rounded-xl p-5 border border-zinc-800/40 bg-zinc-900/40 transition-all duration-700 ease-out ${
-                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
             >
               <div className="mb-4">
@@ -394,7 +460,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
                 <p className="text-xs text-zinc-500 mt-0.5">12 businesses need help now</p>
               </div>
               <div className="h-[200px]">
-                {chartsVisible && (
+                {charts.visible && (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={MOCK_OPPORTUNITY_DATA} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_STROKE} horizontal={false} />
@@ -415,16 +481,16 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
             {/* Chart 2: Claim Status (Donut) */}
             <div
               className={`rounded-xl p-5 border border-zinc-800/40 bg-zinc-900/40 transition-all duration-700 ease-out ${
-                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
-              style={{ transitionDelay: chartsVisible ? '150ms' : '0ms' }}
+              style={{ transitionDelay: charts.visible ? '150ms' : '0ms' }}
             >
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-zinc-200">Unclaimed Profiles</h3>
                 <p className="text-xs text-rose-400/80 mt-0.5">40% have no owner</p>
               </div>
               <div className="h-[200px]">
-                {chartsVisible && (
+                {charts.visible && (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -459,16 +525,16 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
             {/* Chart 3: Avg Market Health (Radar) */}
             <div
               className={`rounded-xl p-5 border border-zinc-800/40 bg-zinc-900/40 transition-all duration-700 ease-out ${
-                chartsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
-              style={{ transitionDelay: chartsVisible ? '300ms' : '0ms' }}
+              style={{ transitionDelay: charts.visible ? '300ms' : '0ms' }}
             >
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-zinc-200">Market Health</h3>
                 <p className="text-xs text-zinc-500 mt-0.5">Low scores = wide open opportunity</p>
               </div>
               <div className="h-[200px]">
-                {chartsVisible && (
+                {charts.visible && (
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="65%" data={MOCK_RADAR_DATA}>
                       <PolarGrid stroke={CHART_GRID_STROKE} />
@@ -486,10 +552,10 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
-      <section className="py-16 md:py-24 border-t border-zinc-800/40">
-        <div className="max-w-4xl mx-auto px-4">
+      <section className="py-20 md:py-28">
+        <div ref={howItWorks.ref} className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-[1fr,1.5fr] gap-12 md:gap-16 items-start">
-            <div className="md:sticky md:top-24">
+            <div className={`md:sticky md:top-24 transition-all duration-700 ease-out ${howItWorks.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
                 Three steps,<br />no learning curve.
               </h2>
@@ -516,7 +582,11 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
                   desc: 'Download a prioritized prospect list. Every business is sorted by who needs SEO help most.',
                 },
               ].map((item, i) => (
-                <div key={i} className="flex gap-5">
+                <div
+                  key={i}
+                  className={`flex gap-5 transition-all duration-700 ease-out ${howItWorks.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                  style={{ transitionDelay: howItWorks.visible ? `${150 + i * 150}ms` : '0ms' }}
+                >
                   <span className="text-sm font-medium text-zinc-700 mt-0.5 shrink-0 w-6">{item.num}</span>
                   <div>
                     <h3 className="text-base font-semibold text-white mb-1.5">{item.title}</h3>
@@ -529,9 +599,49 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
         </div>
       </section>
 
+      {/* ── EXPORT PREVIEW ─────────────────────────────────────────── */}
+      <section className="py-20 md:py-28">
+        <div ref={exportPreview.ref} className="max-w-4xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+            {/* Left: copy — slides in from left */}
+            <div className={`flex-1 text-center md:text-left transition-all duration-700 ease-out ${exportPreview.visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                Export-ready prospect lists
+              </h2>
+              <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                Every scan produces a structured CSV with scores, signals, and contact info — ready for your CRM or outreach tool.
+              </p>
+              <ul className="space-y-2.5 text-sm text-zinc-400">
+                <li className="flex items-center gap-2 justify-center md:justify-start">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  SEO Need Scores for every business
+                </li>
+                <li className="flex items-center gap-2 justify-center md:justify-start">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  Phone, website, and contact details
+                </li>
+                <li className="flex items-center gap-2 justify-center md:justify-start">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  Signal breakdowns per prospect
+                </li>
+              </ul>
+            </div>
+
+            {/* Right: Excel logo — slides in from right */}
+            <div className={`shrink-0 transition-all duration-700 ease-out delay-200 ${exportPreview.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+              <img
+                src="/excel-logo.png"
+                alt="Export to Excel"
+                className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-contain drop-shadow-[0_0_30px_rgba(16,185,129,0.12)]"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ──────────────────────────────────────────────────────── */}
       <section className="py-16 md:py-24 border-t border-zinc-800/40">
-        <div className="max-w-2xl mx-auto px-4">
+        <div ref={faqReveal.ref} className={`max-w-2xl mx-auto px-4 transition-all duration-700 ease-out ${faqReveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <h2 className="text-lg font-semibold text-white mb-6">
             Frequently asked questions
           </h2>
@@ -576,7 +686,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
 
       {/* ── FINAL CTA ────────────────────────────────────────────────── */}
       <section className="py-20 md:py-28 border-t border-zinc-800/40">
-        <div className="max-w-xl mx-auto px-4 text-center">
+        <div ref={ctaReveal.ref} className={`max-w-xl mx-auto px-4 text-center transition-all duration-700 ease-out ${ctaReveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Every day you prospect manually is a day someone else closes the deal.
           </h2>
