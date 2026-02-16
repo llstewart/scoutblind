@@ -23,7 +23,7 @@ const faqItems = [
   },
   {
     q: 'Is the data accurate?',
-    a: 'Scoutblind employs high-performance algorithms that integrate real-time GMB data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence. We prioritize high-integrity data to ensure you are always working with a reliable competitive advantage.',
+    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Scoutblind automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
   },
   {
     q: 'Can I export my data?',
@@ -49,7 +49,7 @@ interface MockBusiness {
 
 const MOCK_BUSINESSES: MockBusiness[] = [
   {
-    name: "Mike's Plumbing",
+    name: 'Lone Star Plumbing Co',
     score: 82,
     rating: 3.8,
     reviewCount: 12,
@@ -57,53 +57,53 @@ const MOCK_BUSINESSES: MockBusiness[] = [
     claimed: false,
     signals: [
       { category: 'gbp', text: 'Unclaimed profile' },
-      { category: 'gbp', text: 'No reply in 280d' },
-      { category: 'rank', text: 'Not ranking' },
-      { category: 'web', text: 'No SEO tools' },
+      { category: 'gbp', text: '0% reply rate (280d)' },
+      { category: 'rank', text: 'Not in local pack' },
+      { category: 'web', text: 'No analytics detected' },
     ],
   },
   {
-    name: 'Bright Smile Dental',
+    name: 'Austin Family Dental',
     score: 61,
     rating: 4.1,
     reviewCount: 8,
     searchRank: '#14',
     claimed: true,
     signals: [
-      { category: 'gbp', text: 'Low reply rate (18%)' },
-      { category: 'rank', text: 'Buried #14' },
-      { category: 'rep', text: 'Few reviews (8)' },
+      { category: 'gbp', text: '18% reply rate (6 mo)' },
+      { category: 'rank', text: 'Position #14 of 20' },
+      { category: 'rep', text: '8 reviews (avg is 47)' },
     ],
   },
   {
-    name: 'Garcia & Associates Law',
+    name: 'Garcia & Sons Law Firm',
     score: 47,
     rating: 3.2,
     reviewCount: 23,
     searchRank: '#5',
     claimed: true,
     signals: [
-      { category: 'rank', text: 'Mid-pack #5' },
-      { category: 'web', text: 'No website' },
-      { category: 'rep', text: 'Below avg (3.2)' },
+      { category: 'rank', text: 'Position #5 of 20' },
+      { category: 'web', text: 'No website linked' },
+      { category: 'rep', text: '3.2★ avg (market 4.1)' },
     ],
   },
   {
-    name: 'Summit HVAC Services',
+    name: 'Summit Mechanical HVAC',
     score: 73,
     rating: 4.5,
     reviewCount: 3,
     searchRank: 'Not ranked',
     claimed: true,
     signals: [
-      { category: 'gbp', text: 'No reply in 1yr' },
-      { category: 'rank', text: 'Not ranking' },
-      { category: 'web', text: 'No SEO tools' },
-      { category: 'rep', text: 'Few reviews (3)' },
+      { category: 'gbp', text: '0% reply rate (12 mo)' },
+      { category: 'rank', text: 'Not in local pack' },
+      { category: 'web', text: 'No analytics detected' },
+      { category: 'rep', text: '3 reviews total' },
     ],
   },
   {
-    name: 'Elite Auto Detailing',
+    name: 'Prestige Auto Detail',
     score: 38,
     rating: 4.2,
     reviewCount: 47,
@@ -111,7 +111,7 @@ const MOCK_BUSINESSES: MockBusiness[] = [
     claimed: true,
     signals: [
       { category: 'gbp', text: 'Last reply 45d ago' },
-      { category: 'rep', text: 'Could improve (4.2)' },
+      { category: 'rep', text: '4.2★ (12 negative)' },
     ],
   },
 ];
@@ -187,14 +187,8 @@ export function MarketingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const router = useRouter();
 
-  // Scroll-reveal refs
+  // Scroll-reveal — only on charts (the one section where animation adds value)
   const charts = useReveal(0.15);
-  const painPoint = useReveal(0.2);
-  const counterBar = useReveal(0.3);
-  const howItWorks = useReveal(0.15);
-  const exportPreview = useReveal(0.2);
-  const faqReveal = useReveal(0.15);
-  const ctaReveal = useReveal(0.2);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -202,18 +196,16 @@ export function MarketingPage() {
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative flex-1 flex items-center px-4 py-20 md:py-28 lg:py-32 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-violet-500/[0.02] rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="relative max-w-6xl mx-auto w-full grid lg:grid-cols-[1fr,1.15fr] gap-12 lg:gap-16 items-center">
+        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1fr,1.15fr] gap-12 lg:gap-16 items-center">
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
-            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-gray-900 mb-5 tracking-tight leading-[1.1]">
-              Find SEO prospects{' '}
-              <span className="text-violet-400">in half the time</span>
+            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-5 tracking-tight leading-[1.1]">
+              Identify unclaimed GMB profiles{' '}
+              <span className="text-violet-400">in seconds.</span>
             </h1>
 
-            <p className="text-base md:text-lg text-gray-500 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Scan Google Business Profiles to identify businesses with weak GMB presence, poor review engagement, and local SEO gaps. The signals you hunt for — automated.
+            <p className="text-base md:text-lg text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              Scan Google Business Profiles to identify businesses with <strong className="text-gray-700 font-semibold">weak GMB presence</strong>, <strong className="text-gray-700 font-semibold">poor review engagement</strong>, and <strong className="text-gray-700 font-semibold">local SEO gaps</strong>. The signals you hunt for — automated.
             </p>
 
             <form
@@ -227,13 +219,15 @@ export function MarketingPage() {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
-                    placeholder="Niche (e.g. Plumbers)"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
+                    defaultValue="Plumbers"
+                    readOnly
+                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm cursor-pointer"
                   />
                   <input
                     type="text"
-                    placeholder="Location (e.g. Austin, TX)"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
+                    defaultValue="Austin, TX"
+                    readOnly
+                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm cursor-pointer"
                   />
                 </div>
                 <button
@@ -246,143 +240,204 @@ export function MarketingPage() {
             </form>
 
             <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">
-              <p className="text-xs text-gray-400">No credit card required. 5 free scans.</p>
+              <p className="text-xs text-gray-500">No credit card required. 5 free scans.</p>
               <span className="text-xs text-gray-300">·</span>
               <Link
                 href="/login"
-                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
+                className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Sign in
               </Link>
             </div>
           </div>
 
-          {/* Right: Mock Table */}
+          {/* Right: Product Preview — App Frame */}
           <div className="relative order-2">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
-              {/* Table header */}
-              <div className="relative flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <h3 className="text-sm font-semibold text-gray-900">Plumbers in Austin, TX</h3>
-                  <span className="px-2 py-0.5 text-[10px] font-medium bg-rose-500/10 text-rose-400 rounded-full">12 high-opportunity</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span className="text-[10px] text-emerald-400 font-medium">Live</span>
-                </div>
-              </div>
+                <div className="rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.08),0_30px_60px_-10px_rgba(0,0,0,0.06)] border border-gray-200/80">
 
-              {/* Desktop table */}
-              <div className="hidden lg:block">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="text-left py-2 px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-8">#</th>
-                      <th className="text-left py-2 px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Business</th>
-                      <th className="text-left py-2 px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Why They Need You</th>
-                      <th className="text-left py-2 px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MOCK_BUSINESSES.slice(0, 4).map((biz, i) => (
-                      <tr key={i} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td className="py-2.5 px-3 text-gray-400 font-medium">{i + 1}</td>
-                        <td className="py-2.5 px-3 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <span className="text-gray-800 font-medium">{biz.name}</span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              biz.score >= 70 ? 'bg-rose-500/10 text-rose-400' :
-                              biz.score >= 40 ? 'bg-amber-500/10 text-amber-400' :
-                              'bg-emerald-500/10 text-emerald-400'
-                            }`}>
-                              {biz.score}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <div className="flex flex-wrap gap-1">
-                            {biz.signals.slice(0, 2).map((signal, j) => {
-                              const colors = SIGNAL_CATEGORY_COLORS[signal.category];
-                              return (
-                                <span key={j} className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded ${colors.bg}`}>
-                                  <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
-                                  <span className={colors.text}>{signal.text}</span>
-                                </span>
-                              );
-                            })}
-                            {biz.signals.length > 2 && (
-                              <span className="text-[10px] text-gray-400 px-1 py-0.5">+{biz.signals.length - 2}</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-2.5 px-3 text-right">
-                          <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full ${
-                            biz.claimed
-                              ? 'bg-emerald-500/10 text-emerald-400'
-                              : 'bg-rose-500/10 text-rose-400'
-                          }`}>
-                            {biz.claimed ? 'Claimed' : 'Unclaimed'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile cards */}
-              <div className="block lg:hidden divide-y divide-gray-100">
-                {MOCK_BUSINESSES.slice(0, 3).map((biz, i) => (
-                  <div key={i} className="px-4 py-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400 font-medium">{i + 1}.</span>
-                        <span className="text-sm font-medium text-gray-900">{biz.name}</span>
-                      </div>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                        biz.score >= 70 ? 'bg-rose-500/10 text-rose-400' :
-                        biz.score >= 40 ? 'bg-amber-500/10 text-amber-400' :
-                        'bg-emerald-500/10 text-emerald-400'
-                      }`}>
-                        {biz.score}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {biz.signals.slice(0, 2).map((signal, j) => {
-                        const colors = SIGNAL_CATEGORY_COLORS[signal.category];
-                        return (
-                          <span key={j} className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded ${colors.bg}`}>
-                            <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
-                            <span className={colors.text}>{signal.text}</span>
-                          </span>
-                        );
-                      })}
-                      {biz.signals.length > 2 && (
-                        <span className="text-[10px] text-gray-500 px-1 py-0.5">+{biz.signals.length - 2} more</span>
-                      )}
+                  {/* Window chrome */}
+                  <div className="flex items-center gap-1.5 px-3.5 py-2 bg-gray-100 border-b border-gray-200">
+                    <span className="w-[10px] h-[10px] rounded-full bg-[#ff5f57]" />
+                    <span className="w-[10px] h-[10px] rounded-full bg-[#febc2e]" />
+                    <span className="w-[10px] h-[10px] rounded-full bg-[#28c840]" />
+                    <div className="flex-1 flex justify-center">
+                      <div className="px-4 py-0.5 bg-white rounded-md border border-gray-200/80 text-[10px] text-gray-400 font-mono tracking-tight">scoutblind.com/dashboard</div>
                     </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Bottom fade */}
-              <div className="relative h-12 bg-gradient-to-t from-white to-transparent">
-                <div className="absolute bottom-2 inset-x-0 text-center">
-                  <span className="text-[11px] text-gray-400">+ 21 more results</span>
+                  {/* App shell: sidebar + main */}
+                  <div className="flex bg-white">
+                    {/* Thin sidebar */}
+                    <div className="hidden lg:flex flex-col items-center w-11 bg-gray-50 border-r border-gray-200 py-3 gap-3 shrink-0">
+                      <img src="/icon.svg" alt="" className="w-5 h-5" />
+                      <div className="w-5 h-5 rounded bg-violet-500/10 flex items-center justify-center">
+                        <svg className="w-3 h-3 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <div className="w-5 h-5 rounded bg-gray-200/60 flex items-center justify-center">
+                        <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="w-5 h-5 rounded bg-gray-200/60 flex items-center justify-center">
+                        <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Main content area */}
+                    <div className="flex-1 min-w-0">
+                      {/* Toolbar */}
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100 bg-white">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 rounded-md border border-gray-200 text-[10px] text-gray-600">
+                            <svg className="w-2.5 h-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Plumbers in Austin, TX
+                          </div>
+                          <span className="px-1.5 py-0.5 text-[9px] font-medium bg-violet-500/10 text-violet-500 rounded">25 results</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button className="flex items-center gap-1 px-2 py-1 text-[10px] text-gray-500 bg-gray-50 border border-gray-200 rounded-md">
+                            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            Export CSV
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Tab bar */}
+                      <div className="flex items-center gap-0 px-3 border-b border-gray-100 bg-white">
+                        <span className="px-3 py-1.5 text-[10px] font-medium text-gray-400 border-b border-transparent">All Results</span>
+                        <span className="px-3 py-1.5 text-[10px] font-medium text-violet-600 border-b-2 border-violet-500">Lead Intel</span>
+                        <span className="px-3 py-1.5 text-[10px] font-medium text-gray-400 border-b border-transparent">Market</span>
+                      </div>
+
+                      {/* Desktop table */}
+                      <div className="hidden lg:block">
+                        <table className="w-full text-[11px]">
+                          <thead>
+                            <tr className="border-b border-gray-100 bg-gray-50/50">
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-7">#</th>
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Business</th>
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-10">Rating</th>
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-12">Reviews</th>
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-16">Status</th>
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider">SEO Signals</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {MOCK_BUSINESSES.map((biz, i) => (
+                              <tr key={i} className={`border-b border-gray-50 ${i === 0 ? 'bg-violet-500/[0.02]' : ''}`}>
+                                <td className="py-2 px-2.5 text-gray-300 font-medium">{i + 1}</td>
+                                <td className="py-2 px-2.5 whitespace-nowrap">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-gray-800 font-medium text-[11px]">{biz.name}</span>
+                                    <span className={`text-[9px] font-bold px-1 py-px rounded ${
+                                      biz.score >= 70 ? 'bg-rose-500/10 text-rose-500' :
+                                      biz.score >= 40 ? 'bg-amber-500/10 text-amber-500' :
+                                      'bg-emerald-500/10 text-emerald-500'
+                                    }`}>
+                                      {biz.score}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="py-2 px-2.5 text-gray-600">{biz.rating}</td>
+                                <td className="py-2 px-2.5 text-gray-600">{biz.reviewCount}</td>
+                                <td className="py-2 px-2.5">
+                                  <span className={`inline-flex items-center px-1.5 py-px text-[9px] font-medium rounded ${
+                                    biz.claimed
+                                      ? 'bg-emerald-500/10 text-emerald-600'
+                                      : 'bg-rose-500/10 text-rose-500'
+                                  }`}>
+                                    {biz.claimed ? 'Claimed' : 'Unclaimed'}
+                                  </span>
+                                </td>
+                                <td className="py-2 px-2.5">
+                                  <div className="flex flex-wrap gap-0.5">
+                                    {biz.signals.slice(0, 2).map((signal, j) => {
+                                      const colors = SIGNAL_CATEGORY_COLORS[signal.category];
+                                      return (
+                                        <span key={j} className={`inline-flex items-center gap-0.5 px-1.5 py-px text-[9px] rounded ${colors.bg}`}>
+                                          <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
+                                          <span className={colors.text}>{signal.text}</span>
+                                        </span>
+                                      );
+                                    })}
+                                    {biz.signals.length > 2 && (
+                                      <span className="text-[9px] text-violet-400 px-1 py-px cursor-pointer hover:text-violet-600">+{biz.signals.length - 2} more</span>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile cards */}
+                      <div className="block lg:hidden divide-y divide-gray-100">
+                        {MOCK_BUSINESSES.slice(0, 3).map((biz, i) => (
+                          <div key={i} className="px-3 py-2.5">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400 font-medium">{i + 1}.</span>
+                                <span className="text-sm font-medium text-gray-900">{biz.name}</span>
+                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                                  biz.claimed
+                                    ? 'bg-emerald-500/10 text-emerald-500'
+                                    : 'bg-rose-500/10 text-rose-500'
+                                }`}>
+                                  {biz.claimed ? 'Claimed' : 'Unclaimed'}
+                                </span>
+                              </div>
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                biz.score >= 70 ? 'bg-rose-500/10 text-rose-500' :
+                                biz.score >= 40 ? 'bg-amber-500/10 text-amber-500' :
+                                'bg-emerald-500/10 text-emerald-500'
+                              }`}>
+                                {biz.score}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3 text-[10px] text-gray-500 mb-1.5">
+                              <span>{biz.rating} stars</span>
+                              <span>{biz.reviewCount} reviews</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {biz.signals.slice(0, 2).map((signal, j) => {
+                                const colors = SIGNAL_CATEGORY_COLORS[signal.category];
+                                return (
+                                  <span key={j} className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded ${colors.bg}`}>
+                                    <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
+                                    <span className={colors.text}>{signal.text}</span>
+                                  </span>
+                                );
+                              })}
+                              {biz.signals.length > 2 && (
+                                <span className="text-[10px] text-gray-500 px-1 py-0.5">+{biz.signals.length - 2} more</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* ── PAIN POINT ─────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28">
-        <div ref={painPoint.ref} className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className={`text-2xl md:text-3xl font-bold text-gray-900 mb-3 transition-all duration-700 ease-out ${painPoint.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+      <section className="py-16 md:py-24">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
             Hours of manual research, done in minutes.
           </h2>
-          <p className={`text-sm text-gray-500 leading-relaxed max-w-2xl mx-auto mb-10 transition-all duration-700 ease-out delay-100 ${painPoint.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          <p className="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
             Stop scrolling Google Maps one listing at a time. Scoutblind scans an entire market in one click.
           </p>
 
@@ -391,38 +446,12 @@ export function MarketingPage() {
               { value: '4 min', label: 'Average scan time' },
               { value: '25+', label: 'Businesses per scan' },
               { value: '10+', label: 'Signals per business' },
-            ].map((stat, i) => (
-              <div
-                key={stat.label}
-                className={`transition-all duration-700 ease-out ${painPoint.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-                style={{ transitionDelay: painPoint.visible ? `${200 + i * 100}ms` : '0ms' }}
-              >
-                <div className="text-3xl md:text-4xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
+            ].map((stat) => (
+              <div key={stat.label}>
+                <div className="text-3xl md:text-4xl font-extrabold text-gray-900">{stat.value}</div>
+                <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── COUNTER BAR ────────────────────────────────────────────── */}
-      <section className="py-10">
-        <div ref={counterBar.ref} className="max-w-3xl mx-auto px-4">
-          <div className={`flex items-center justify-center gap-6 sm:gap-10 transition-all duration-700 ease-out ${counterBar.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <div className="text-center">
-              <div className="text-lg sm:text-xl font-bold text-gray-900">1,000+</div>
-              <div className="text-[11px] text-gray-500 mt-0.5">Businesses scanned</div>
-            </div>
-            <div className="w-px h-8 bg-gray-200" />
-            <div className="text-center">
-              <div className="text-lg sm:text-xl font-bold text-gray-900">100+</div>
-              <div className="text-[11px] text-gray-500 mt-0.5">Markets analyzed</div>
-            </div>
-            <div className="w-px h-8 bg-gray-200" />
-            <div className="text-center">
-              <div className="text-lg sm:text-xl font-bold text-gray-900">10,000+</div>
-              <div className="text-[11px] text-gray-500 mt-0.5">Signals checked</div>
-            </div>
           </div>
         </div>
       </section>
@@ -431,10 +460,10 @@ export function MarketingPage() {
       <section className="py-16 md:py-24 border-t border-gray-200">
         <div className="max-w-5xl mx-auto px-4">
           <div className="max-w-xl mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
               This is one scan of one market.
             </h2>
-            <p className="text-sm text-gray-500 leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed">
               Every scan surfaces opportunity breakdowns, claim gaps, and market health scores. Run it on your top niches and see what you&apos;ve been missing.
             </p>
           </div>
@@ -448,7 +477,7 @@ export function MarketingPage() {
             >
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-gray-800">Opportunity Breakdown</h3>
-                <p className="text-xs text-gray-500 mt-0.5">12 businesses need help now</p>
+                <p className="text-xs text-gray-600 mt-0.5">12 businesses need help now</p>
               </div>
               <div className="h-[200px]">
                 {charts.visible && (
@@ -505,7 +534,7 @@ export function MarketingPage() {
                         verticalAlign="bottom"
                         iconType="circle"
                         iconSize={8}
-                        formatter={(value: string) => <span className="text-xs text-gray-500">{value}</span>}
+                        formatter={(value: string) => <span className="text-xs text-gray-600">{value}</span>}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -522,7 +551,7 @@ export function MarketingPage() {
             >
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-gray-800">Market Health</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Low scores = wide open opportunity</p>
+                <p className="text-xs text-gray-600 mt-0.5">Low scores = wide open opportunity</p>
               </div>
               <div className="h-[200px]">
                 {charts.visible && (
@@ -543,14 +572,14 @@ export function MarketingPage() {
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28">
-        <div ref={howItWorks.ref} className="max-w-4xl mx-auto px-4">
+      <section className="py-16 md:py-20">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-[1fr,1.5fr] gap-12 md:gap-16 items-start">
-            <div className={`md:sticky md:top-24 transition-all duration-700 ease-out ${howItWorks.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+            <div className="md:sticky md:top-24">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
                 Three steps,<br />no learning curve.
               </h2>
-              <p className="text-sm text-gray-500 leading-relaxed">
+              <p className="text-sm text-gray-600 leading-relaxed">
                 You don&apos;t need a tutorial. Enter a market, read the signals, close the deal.
               </p>
             </div>
@@ -573,15 +602,11 @@ export function MarketingPage() {
                   desc: 'Download a prioritized prospect list. Every business is sorted by who needs SEO help most.',
                 },
               ].map((item, i) => (
-                <div
-                  key={i}
-                  className={`flex gap-5 transition-all duration-700 ease-out ${howItWorks.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-                  style={{ transitionDelay: howItWorks.visible ? `${150 + i * 150}ms` : '0ms' }}
-                >
+                <div key={i} className="flex gap-5">
                   <span className="text-sm font-medium text-gray-300 mt-0.5 shrink-0 w-6">{item.num}</span>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900 mb-1.5">{item.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -592,47 +617,51 @@ export function MarketingPage() {
 
       {/* ── EXPORT PREVIEW ─────────────────────────────────────────── */}
       <section className="py-20 md:py-28">
-        <div ref={exportPreview.ref} className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
-            {/* Left: copy — slides in from left */}
-            <div className={`flex-1 text-center md:text-left transition-all duration-700 ease-out ${exportPreview.visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                Export-ready prospect lists
-              </h2>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                Every scan produces a structured CSV with scores, signals, and contact info — ready for your CRM or outreach tool.
-              </p>
-              <ul className="space-y-2.5 text-sm text-gray-500">
-                <li className="flex items-center gap-2 justify-center md:justify-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                  SEO Need Scores for every business
-                </li>
-                <li className="flex items-center gap-2 justify-center md:justify-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                  Phone, website, and contact details
-                </li>
-                <li className="flex items-center gap-2 justify-center md:justify-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                  Signal breakdowns per prospect
-                </li>
-              </ul>
-            </div>
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="max-w-xl mb-10">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
+              Export-ready prospect lists
+            </h2>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Every scan produces a structured CSV with scores, signals, and contact info — ready for your CRM or outreach tool.
+            </p>
+          </div>
 
-            {/* Right: Excel logo — slides in from right */}
-            <div className={`shrink-0 transition-all duration-700 ease-out delay-200 ${exportPreview.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
-              <img
-                src="/excel-logo.png"
-                alt="Export to Excel"
-                className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-contain drop-shadow-[0_0_30px_rgba(156,163,175,0.15)]"
-              />
+          {/* Real export screenshot in app frame */}
+          <div className="rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+            <div className="flex items-center gap-1.5 px-4 py-2 bg-gray-50 border-b border-gray-200">
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+              <div className="flex-1 flex justify-center">
+                <div className="px-3 py-0.5 bg-white rounded border border-gray-200 text-[10px] text-gray-400 font-mono">leads-signals-personal-injury-attorney-in-phoenix.csv</div>
+              </div>
             </div>
+            <img
+              src="/export-preview.png"
+              alt="CSV export showing lead data with columns for Name, Phone, Website, Rating, Reviews, Response Rate, Search Visibility, and more"
+              className="w-full"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
+            {[
+              'Name, phone, website, and address for every business',
+              'Rating, review count, response rate, and days dormant',
+              'Search visibility, website tech, SEO status, and claim data',
+            ].map((text) => (
+              <div key={text} className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 mt-1.5" />
+                <span className="text-sm text-gray-600">{text}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────────── */}
       <section className="py-16 md:py-24 border-t border-gray-200">
-        <div ref={faqReveal.ref} className={`max-w-2xl mx-auto px-4 transition-all duration-700 ease-out ${faqReveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+        <div className="max-w-2xl mx-auto px-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">
             Frequently asked questions
           </h2>
@@ -657,7 +686,7 @@ export function MarketingPage() {
                 </button>
                 {openFaq === i && (
                   <div className="pb-4">
-                    <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{item.a}</p>
                   </div>
                 )}
               </div>
@@ -667,7 +696,7 @@ export function MarketingPage() {
           <div className="mt-6">
             <Link
               href="/faq"
-              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               View all questions
             </Link>
@@ -677,11 +706,11 @@ export function MarketingPage() {
 
       {/* ── FINAL CTA ────────────────────────────────────────────────── */}
       <section className="py-20 md:py-28 border-t border-gray-200">
-        <div ref={ctaReveal.ref} className={`max-w-xl mx-auto px-4 text-center transition-all duration-700 ease-out ${ctaReveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+        <div className="max-w-xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
             Every day you prospect manually is a day someone else closes the deal.
           </h2>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-gray-600 mb-8">
             5 free scans. No credit card required.
           </p>
           <Link

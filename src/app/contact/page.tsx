@@ -51,8 +51,8 @@ export default function ContactPage() {
   return (
     <MarketingLayout>
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
-        <p className="text-sm text-gray-500 mb-10">
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Contact Us</h1>
+        <p className="text-sm text-gray-600 mb-10">
           Have a question or need help? We&apos;d love to hear from you.
         </p>
 
@@ -63,20 +63,20 @@ export default function ContactPage() {
               <h2 className="text-sm font-semibold text-gray-900 mb-2">Email</h2>
               <a
                 href="mailto:support@scoutblind.com"
-                className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
+                className="text-sm text-violet-600 hover:text-violet-500 transition-colors"
               >
                 support@scoutblind.com
               </a>
             </div>
             <div>
               <h2 className="text-sm font-semibold text-gray-900 mb-2">Response Time</h2>
-              <p className="text-sm text-gray-500">We typically respond within 24 hours on business days.</p>
+              <p className="text-sm text-gray-600">We typically respond within 24 hours on business days.</p>
             </div>
             <div>
               <h2 className="text-sm font-semibold text-gray-900 mb-2">Common Topics</h2>
-              <ul className="text-sm text-gray-500 space-y-1">
+              <ul className="text-sm text-gray-600 space-y-1">
                 <li>
-                  <a href="/faq" className="text-violet-400 hover:text-violet-300 transition-colors">
+                  <a href="/faq" className="text-violet-600 hover:text-violet-500 transition-colors">
                     Check our FAQ
                   </a>{' '}
                   for quick answers
@@ -97,12 +97,12 @@ export default function ContactPage() {
                   </svg>
                 </div>
                 <h3 className="text-base font-semibold text-gray-900 mb-1">Message Sent</h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600">
                   Thanks for reaching out! We&apos;ll get back to you soon.
                 </p>
                 <button
                   onClick={() => setResult(null)}
-                  className="mt-4 text-sm text-violet-400 hover:text-violet-300"
+                  className="mt-4 text-sm text-violet-600 hover:text-violet-500"
                 >
                   Send another message
                 </button>
@@ -116,7 +116,7 @@ export default function ContactPage() {
                 )}
 
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-600 mb-1.5">
+                  <label htmlFor="name" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                     Name
                   </label>
                   <input
@@ -132,7 +132,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1.5">
+                  <label htmlFor="email" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                     Email
                   </label>
                   <input
@@ -148,7 +148,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-600 mb-1.5">
+                  <label htmlFor="subject" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                     Subject
                   </label>
                   <select
@@ -166,7 +166,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-600 mb-1.5">
+                  <label htmlFor="message" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                     Message
                   </label>
                   <textarea

@@ -23,7 +23,7 @@ const faqItems = [
   },
   {
     q: 'Is the data accurate?',
-    a: 'Scoutblind employs high-performance algorithms that integrate real-time GMB data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence. We prioritize high-integrity data to ensure you are always working with a reliable competitive advantage.',
+    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Scoutblind automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
   },
   {
     q: 'How does pricing work?',
@@ -49,8 +49,8 @@ export default function FaqPage() {
   return (
     <MarketingLayout>
       <div className="max-w-2xl mx-auto px-4 py-12 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Frequently Asked Questions</h1>
-        <p className="text-sm text-gray-500 mb-10">
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Frequently Asked Questions</h1>
+        <p className="text-sm text-gray-600 mb-10">
           Everything you need to know about Scoutblind.
         </p>
 
@@ -74,7 +74,7 @@ export default function FaqPage() {
               </button>
               {openIndex === i && (
                 <div className="px-4 pb-4">
-                  <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{item.a}</p>
                 </div>
               )}
             </div>
@@ -84,7 +84,7 @@ export default function FaqPage() {
         {/* Still have questions? */}
         <div className="mt-12 p-6 rounded-xl bg-gray-50 border border-gray-200 text-center">
           <h3 className="text-base font-semibold text-gray-900 mb-2">Still have questions?</h3>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-600 mb-4">
             Can&apos;t find what you&apos;re looking for? Our team is happy to help.
           </p>
           <Link

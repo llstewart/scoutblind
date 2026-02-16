@@ -106,10 +106,10 @@ export default function FeaturesPage() {
       {/* Hero */}
       <section className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 tracking-tight leading-[1.1]">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 mb-5 tracking-tight leading-[1.1]">
             What Scoutblind analyzes
           </h1>
-          <p className="text-base md:text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
             Every scan evaluates 10+ signals across four categories to surface which businesses genuinely need SEO help — and which are already covered.
           </p>
         </div>
@@ -121,10 +121,10 @@ export default function FeaturesPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-500/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3 text-center">
             Signal categories
           </h2>
-          <p className="text-sm text-gray-500 text-center mb-12 max-w-xl mx-auto">
+          <p className="text-sm text-gray-600 text-center mb-12 max-w-xl mx-auto">
             Each business is scored across four dimensions. Here&apos;s what we look at.
           </p>
 
@@ -152,7 +152,7 @@ export default function FeaturesPage() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-gray-500 leading-relaxed mb-5">{cat.desc}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed mb-5">{cat.desc}</p>
 
                   {/* Signal list */}
                   <div className="space-y-2.5">
@@ -161,7 +161,7 @@ export default function FeaturesPage() {
                         <span className={`mt-1.5 w-1.5 h-1.5 rounded-full ${cat.badgeColor} shrink-0`} />
                         <div>
                           <span className="text-sm text-gray-800">{signal.name}</span>
-                          <span className="text-xs text-gray-400 ml-1.5">{signal.detail}</span>
+                          <span className="text-xs text-gray-500 ml-1.5">{signal.detail}</span>
                         </div>
                       </div>
                     ))}
@@ -176,10 +176,10 @@ export default function FeaturesPage() {
       {/* Scoring */}
       <section className="py-16 md:py-24 border-t border-gray-200">
         <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3 text-center">
             SEO Need Score
           </h2>
-          <p className="text-sm text-gray-500 text-center mb-10 max-w-xl mx-auto">
+          <p className="text-sm text-gray-600 text-center mb-10 max-w-xl mx-auto">
             Every business receives a 0–100 score based on how urgently they need SEO services. Higher means more opportunity for you.
           </p>
 
@@ -192,7 +192,7 @@ export default function FeaturesPage() {
                 <span className={`text-lg font-bold ${item.color} w-20 shrink-0`}>{item.range}</span>
                 <div>
                   <div className={`text-sm font-semibold ${item.color}`}>{item.label}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{item.desc}</div>
+                  <div className="text-xs text-gray-600 mt-0.5">{item.desc}</div>
                 </div>
               </div>
             ))}
@@ -203,10 +203,10 @@ export default function FeaturesPage() {
       {/* Export */}
       <section className="py-16 md:py-24 border-t border-gray-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
             Export to CSV
           </h2>
-          <p className="text-sm text-gray-500 leading-relaxed max-w-xl mx-auto mb-8">
+          <p className="text-sm text-gray-600 leading-relaxed max-w-xl mx-auto mb-8">
             Every scan can be exported as a structured spreadsheet with scores, signals, contact info, and more — ready for your CRM or outreach tool.
           </p>
 
@@ -224,10 +224,10 @@ export default function FeaturesPage() {
       {/* CTA */}
       <section className="py-20 md:py-28 border-t border-gray-200">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
             See it in action
           </h2>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-gray-600 mb-8">
             5 free scans. No credit card required.
           </p>
           <Link

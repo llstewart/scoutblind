@@ -24,14 +24,17 @@ export default function LoginPage() {
         {/* Content */}
         <div className="relative flex flex-col justify-center flex-1 px-12 xl:px-16">
           <div className="max-w-sm">
-            <Link href="/" className="text-2xl font-bold text-gray-900 inline-block mb-12">
-              Scoutblind<span className="text-violet-500">.</span>
+            <Link href="/" className="flex items-center gap-2.5 mb-12">
+              <img src="/icon.svg" alt="" className="w-8 h-8" />
+              <span className="text-2xl font-semibold text-gray-900">
+                Scoutblind<span className="text-violet-500">.</span>
+              </span>
             </Link>
 
-            <h1 className="text-2xl xl:text-3xl font-bold text-gray-900 leading-tight mb-4">
+            <h1 className="text-2xl xl:text-3xl font-semibold text-gray-900 leading-tight mb-4">
               Your prospects are waiting.
             </h1>
-            <p className="text-sm text-gray-500 leading-relaxed mb-10">
+            <p className="text-sm text-gray-600 leading-relaxed mb-10">
               Pick up right where you left off. Your saved searches, market insights, and exported reports are all here.
             </p>
 
@@ -76,7 +79,7 @@ export default function LoginPage() {
 
         {/* Bottom bar */}
         <div className="relative px-12 xl:px-16 py-6 border-t border-gray-200">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-500">
             Trusted by SEO agencies to scan 1,000+ businesses across 100+ markets.
           </p>
         </div>
@@ -87,8 +90,11 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile-only logo */}
           <div className="text-center mb-8 lg:hidden">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              Scoutblind<span className="text-violet-500">.</span>
+            <Link href="/" className="inline-flex items-center gap-2">
+              <img src="/icon.svg" alt="" className="w-7 h-7" />
+              <span className="text-xl font-semibold text-gray-900">
+                Scoutblind<span className="text-violet-500">.</span>
+              </span>
             </Link>
           </div>
 

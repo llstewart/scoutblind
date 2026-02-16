@@ -129,7 +129,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
           {modeSwitchLinks ? (
             <Link
               href="/login"
-              className="mt-4 inline-block text-violet-400 hover:text-violet-300 text-sm"
+              className="mt-4 inline-block text-violet-600 hover:text-violet-500 text-sm"
             >
               Back to sign in
             </Link>
@@ -139,7 +139,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                 setMessage(null);
                 switchMode('signin');
               }}
-              className="mt-4 text-violet-400 hover:text-violet-300 text-sm"
+              className="mt-4 text-violet-600 hover:text-violet-500 text-sm"
             >
               Back to sign in
             </button>
@@ -198,7 +198,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
           {mode === 'signin' && (
             <form onSubmit={handleEmailSignIn} className="space-y-4">
               <div>
-                <label htmlFor="signin-email" className="block text-sm font-medium text-gray-500 mb-1.5">
+                <label htmlFor="signin-email" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                   Email
                 </label>
                 <input
@@ -212,7 +212,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                 />
               </div>
               <div>
-                <label htmlFor="signin-password" className="block text-sm font-medium text-gray-500 mb-1.5">
+                <label htmlFor="signin-password" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -248,7 +248,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                 <button
                   type="button"
                   onClick={() => switchMode('forgot')}
-                  className="text-sm text-violet-400 hover:text-violet-300"
+                  className="text-sm text-violet-600 hover:text-violet-500"
                 >
                   Forgot password?
                 </button>
@@ -267,7 +267,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
           {mode === 'signup' && (
             <form onSubmit={handleEmailSignUp} className="space-y-4">
               <div>
-                <label htmlFor="signup-name" className="block text-sm font-medium text-gray-500 mb-1.5">
+                <label htmlFor="signup-name" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                   Full Name
                 </label>
                 <input
@@ -281,7 +281,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                 />
               </div>
               <div>
-                <label htmlFor="signup-email" className="block text-sm font-medium text-gray-500 mb-1.5">
+                <label htmlFor="signup-email" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                   Email
                 </label>
                 <input
@@ -295,7 +295,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                 />
               </div>
               <div>
-                <label htmlFor="signup-password" className="block text-sm font-medium text-gray-500 mb-1.5">
+                <label htmlFor="signup-password" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -327,7 +327,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                     )}
                   </button>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
+                <p className="mt-1 text-xs text-gray-600">Minimum 6 characters</p>
               </div>
               <button
                 type="submit"
@@ -342,11 +342,11 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
           {/* Forgot Password Form */}
           {mode === 'forgot' && (
             <form onSubmit={handleForgotPassword} className="space-y-4">
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 Enter your email and we&apos;ll send you a link to reset your password.
               </p>
               <div>
-                <label htmlFor="forgot-email" className="block text-sm font-medium text-gray-500 mb-1.5">
+                <label htmlFor="forgot-email" className="block text-[13px] font-medium text-gray-700 mb-1.5">
                   Email
                 </label>
                 <input
@@ -369,7 +369,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
               <button
                 type="button"
                 onClick={() => switchMode('signin')}
-                className="w-full text-sm text-gray-500 hover:text-gray-900"
+                className="w-full text-sm text-gray-600 hover:text-gray-900"
               >
                 Back to sign in
               </button>
@@ -378,18 +378,18 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
 
           {/* Mode Toggle */}
           {mode !== 'forgot' && (
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="mt-6 text-center text-sm text-gray-600">
               {mode === 'signin' ? (
                 <>
                   Don&apos;t have an account?{' '}
                   {modeSwitchLinks ? (
-                    <Link href="/signup" className="text-violet-400 hover:text-violet-300 font-medium">
+                    <Link href="/signup" className="text-violet-600 hover:text-violet-500 font-medium">
                       Sign up
                     </Link>
                   ) : (
                     <button
                       onClick={() => switchMode('signup')}
-                      className="text-violet-400 hover:text-violet-300 font-medium"
+                      className="text-violet-600 hover:text-violet-500 font-medium"
                     >
                       Sign up
                     </button>
@@ -399,13 +399,13 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                 <>
                   Already have an account?{' '}
                   {modeSwitchLinks ? (
-                    <Link href="/login" className="text-violet-400 hover:text-violet-300 font-medium">
+                    <Link href="/login" className="text-violet-600 hover:text-violet-500 font-medium">
                       Sign in
                     </Link>
                   ) : (
                     <button
                       onClick={() => switchMode('signin')}
-                      className="text-violet-400 hover:text-violet-300 font-medium"
+                      className="text-violet-600 hover:text-violet-500 font-medium"
                     >
                       Sign in
                     </button>
@@ -420,13 +420,13 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
       {/* Terms Footer */}
       {mode === 'signup' && !message && (
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-600">
             By signing up, you agree to our{' '}
-            <a href="/terms" className="text-violet-400 hover:text-violet-300">
+            <a href="/terms" className="text-violet-600 hover:text-violet-500">
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="/privacy" className="text-violet-400 hover:text-violet-300">
+            <a href="/privacy" className="text-violet-600 hover:text-violet-500">
               Privacy Policy
             </a>
           </p>

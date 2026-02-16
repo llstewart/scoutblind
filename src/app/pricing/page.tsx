@@ -25,10 +25,10 @@ export default function PricingPage() {
   return (
     <MarketingLayout>
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-2">
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center mb-2">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-sm text-gray-500 text-center mb-12">
+        <p className="text-sm text-gray-600 text-center mb-12">
           One scan could pay for a year of Scoutblind.
         </p>
 
@@ -40,10 +40,10 @@ export default function PricingPage() {
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$0</span>
             </div>
-            <p className="text-xs text-gray-500 mb-5">Get started with no commitment.</p>
+            <p className="text-xs text-gray-600 mb-5">Get started with no commitment.</p>
             <ul className="space-y-2.5 mb-7">
               {['5 market scans', 'Full signal analysis', 'CSV export', 'Search history'].map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                   <svg className="w-4 h-4 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -67,12 +67,12 @@ export default function PricingPage() {
             <h2 className="text-base font-semibold text-gray-900 mb-1">Starter</h2>
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$29</span>
-              <span className="text-sm text-gray-500">/mo</span>
+              <span className="text-sm text-gray-600">/mo</span>
             </div>
-            <p className="text-xs text-gray-500 mb-5">For agencies actively prospecting.</p>
+            <p className="text-xs text-gray-600 mb-5">For agencies actively prospecting.</p>
             <ul className="space-y-2.5 mb-7">
               {['50 scans/month', 'Everything in Free', 'Priority support', 'Saved search library'].map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                   <svg className="w-4 h-4 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -93,12 +93,12 @@ export default function PricingPage() {
             <h2 className="text-base font-semibold text-gray-900 mb-1">Pro</h2>
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$79</span>
-              <span className="text-sm text-gray-500">/mo</span>
+              <span className="text-sm text-gray-600">/mo</span>
             </div>
-            <p className="text-xs text-gray-500 mb-5">For teams running high volume.</p>
+            <p className="text-xs text-gray-600 mb-5">For teams running high volume.</p>
             <ul className="space-y-2.5 mb-7">
               {['200 scans/month', 'Everything in Starter', 'Bulk analysis', 'API access (coming soon)'].map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                   <svg className="w-4 h-4 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -128,7 +128,7 @@ export default function PricingPage() {
                   {s.step}
                 </div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-1">{s.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{s.description}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{s.description}</p>
               </div>
             ))}
           </div>
@@ -139,19 +139,19 @@ export default function PricingPage() {
             >
               Try it free
             </Link>
-            <p className="text-xs text-gray-400 mt-2">No credit card required. 5 free scans.</p>
+            <p className="text-xs text-gray-500 mt-2">No credit card required. 5 free scans.</p>
           </div>
         </div>
 
         {/* FAQ link */}
         <div className="mt-12 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-600">
             Have questions? Check our{' '}
-            <a href="/faq" className="text-violet-400 hover:text-violet-300 transition-colors">
+            <a href="/faq" className="text-violet-600 hover:text-violet-500 transition-colors">
               FAQ
             </a>
             {' '}or{' '}
-            <a href="/contact" className="text-violet-400 hover:text-violet-300 transition-colors">
+            <a href="/contact" className="text-violet-600 hover:text-violet-500 transition-colors">
               contact us
             </a>.
           </p>

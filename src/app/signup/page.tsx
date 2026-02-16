@@ -21,11 +21,14 @@ export default function SignupPage() {
         {/* Content */}
         <div className="relative flex flex-col justify-center flex-1 px-12 xl:px-16">
           <div className="max-w-[360px]">
-            <Link href="/" className="text-2xl font-bold text-white inline-block mb-12">
-              Scoutblind<span className="text-violet-200">.</span>
+            <Link href="/" className="flex items-center gap-2.5 mb-12">
+              <img src="/icon.svg" alt="" className="w-8 h-8 brightness-0 invert" />
+              <span className="text-2xl font-semibold text-white">
+                Scoutblind<span className="text-violet-200">.</span>
+              </span>
             </Link>
 
-            <h1 className="text-2xl xl:text-3xl font-bold text-white leading-tight mb-3">
+            <h1 className="text-2xl xl:text-3xl font-semibold text-white leading-tight mb-3">
               Find SEO prospects<br />
               <span className="text-violet-200">in half the time.</span>
             </h1>
@@ -106,8 +109,11 @@ export default function SignupPage() {
         <div className="w-full max-w-md">
           {/* Mobile-only logo */}
           <div className="text-center mb-8 lg:hidden">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              Scoutblind<span className="text-violet-500">.</span>
+            <Link href="/" className="inline-flex items-center gap-2">
+              <img src="/icon.svg" alt="" className="w-7 h-7" />
+              <span className="text-xl font-semibold text-gray-900">
+                Scoutblind<span className="text-violet-500">.</span>
+              </span>
             </Link>
           </div>
 
