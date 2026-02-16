@@ -199,13 +199,16 @@ export function MarketingPage() {
         <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1fr,1.15fr] gap-12 lg:gap-16 items-center">
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
-            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-5 tracking-tight leading-[1.1]">
-              Identify unclaimed business profiles{' '}
-              <span className="text-violet-400">in seconds.</span>
+            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
+              Find local businesses that{' '}
+              <span className="text-violet-400">actually need your SEO services.</span>
             </h1>
 
-            <p className="text-base md:text-lg text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Scan Google Business Profiles to surface <strong className="text-gray-700 font-semibold">weak online presence</strong>, <strong className="text-gray-700 font-semibold">poor review engagement</strong>, and <strong className="text-gray-700 font-semibold">local SEO gaps</strong>. The signals you hunt for — automated.
+            <p className="text-sm text-gray-600 mb-2 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              Scan any market. See who&apos;s underserved. Export and pitch.
+            </p>
+            <p className="text-sm text-gray-500 mb-8 max-w-lg mx-auto lg:mx-0 italic">
+              The signals you hunt for — automated.
             </p>
 
             <form
