@@ -449,7 +449,7 @@ export function MarketingPage() {
       </section>
 
       {/* ── CHARTS ───────────────────────────────────────────────────── */}
-      <section className="py-16 md:py-24 border-t border-gray-200">
+      <section className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-4">
           <div className="max-w-xl mb-12">
             <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
@@ -564,7 +564,7 @@ export function MarketingPage() {
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
-      <section className="py-16 md:py-20">
+      <section className="py-16 md:py-20 bg-violet-50/50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-[1fr,1.5fr] gap-12 md:gap-16 items-start">
             <div className="md:sticky md:top-24">
@@ -619,16 +619,8 @@ export function MarketingPage() {
             </p>
           </div>
 
-          {/* Real export screenshot in app frame */}
-          <div className="rounded-xl border border-gray-200 shadow-lg overflow-hidden">
-            <div className="flex items-center gap-1.5 px-4 py-2 bg-gray-50 border-b border-gray-200">
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
-              <div className="flex-1 flex justify-center">
-                <div className="px-3 py-0.5 bg-white rounded border border-gray-200 text-[10px] text-gray-400 font-mono">leads-signals-personal-injury-attorney-in-phoenix.csv</div>
-              </div>
-            </div>
+          {/* Real export screenshot */}
+          <div className="rounded-xl border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.08)] overflow-hidden">
             <img
               src="/export-preview.png"
               alt="CSV export showing lead data with columns for Name, Phone, Website, Rating, Reviews, Response Rate, Search Visibility, and more"
