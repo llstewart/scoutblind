@@ -48,7 +48,7 @@ export function UsageLimitsBadge({ sessionId }: UsageLimitsProps) {
         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
           isNearLimit
             ? 'bg-amber-500/10 text-amber-400'
-            : 'bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800'
+            : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
         }`}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,16 +63,16 @@ export function UsageLimitsBadge({ sessionId }: UsageLimitsProps) {
       {showDetails && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowDetails(false)} />
-          <div className="absolute top-full right-0 mt-2 w-64 bg-zinc-800 rounded-xl shadow-xl shadow-black/30 z-50 p-4">
-            <h3 className="text-sm font-semibold text-white mb-3">Usage This Minute</h3>
+          <div className="absolute top-full right-0 mt-2 w-64 bg-gray-100 rounded-xl shadow-xl shadow-black/10 z-50 p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Usage This Minute</h3>
 
             {/* Searches */}
             <div className="mb-3">
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-zinc-400">Searches</span>
-                <span className="text-zinc-300">{usage.searches.used}/{usage.searches.limit}</span>
+                <span className="text-gray-500">Searches</span>
+                <span className="text-gray-700">{usage.searches.used}/{usage.searches.limit}</span>
               </div>
-              <div className="h-1.5 bg-zinc-700 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
                     searchPercent >= 80 ? 'bg-amber-500' : 'bg-violet-500'
@@ -85,10 +85,10 @@ export function UsageLimitsBadge({ sessionId }: UsageLimitsProps) {
             {/* Analyses */}
             <div className="mb-3">
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-zinc-400">Analyses</span>
-                <span className="text-zinc-300">{usage.analyses.used}/{usage.analyses.limit}</span>
+                <span className="text-gray-500">Analyses</span>
+                <span className="text-gray-700">{usage.analyses.used}/{usage.analyses.limit}</span>
               </div>
-              <div className="h-1.5 bg-zinc-700 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
                     analysisPercent >= 80 ? 'bg-amber-500' : 'bg-violet-500'
@@ -98,7 +98,7 @@ export function UsageLimitsBadge({ sessionId }: UsageLimitsProps) {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-gray-500">
               Limits reset every minute. Upgrade for higher limits.
             </p>
           </div>

@@ -49,8 +49,8 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   other: {
-    'theme-color': '#0f0f10',
-    'msapplication-TileColor': '#0f0f10',
+    'theme-color': '#ffffff',
+    'msapplication-TileColor': '#ffffff',
   },
 };
 

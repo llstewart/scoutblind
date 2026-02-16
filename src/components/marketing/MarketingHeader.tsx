@@ -21,9 +21,9 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
   }, []);
 
   return (
-    <header className="relative z-50">
+    <header className="relative z-50 border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-white">
+        <Link href="/" className="text-xl font-bold text-gray-900">
           Scoutblind<span className="text-violet-500">.</span>
         </Link>
         <nav aria-label="Main navigation" className="flex items-center gap-3">
@@ -39,27 +39,27 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
               {/* Desktop nav */}
               <Link
                 href="/features"
-                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Features
               </Link>
               <Link
                 href="/pricing"
-                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Pricing
               </Link>
               {onSignIn ? (
                 <button
                   onClick={onSignIn}
-                  className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                  className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   Sign in
                 </button>
               ) : (
                 <Link
                   href="/"
-                  className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                  className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   Sign in
                 </Link>
@@ -85,7 +85,7 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
               {/* Hamburger - mobile only */}
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="sm:hidden p-2 text-zinc-400 hover:text-white transition-colors"
+                className="sm:hidden p-2 text-gray-500 hover:text-gray-900 transition-colors"
                 aria-label="Toggle menu"
                 aria-expanded={menuOpen}
               >
@@ -104,25 +104,25 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
 
       {/* Mobile dropdown */}
       {menuOpen && !isLoggedIn && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-zinc-900 border-t border-zinc-800/50 px-4 py-3 flex flex-col gap-1">
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex flex-col gap-1 shadow-lg">
           <Link
             href="/features"
             onClick={() => setMenuOpen(false)}
-            className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
+            className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
           >
             Features
           </Link>
           <Link
             href="/pricing"
             onClick={() => setMenuOpen(false)}
-            className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
+            className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
           >
             Pricing
           </Link>
           {onSignIn ? (
             <button
               onClick={() => { onSignIn(); setMenuOpen(false); }}
-              className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors text-left"
+              className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors text-left"
             >
               Sign in
             </button>
@@ -130,7 +130,7 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
             <Link
               href="/"
               onClick={() => setMenuOpen(false)}
-              className="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
+              className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               Sign in
             </Link>

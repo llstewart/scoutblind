@@ -9,7 +9,7 @@ interface MarketingLayoutProps {
 
 export function MarketingLayout({ children, onSignIn, onSignUp }: MarketingLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <MarketingHeader onSignIn={onSignIn} onSignUp={onSignUp} />
       <main className="flex-1">{children}</main>
       <MarketingFooter />

@@ -49,22 +49,22 @@ export default function FaqPage() {
   return (
     <MarketingLayout>
       <div className="max-w-2xl mx-auto px-4 py-12 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Frequently Asked Questions</h1>
-        <p className="text-sm text-zinc-500 mb-10">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Frequently Asked Questions</h1>
+        <p className="text-sm text-gray-500 mb-10">
           Everything you need to know about Scoutblind.
         </p>
 
         <div className="space-y-3">
           {faqItems.map((item, i) => (
-            <div key={i} className="border border-zinc-800/50 rounded-lg overflow-hidden">
+            <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 aria-expanded={openIndex === i}
-                className="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-800/20 transition-colors"
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
               >
-                <span className="text-sm font-medium text-white pr-4">{item.q}</span>
+                <span className="text-sm font-medium text-gray-900 pr-4">{item.q}</span>
                 <svg
-                  className={`w-4 h-4 text-zinc-500 flex-shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-gray-500 flex-shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -74,7 +74,7 @@ export default function FaqPage() {
               </button>
               {openIndex === i && (
                 <div className="px-4 pb-4">
-                  <p className="text-sm text-zinc-400 leading-relaxed">{item.a}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
                 </div>
               )}
             </div>
@@ -82,9 +82,9 @@ export default function FaqPage() {
         </div>
 
         {/* Still have questions? */}
-        <div className="mt-12 p-6 rounded-xl bg-zinc-800/30 border border-zinc-800/50 text-center">
-          <h3 className="text-base font-semibold text-white mb-2">Still have questions?</h3>
-          <p className="text-sm text-zinc-500 mb-4">
+        <div className="mt-12 p-6 rounded-xl bg-gray-50 border border-gray-200 text-center">
+          <h3 className="text-base font-semibold text-gray-900 mb-2">Still have questions?</h3>
+          <p className="text-sm text-gray-500 mb-4">
             Can&apos;t find what you&apos;re looking for? Our team is happy to help.
           </p>
           <Link

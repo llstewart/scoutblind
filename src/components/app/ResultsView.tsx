@@ -37,15 +37,15 @@ export function ResultsView() {
     <div className="flex flex-col h-full p-4 gap-4">
       {/* Search Context Header */}
       {searchParams && !isViewingSavedSearch && (
-        <div className="flex items-center gap-2 text-sm text-zinc-400">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <span>
-            Results for <span className="text-white font-medium">{searchParams.niche}</span> in <span className="text-white font-medium">{searchParams.location}</span>
+            Results for <span className="text-gray-900 font-medium">{searchParams.niche}</span> in <span className="text-gray-900 font-medium">{searchParams.location}</span>
           </span>
           {isCached && (
-            <span className="px-2 py-0.5 text-xs bg-zinc-800 text-zinc-500 rounded">Cached</span>
+            <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">Cached</span>
           )}
         </div>
       )}
@@ -60,22 +60,22 @@ export function ResultsView() {
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-zinc-900/60 rounded-xl shadow-lg shadow-black/20 overflow-x-auto">
+        <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl shadow-sm overflow-x-auto">
           <button
             onClick={() => setActiveTab('general')}
             className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${activeTab === 'general'
-              ? 'bg-zinc-800 text-white shadow-sm'
-              : 'text-zinc-400 hover:text-white'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-900'
               }`}
           >
             All Results
-            <span className="ml-1.5 sm:ml-2 text-zinc-500">({businesses.length})</span>
+            <span className="ml-1.5 sm:ml-2 text-gray-400">({businesses.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('upgraded')}
             className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
-              ? 'bg-zinc-800 text-white shadow-sm'
-              : 'text-zinc-400 hover:text-white'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-900'
               }`}
           >
             <span>Lead Intel</span>
@@ -89,14 +89,14 @@ export function ResultsView() {
               </span>
             )}
             {tableBusinesses.length > 0 && (
-              <span className="text-zinc-500">({tableBusinesses.length})</span>
+              <span className="text-gray-400">({tableBusinesses.length})</span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('market')}
             className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
-              ? 'bg-zinc-800 text-white shadow-sm'
-              : 'text-zinc-400 hover:text-white'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-900'
               }`}
           >
             <span>Market</span>
@@ -112,7 +112,7 @@ export function ResultsView() {
           {!isViewingSavedSearch && (
             <button
               onClick={handleNewSearch}
-              className="px-3 py-2 text-sm font-medium rounded-lg bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all flex items-center gap-2"
+              className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -134,7 +134,7 @@ export function ResultsView() {
               }
             }}
             disabled={activeTab === 'market' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
-            className="px-3 py-2 text-sm font-medium rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -190,7 +190,7 @@ export function ResultsView() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setWasAnalysisInterrupted(false)}
-              className="text-xs text-zinc-400 hover:text-white px-2 py-1"
+              className="text-xs text-gray-500 hover:text-gray-900 px-2 py-1"
             >
               Dismiss
             </button>
@@ -220,7 +220,7 @@ export function ResultsView() {
                       ? 'bg-emerald-500'
                       : phase === analyzeProgress.phase
                         ? 'bg-violet-500 animate-pulse'
-                        : 'bg-zinc-700'
+                        : 'bg-gray-300'
                       }`}
                   />
                 ))}
@@ -248,11 +248,11 @@ export function ResultsView() {
 
       {/* Data Table / Market Dashboard */}
       {activeTab === 'market' ? (
-        <div className="flex-1 min-h-0 bg-zinc-900/30 rounded-xl shadow-lg shadow-black/20 p-4 overflow-y-auto">
+        <div className="flex-1 min-h-0 bg-white border border-gray-200 rounded-xl shadow-sm p-4 overflow-y-auto">
           <MarketDashboard />
         </div>
       ) : (
-      <div className={`bg-zinc-900/60 rounded-xl shadow-lg shadow-black/20 overflow-hidden ${activeTab === 'upgraded' && isPremium
+      <div className={`bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden ${activeTab === 'upgraded' && isPremium
         ? 'ring-1 ring-violet-500/20'
         : ''
         }`}>
@@ -260,13 +260,13 @@ export function ResultsView() {
           isViewingSavedSearch && businesses.length === 0 ? (
             // Viewing saved search - no general list available
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
               </div>
-              <h3 className="text-sm font-medium text-zinc-300 mb-1">Viewing Saved Search</h3>
-              <p className="text-xs text-zinc-500 max-w-xs mb-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-1">Viewing Saved Search</h3>
+              <p className="text-xs text-gray-500 max-w-xs mb-4">
                 This is your saved analysis data. Run a new search to see all results.
               </p>
               <button
@@ -304,7 +304,7 @@ export function ResultsView() {
       )}
 
       {/* Footer Summary */}
-      <div className="text-center text-sm text-zinc-500 pb-4">
+      <div className="text-center text-sm text-gray-500 pb-4">
         {activeTab === 'market' ? (
           <span>
             Market insights for &quot;{searchParams?.niche}&quot; in {searchParams?.location}

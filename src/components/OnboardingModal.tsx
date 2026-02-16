@@ -53,14 +53,14 @@ function SearchVisual() {
     <div className="relative flex flex-col items-center justify-center w-full h-44 gap-3">
       {/* Mini app mockup */}
       <div className="w-full max-w-xs">
-        <div className="rounded-xl bg-zinc-800/80 border border-zinc-700/40 p-3 shadow-lg shadow-black/20">
+        <div className="rounded-xl bg-gray-50 border border-gray-200 p-3 shadow-lg shadow-black/10">
           {/* Fake search bar */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/80 border border-zinc-700/30">
-              <span className="text-xs text-zinc-400">plumber</span>
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200">
+              <span className="text-xs text-gray-500">plumber</span>
             </div>
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/80 border border-zinc-700/30">
-              <span className="text-xs text-zinc-400">Austin, TX</span>
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200">
+              <span className="text-xs text-gray-500">Austin, TX</span>
             </div>
           </div>
           <div className="w-full py-1.5 rounded-lg bg-violet-600 text-center">
@@ -71,8 +71,8 @@ function SearchVisual() {
         <div className="mt-2 mx-2 space-y-1">
           {[72, 58, 45].map((w, i) => (
             <div key={i} className="flex items-center gap-2 opacity-60" style={{ opacity: 0.7 - i * 0.2 }}>
-              <div className="w-5 h-5 rounded bg-zinc-800 border border-zinc-700/30" />
-              <div className="h-2 rounded-full bg-zinc-700/50" style={{ width: `${w}%` }} />
+              <div className="w-5 h-5 rounded bg-gray-100 border border-gray-200" />
+              <div className="h-2 rounded-full bg-gray-200" style={{ width: `${w}%` }} />
             </div>
           ))}
         </div>
@@ -92,25 +92,25 @@ function AnalyzeVisual() {
   return (
     <div className="relative flex flex-col items-center justify-center w-full h-44">
       {/* Mini analysis card */}
-      <div className="w-full max-w-xs rounded-xl bg-zinc-800/80 border border-zinc-700/40 p-4 shadow-lg shadow-black/20">
+      <div className="w-full max-w-xs rounded-xl bg-gray-50 border border-gray-200 p-4 shadow-lg shadow-black/10">
         {/* Business name placeholder */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-zinc-700/60" />
+          <div className="w-7 h-7 rounded-lg bg-gray-200" />
           <div>
-            <div className="h-2 w-24 rounded-full bg-zinc-600/60 mb-1" />
-            <div className="h-1.5 w-16 rounded-full bg-zinc-700/40" />
+            <div className="h-2 w-24 rounded-full bg-gray-300 mb-1" />
+            <div className="h-1.5 w-16 rounded-full bg-gray-200" />
           </div>
           <div className="ml-auto text-right">
             <span className="text-lg font-black text-violet-400">75</span>
-            <div className="text-[9px] text-zinc-500 -mt-0.5">SEO Need</div>
+            <div className="text-[9px] text-gray-500 -mt-0.5">SEO Need</div>
           </div>
         </div>
         {/* Signal bars */}
         <div className="space-y-1.5">
           {signals.map((s) => (
             <div key={s.label} className="flex items-center gap-2">
-              <span className="text-[10px] text-zinc-500 w-8 font-medium">{s.label}</span>
-              <div className="flex-1 h-1.5 rounded-full bg-zinc-900/80 overflow-hidden">
+              <span className="text-[10px] text-gray-500 w-8 font-medium">{s.label}</span>
+              <div className="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden">
                 <div
                   className={`h-full rounded-full ${s.fill} transition-all`}
                   style={{ width: `${(s.score / s.max) * 100}%` }}
@@ -131,10 +131,10 @@ function ReadyVisual() {
       <div className="absolute w-36 h-36 rounded-full bg-gradient-to-br from-violet-600/15 to-purple-600/10 blur-2xl" />
       {/* Big credit number */}
       <div className="relative flex flex-col items-center">
-        <span className="text-7xl font-black bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent leading-none">
+        <span className="text-7xl font-black bg-gradient-to-b from-gray-900 to-gray-500 bg-clip-text text-transparent leading-none">
           5
         </span>
-        <span className="text-xs font-semibold text-zinc-500 tracking-widest uppercase mt-1">free credits</span>
+        <span className="text-xs font-semibold text-gray-500 tracking-widest uppercase mt-1">free credits</span>
       </div>
     </div>
   );
@@ -181,12 +181,12 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Welcome to Scoutblind"
-        className="relative bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/50 w-full max-w-lg m-4 overflow-hidden"
+        className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-black/10 w-full max-w-lg m-4 overflow-hidden"
       >
         {/* Close button */}
         <button
           onClick={handleSkip}
-          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors"
+          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
           aria-label="Close onboarding"
         >
           <X className="w-4 h-4" />
@@ -201,8 +201,8 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
 
           {/* Text */}
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-bold text-white">{slide.title}</h2>
-            <p className="text-sm text-zinc-400 leading-relaxed max-w-sm mx-auto">{slide.description}</p>
+            <h2 className="text-xl font-bold text-gray-900">{slide.title}</h2>
+            <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">{slide.description}</p>
           </div>
         </div>
 
@@ -217,7 +217,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
                 className={`rounded-full transition-all duration-300 ${
                   index === currentSlide
                     ? 'w-6 h-2 bg-violet-500'
-                    : 'w-2 h-2 bg-zinc-700 hover:bg-zinc-600'
+                    : 'w-2 h-2 bg-gray-200 hover:bg-gray-300'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -228,7 +228,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
           <div className="flex items-center justify-between gap-3">
             <button
               onClick={handleSkip}
-              className="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
               Skip
             </button>

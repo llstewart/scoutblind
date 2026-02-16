@@ -139,12 +139,12 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
           role="dialog"
           aria-modal="true"
           aria-labelledby="auth-modal-title"
-          className="w-full max-w-md bg-zinc-900 rounded-2xl shadow-2xl shadow-black/40 my-auto"
+          className="w-full max-w-md bg-white rounded-2xl shadow-2xl shadow-black/10 my-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4">
-            <h2 id="auth-modal-title" className="text-xl font-semibold text-white">
+            <h2 id="auth-modal-title" className="text-xl font-semibold text-gray-900">
               {mode === 'signin' && 'Welcome back'}
               {mode === 'signup' && (signupHeading || 'Create account')}
               {mode === 'forgot' && 'Reset password'}
@@ -152,9 +152,9 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
             <button
               onClick={onClose}
               aria-label="Close dialog"
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -169,7 +169,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-zinc-300">{message}</p>
+                <p className="text-gray-600">{message}</p>
                 <button
                   onClick={() => {
                     setMessage(null);
@@ -188,7 +188,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                     <button
                       onClick={handleGoogleSignIn}
                       disabled={isLoading}
-                      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-zinc-100 text-zinc-900 font-medium rounded-lg transition-colors disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-gray-900 font-medium rounded-lg transition-colors disabled:opacity-50"
                     >
                       <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path
@@ -213,10 +213,10 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
 
                     <div className="relative my-6">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-zinc-700" />
+                        <div className="w-full border-t border-gray-200" />
                       </div>
                       <div className="relative flex justify-center text-sm">
-                        <span className="px-4 bg-zinc-900 text-zinc-500">or</span>
+                        <span className="px-4 bg-white text-gray-500">or</span>
                       </div>
                     </div>
                   </>
@@ -233,7 +233,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                 {mode === 'signin' && (
                   <form onSubmit={handleEmailSignIn} className="space-y-4">
                     <div>
-                      <label htmlFor="signin-email" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signin-email" className="block text-sm font-medium text-gray-500 mb-1.5">
                         Email
                       </label>
                       <input
@@ -242,12 +242,12 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>
                     <div>
-                      <label htmlFor="signin-password" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signin-password" className="block text-sm font-medium text-gray-500 mb-1.5">
                         Password
                       </label>
                       <div className="relative">
@@ -257,14 +257,14 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
-                          className="w-full px-4 py-2.5 pr-11 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                          className="w-full px-4 py-2.5 pr-11 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                           placeholder="••••••••"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                           {showPassword ? (
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -302,7 +302,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                 {mode === 'signup' && (
                   <form onSubmit={handleEmailSignUp} className="space-y-4">
                     <div>
-                      <label htmlFor="signup-name" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signup-name" className="block text-sm font-medium text-gray-500 mb-1.5">
                         Full Name
                       </label>
                       <input
@@ -311,12 +311,12 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="John Doe"
                       />
                     </div>
                     <div>
-                      <label htmlFor="signup-email" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signup-email" className="block text-sm font-medium text-gray-500 mb-1.5">
                         Email
                       </label>
                       <input
@@ -325,12 +325,12 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>
                     <div>
-                      <label htmlFor="signup-password" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="signup-password" className="block text-sm font-medium text-gray-500 mb-1.5">
                         Password
                       </label>
                       <div className="relative">
@@ -341,14 +341,14 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                           onChange={(e) => setPassword(e.target.value)}
                           required
                           minLength={6}
-                          className="w-full px-4 py-2.5 pr-11 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                          className="w-full px-4 py-2.5 pr-11 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                           placeholder="••••••••"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                           {showPassword ? (
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -362,7 +362,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                           )}
                         </button>
                       </div>
-                      <p className="mt-1 text-xs text-zinc-500">Minimum 6 characters</p>
+                      <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
                     </div>
                     <button
                       type="submit"
@@ -377,11 +377,11 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                 {/* Forgot Password Form */}
                 {mode === 'forgot' && (
                   <form onSubmit={handleForgotPassword} className="space-y-4">
-                    <p className="text-sm text-zinc-400 mb-4">
+                    <p className="text-sm text-gray-500 mb-4">
                       Enter your email and we&apos;ll send you a link to reset your password.
                     </p>
                     <div>
-                      <label htmlFor="forgot-email" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                      <label htmlFor="forgot-email" className="block text-sm font-medium text-gray-500 mb-1.5">
                         Email
                       </label>
                       <input
@@ -390,7 +390,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>
@@ -404,7 +404,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
                     <button
                       type="button"
                       onClick={() => switchMode('signin')}
-                      className="w-full text-sm text-zinc-400 hover:text-white"
+                      className="w-full text-sm text-gray-500 hover:text-gray-900"
                     >
                       Back to sign in
                     </button>
@@ -413,7 +413,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
 
                 {/* Mode Toggle */}
                 {mode !== 'forgot' && (
-                  <p className="mt-6 text-center text-sm text-zinc-500">
+                  <p className="mt-6 text-center text-sm text-gray-500">
                     {mode === 'signin' ? (
                       <>
                         Don&apos;t have an account?{' '}
@@ -444,7 +444,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
           {/* Footer */}
           {mode === 'signup' && !message && (
             <div className="px-6 py-4 text-center">
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-gray-500">
                 By signing up, you agree to our{' '}
                 <a href="/terms" className="text-violet-400 hover:text-violet-300">
                   Terms of Service

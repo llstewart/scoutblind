@@ -12,7 +12,7 @@ const statusStyles: Record<StatusType, string> = {
   success: 'bg-emerald-500/10 text-emerald-400',
   warning: 'bg-amber-500/10 text-amber-400',
   error: 'bg-rose-500/10 text-rose-400',
-  neutral: 'bg-zinc-800 text-zinc-400',
+  neutral: 'bg-gray-100 text-gray-500',
 };
 
 export function StatusTag({ status, children, className = '' }: StatusTagProps) {
@@ -34,7 +34,7 @@ export function StatusDot({ status }: StatusDotProps) {
     success: 'bg-emerald-500',
     warning: 'bg-amber-500',
     error: 'bg-rose-500',
-    neutral: 'bg-zinc-500',
+    neutral: 'bg-gray-400',
   };
 
   return (

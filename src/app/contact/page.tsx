@@ -51,8 +51,8 @@ export default function ContactPage() {
   return (
     <MarketingLayout>
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Contact Us</h1>
-        <p className="text-sm text-zinc-500 mb-10">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
+        <p className="text-sm text-gray-500 mb-10">
           Have a question or need help? We&apos;d love to hear from you.
         </p>
 
@@ -60,7 +60,7 @@ export default function ContactPage() {
           {/* Left: Info */}
           <div className="md:col-span-2 space-y-6">
             <div>
-              <h2 className="text-sm font-semibold text-white mb-2">Email</h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-2">Email</h2>
               <a
                 href="mailto:support@scoutblind.com"
                 className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
@@ -69,12 +69,12 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white mb-2">Response Time</h2>
-              <p className="text-sm text-zinc-500">We typically respond within 24 hours on business days.</p>
+              <h2 className="text-sm font-semibold text-gray-900 mb-2">Response Time</h2>
+              <p className="text-sm text-gray-500">We typically respond within 24 hours on business days.</p>
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white mb-2">Common Topics</h2>
-              <ul className="text-sm text-zinc-500 space-y-1">
+              <h2 className="text-sm font-semibold text-gray-900 mb-2">Common Topics</h2>
+              <ul className="text-sm text-gray-500 space-y-1">
                 <li>
                   <a href="/faq" className="text-violet-400 hover:text-violet-300 transition-colors">
                     Check our FAQ
@@ -96,8 +96,8 @@ export default function ContactPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-base font-semibold text-white mb-1">Message Sent</h3>
-                <p className="text-sm text-zinc-400">
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Message Sent</h3>
+                <p className="text-sm text-gray-500">
                   Thanks for reaching out! We&apos;ll get back to you soon.
                 </p>
                 <button
@@ -116,7 +116,7 @@ export default function ContactPage() {
                 )}
 
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-600 mb-1.5">
                     Name
                   </label>
                   <input
@@ -126,13 +126,13 @@ export default function ContactPage() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                     placeholder="Your name"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1.5">
                     Email
                   </label>
                   <input
@@ -142,20 +142,20 @@ export default function ContactPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                     placeholder="you@example.com"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-600 mb-1.5">
                     Subject
                   </label>
                   <select
                     id="subject"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors"
                   >
                     {subjects.map((s) => (
                       <option key={s} value={s}>
@@ -166,7 +166,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-zinc-400 mb-1.5">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-600 mb-1.5">
                     Message
                   </label>
                   <textarea
@@ -176,7 +176,7 @@ export default function ContactPage() {
                     required
                     maxLength={5000}
                     rows={5}
-                    className="w-full px-4 py-2.5 bg-zinc-800/50 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors resize-none"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors resize-none"
                     placeholder="How can we help?"
                   />
                 </div>

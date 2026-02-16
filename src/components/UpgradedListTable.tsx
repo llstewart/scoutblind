@@ -397,15 +397,15 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800/50 bg-zinc-900/50">
-        <span className="text-xs text-zinc-400">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-gray-50">
+        <span className="text-xs text-gray-500">
           {businesses.length.toLocaleString()} analyzed
         </span>
         <button
           onClick={() => setIsCompact(!isCompact)}
           className={`hidden md:flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${isCompact
               ? 'bg-violet-600/20 text-violet-400'
-              : 'text-zinc-500 hover:text-zinc-300'
+              : 'text-gray-500 hover:text-gray-700'
             }`}
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -423,9 +423,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
       )}
 
       {/* Filter Controls */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800/50 bg-zinc-900/30">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center gap-3">
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-gray-500">
             {enrichedBusinesses.length}/{businesses.length} enriched
           </span>
           {pendingCount > 0 && (
@@ -443,7 +443,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
           disabled={pendingCount > 0}
           className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-all ${sortByPriority
             ? 'bg-violet-600 text-white'
-            : 'text-zinc-400 hover:text-white'
+            : 'text-gray-500 hover:text-gray-900'
             } ${pendingCount > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -476,8 +476,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
         {/* Desktop Table View */}
         <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-xs">
-          <thead className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-sm">
-            <tr className="border-b border-zinc-800/50">
+          <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
+            <tr className="border-b border-gray-200">
               <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground w-12`}>
                 #
               </th>
@@ -658,8 +658,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   key={index}
                   data-row-index={index}
                   onClick={() => setFocusedRow(index)}
-                  className={`border-b border-zinc-800/30 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
-                      isPending ? 'bg-violet-500/5' : 'hover:bg-white/[0.02]'
+                  className={`border-b border-gray-200 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
+                      isPending ? 'bg-violet-500/5' : 'hover:bg-gray-50'
                     }`}
                 >
                   <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
@@ -763,7 +763,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                           href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline hover:text-white truncate block max-w-[180px]"
+                          className="text-primary hover:underline hover:text-gray-900 truncate block max-w-[180px]"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {(() => {
@@ -945,15 +945,15 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-3 py-2 border-t border-zinc-800/50 bg-zinc-900/30">
-          <div className="text-xs text-zinc-500 tabular-nums">
+        <div className="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-gray-50">
+          <div className="text-xs text-gray-500 tabular-nums">
             {startIndex + 1}–{Math.min(endIndex, displayedBusinesses.length)} of {displayedBusinesses.length.toLocaleString()}
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-2 py-1 text-xs text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Prev
             </button>
@@ -975,7 +975,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     onClick={() => setCurrentPage(page)}
                     className={`w-6 h-6 text-xs rounded ${currentPage === page
                       ? 'bg-violet-600 text-white'
-                      : 'text-zinc-500 hover:text-white'
+                      : 'text-gray-500 hover:text-gray-900'
                       }`}
                   >
                     {page}
@@ -986,7 +986,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 text-xs text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Next
             </button>

@@ -100,31 +100,31 @@ const SCORE_RANGES = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <MarketingHeader />
 
       {/* Hero */}
       <section className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-5 tracking-tight leading-[1.1]">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-5 tracking-tight leading-[1.1]">
             What Scoutblind analyzes
           </h1>
-          <p className="text-base md:text-lg text-zinc-400 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto">
             Every scan evaluates 10+ signals across four categories to surface which businesses genuinely need SEO help — and which are already covered.
           </p>
         </div>
       </section>
 
       {/* Signal Categories */}
-      <section className="py-16 md:py-24 border-t border-zinc-800/40 relative overflow-hidden">
+      <section className="py-16 md:py-24 border-t border-gray-200 relative overflow-hidden">
         {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-500/[0.02] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-500/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 text-center">
             Signal categories
           </h2>
-          <p className="text-sm text-zinc-400 text-center mb-12 max-w-xl mx-auto">
+          <p className="text-sm text-gray-500 text-center mb-12 max-w-xl mx-auto">
             Each business is scored across four dimensions. Here&apos;s what we look at.
           </p>
 
@@ -132,12 +132,12 @@ export default function FeaturesPage() {
             {SIGNAL_CATEGORIES.map((cat) => (
               <div
                 key={cat.label}
-                className={`group relative rounded-2xl border ${cat.borderColor} bg-gradient-to-b from-[#1e1e24]/80 to-[#141417]/90 backdrop-blur-sm p-6 transition-all duration-300 hover:shadow-lg ${cat.glowColor} hover:border-opacity-40 overflow-hidden`}
+                className={`group relative rounded-2xl border ${cat.borderColor} bg-white shadow-sm p-6 transition-all duration-300 hover:shadow-lg ${cat.glowColor} hover:border-opacity-40 overflow-hidden`}
               >
                 {/* Card top glow accent */}
-                <div className={`absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent ${cat.textClass === 'text-sky-400' ? 'via-sky-500/30' : cat.textClass === 'text-amber-400' ? 'via-amber-500/30' : cat.textClass === 'text-violet-400' ? 'via-violet-500/30' : 'via-rose-500/30'} to-transparent`} />
+                <div className={`absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent ${cat.textClass === 'text-sky-400' ? 'via-sky-500/15' : cat.textClass === 'text-amber-400' ? 'via-amber-500/15' : cat.textClass === 'text-violet-400' ? 'via-violet-500/15' : 'via-rose-500/15'} to-transparent`} />
                 {/* Subtle corner glow */}
-                <div className={`absolute -top-12 -right-12 w-32 h-32 ${cat.bgGlow} rounded-full blur-2xl pointer-events-none transition-opacity duration-300 opacity-60 group-hover:opacity-100`} />
+                <div className={`absolute -top-12 -right-12 w-32 h-32 ${cat.bgGlow} rounded-full blur-2xl pointer-events-none transition-opacity duration-300 opacity-30 group-hover:opacity-60`} />
 
                 <div className="relative">
                   {/* Header: badge + label */}
@@ -147,12 +147,12 @@ export default function FeaturesPage() {
                     </div>
                     <div>
                       <span className={`text-xs font-bold uppercase tracking-wider ${cat.textClass}`}>{cat.label}</span>
-                      <h3 className="text-base font-semibold text-white -mt-0.5">{cat.fullName}</h3>
+                      <h3 className="text-base font-semibold text-gray-900 -mt-0.5">{cat.fullName}</h3>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-zinc-500 leading-relaxed mb-5">{cat.desc}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed mb-5">{cat.desc}</p>
 
                   {/* Signal list */}
                   <div className="space-y-2.5">
@@ -160,8 +160,8 @@ export default function FeaturesPage() {
                       <div key={signal.name} className="flex items-start gap-2.5">
                         <span className={`mt-1.5 w-1.5 h-1.5 rounded-full ${cat.badgeColor} shrink-0`} />
                         <div>
-                          <span className="text-sm text-zinc-200">{signal.name}</span>
-                          <span className="text-xs text-zinc-600 ml-1.5">{signal.detail}</span>
+                          <span className="text-sm text-gray-800">{signal.name}</span>
+                          <span className="text-xs text-gray-400 ml-1.5">{signal.detail}</span>
                         </div>
                       </div>
                     ))}
@@ -174,12 +174,12 @@ export default function FeaturesPage() {
       </section>
 
       {/* Scoring */}
-      <section className="py-16 md:py-24 border-t border-zinc-800/40">
+      <section className="py-16 md:py-24 border-t border-gray-200">
         <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 text-center">
             SEO Need Score
           </h2>
-          <p className="text-sm text-zinc-400 text-center mb-10 max-w-xl mx-auto">
+          <p className="text-sm text-gray-500 text-center mb-10 max-w-xl mx-auto">
             Every business receives a 0–100 score based on how urgently they need SEO services. Higher means more opportunity for you.
           </p>
 
@@ -187,12 +187,12 @@ export default function FeaturesPage() {
             {SCORE_RANGES.map((item) => (
               <div
                 key={item.range}
-                className="flex items-center gap-4 rounded-lg border border-zinc-800/40 bg-zinc-900/40 px-5 py-4"
+                className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 px-5 py-4"
               >
                 <span className={`text-lg font-bold ${item.color} w-20 shrink-0`}>{item.range}</span>
                 <div>
                   <div className={`text-sm font-semibold ${item.color}`}>{item.label}</div>
-                  <div className="text-xs text-zinc-500 mt-0.5">{item.desc}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{item.desc}</div>
                 </div>
               </div>
             ))}
@@ -201,12 +201,12 @@ export default function FeaturesPage() {
       </section>
 
       {/* Export */}
-      <section className="py-16 md:py-24 border-t border-zinc-800/40">
+      <section className="py-16 md:py-24 border-t border-gray-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
             Export to CSV
           </h2>
-          <p className="text-sm text-zinc-400 leading-relaxed max-w-xl mx-auto mb-8">
+          <p className="text-sm text-gray-500 leading-relaxed max-w-xl mx-auto mb-8">
             Every scan can be exported as a structured spreadsheet with scores, signals, contact info, and more — ready for your CRM or outreach tool.
           </p>
 
@@ -216,18 +216,18 @@ export default function FeaturesPage() {
               alt="Export to Excel"
               className="w-16 h-16 object-contain drop-shadow-[0_0_20px_rgba(16,185,129,0.1)]"
             />
-            <span className="text-sm text-zinc-300">One-click CSV download</span>
+            <span className="text-sm text-gray-700">One-click CSV download</span>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 md:py-28 border-t border-zinc-800/40">
+      <section className="py-20 md:py-28 border-t border-gray-200">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
             See it in action
           </h2>
-          <p className="text-sm text-zinc-500 mb-8">
+          <p className="text-sm text-gray-500 mb-8">
             5 free scans. No credit card required.
           </p>
           <Link

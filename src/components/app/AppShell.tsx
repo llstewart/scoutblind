@@ -45,7 +45,7 @@ export function AppShell({
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -113,8 +113,8 @@ export function TabHeader({
   return (
     <div className="flex items-start justify-between mb-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{title}</h1>
-        {subtitle && <p className="text-sm text-zinc-500 mt-1">{subtitle}</p>}
+        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+        {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
