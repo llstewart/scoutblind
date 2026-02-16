@@ -564,7 +564,7 @@ export function MarketingPage() {
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
-      <section className="py-16 md:py-20 bg-violet-50/50">
+      <section className="py-16 md:py-20 bg-violet-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-[1fr,1.5fr] gap-12 md:gap-16 items-start">
             <div className="md:sticky md:top-24">
