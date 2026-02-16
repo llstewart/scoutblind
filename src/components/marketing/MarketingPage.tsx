@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -10,12 +11,6 @@ import {
 import { SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS, type SignalCategory } from '@/lib/signals';
 import { MarketingHeader } from './MarketingHeader';
 import { MarketingFooter } from './MarketingFooter';
-
-interface MarketingPageProps {
-  onSignIn: () => void;
-  onSignUp: () => void;
-  onSearchSignUp: () => void;
-}
 
 const faqItems = [
   {
@@ -188,8 +183,9 @@ function useReveal(threshold = 0.15) {
   return { ref, visible };
 }
 
-export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingPageProps) {
+export function MarketingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const router = useRouter();
 
   // Scroll-reveal refs
   const charts = useReveal(0.15);
@@ -202,7 +198,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <MarketingHeader onSignIn={onSignIn} onSignUp={onSignUp} />
+      <MarketingHeader />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative flex-1 flex items-center px-4 py-20 md:py-28 lg:py-32 overflow-hidden">
@@ -223,7 +219,7 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                onSearchSignUp();
+                router.push('/signup');
               }}
               className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2"
             >
@@ -252,12 +248,12 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
             <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">
               <p className="text-xs text-gray-400">No credit card required. 5 free scans.</p>
               <span className="text-xs text-gray-300">·</span>
-              <button
-                onClick={onSignIn}
+              <Link
+                href="/login"
                 className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
               >
                 Sign in
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -688,12 +684,12 @@ export function MarketingPage({ onSignIn, onSignUp, onSearchSignUp }: MarketingP
           <p className="text-sm text-gray-500 mb-8">
             5 free scans. No credit card required.
           </p>
-          <button
-            onClick={onSignUp}
-            className="px-8 py-3.5 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+          <Link
+            href="/signup"
+            className="inline-block px-8 py-3.5 text-base font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
           >
             Get started
-          </button>
+          </Link>
         </div>
       </section>
 

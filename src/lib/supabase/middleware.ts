@@ -32,8 +32,8 @@ export async function updateSession(request: NextRequest) {
   // Refreshing the auth token
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Redirect authenticated users from marketing page to dashboard
-  if (user && request.nextUrl.pathname === '/') {
+  // Redirect authenticated users from marketing/auth pages to dashboard
+  if (user && ['/', '/login', '/signup'].includes(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);

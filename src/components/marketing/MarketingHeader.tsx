@@ -4,12 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
-interface MarketingHeaderProps {
-  onSignIn?: () => void;
-  onSignUp?: () => void;
-}
-
-export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
+export function MarketingHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -49,38 +44,20 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
               >
                 Pricing
               </Link>
-              {onSignIn ? (
-                <button
-                  onClick={onSignIn}
-                  className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  Sign in
-                </button>
-              ) : (
-                <Link
-                  href="/"
-                  className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  Sign in
-                </Link>
-              )}
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Sign in
+              </Link>
 
               {/* Get Started - always visible */}
-              {onSignUp ? (
-                <button
-                  onClick={onSignUp}
-                  className="px-4 py-2 text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
-                >
-                  Get Started Free
-                </button>
-              ) : (
-                <Link
-                  href="/"
-                  className="px-4 py-2 text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
-                >
-                  Get Started Free
-                </Link>
-              )}
+              <Link
+                href="/signup"
+                className="px-4 py-2 text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+              >
+                Get Started Free
+              </Link>
 
               {/* Hamburger - mobile only */}
               <button
@@ -119,22 +96,13 @@ export function MarketingHeader({ onSignIn, onSignUp }: MarketingHeaderProps) {
           >
             Pricing
           </Link>
-          {onSignIn ? (
-            <button
-              onClick={() => { onSignIn(); setMenuOpen(false); }}
-              className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors text-left"
-            >
-              Sign in
-            </button>
-          ) : (
-            <Link
-              href="/"
-              onClick={() => setMenuOpen(false)}
-              className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              Sign in
-            </Link>
-          )}
+          <Link
+            href="/login"
+            onClick={() => setMenuOpen(false)}
+            className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+          >
+            Sign in
+          </Link>
         </div>
       )}
     </header>

@@ -1,28 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
-import { AuthModal } from '@/components/auth/AuthModal';
+import Link from 'next/link';
 import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 
 export default function PricingPage() {
-  const {
-    showAuthModal,
-    setShowAuthModal,
-    authMode,
-    setAuthMode,
-  } = useAppContext();
-
-  const openSignUp = () => {
-    setAuthMode('signup');
-    setShowAuthModal(true);
-  };
-
-  const openSignIn = () => {
-    setAuthMode('signin');
-    setShowAuthModal(true);
-  };
-
   const steps = [
     {
       step: '1',
@@ -42,7 +23,7 @@ export default function PricingPage() {
   ];
 
   return (
-    <MarketingLayout onSignIn={openSignIn} onSignUp={openSignUp}>
+    <MarketingLayout>
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-2">
           Simple, Transparent Pricing
@@ -70,12 +51,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={openSignUp}
+            <Link
+              href="/signup"
               className="block w-full py-2.5 text-sm font-medium text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors text-center"
             >
               Start Free
-            </button>
+            </Link>
           </div>
 
           {/* Starter */}
@@ -99,12 +80,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={openSignUp}
+            <Link
+              href="/signup"
               className="block w-full py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors text-center"
             >
               Start Now
-            </button>
+            </Link>
           </div>
 
           {/* Pro */}
@@ -125,12 +106,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={openSignUp}
+            <Link
+              href="/signup"
               className="block w-full py-2.5 text-sm font-medium text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors text-center"
             >
               Start Now
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -152,12 +133,12 @@ export default function PricingPage() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <button
-              onClick={openSignUp}
-              className="px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+            <Link
+              href="/signup"
+              className="inline-block px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
             >
               Try it free
-            </button>
+            </Link>
             <p className="text-xs text-gray-400 mt-2">No credit card required. 5 free scans.</p>
           </div>
         </div>
@@ -176,12 +157,6 @@ export default function PricingPage() {
           </p>
         </div>
       </div>
-
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        defaultMode={authMode}
-      />
     </MarketingLayout>
   );
 }
