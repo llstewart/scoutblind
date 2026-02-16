@@ -14,7 +14,7 @@ export function MarketingFooter() {
               </span>
             </Link>
             <p className="mt-2 text-xs text-gray-600 leading-relaxed">
-              GMB signal analysis for SEO agencies. Find prospects who need your help.
+              GBP signal analysis for SEO agencies. Find prospects who need your help.
             </p>
           </div>
 
@@ -85,6 +85,10 @@ export function MarketingFooter() {
             <Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link>
           </div>
         </div>
+
+        <p className="mt-4 text-[10px] text-gray-400 text-center">
+          Google and Google Business Profile are trademarks of Google LLC. Scoutblind is not affiliated with or endorsed by Google.
+        </p>
       </div>
     </footer>
   );

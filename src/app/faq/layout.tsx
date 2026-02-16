@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'FAQ',
-  description: 'Frequently asked questions about Scoutblind. Learn about credits, GMB signals, pricing, data accuracy, and more.',
+  description: 'Frequently asked questions about Scoutblind. Learn about credits, GBP signals, pricing, data accuracy, and more.',
   alternates: { canonical: '/faq' },
 };
 
@@ -15,7 +15,7 @@ const faqJsonLd = {
       name: 'What is Scoutblind?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Scoutblind is a prospecting tool for SEO agencies. It scans Google Business Profiles in any market and analyzes key GMB signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your SEO services.',
+        text: 'Scoutblind is a prospecting tool for SEO agencies. It scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your SEO services.',
       },
     },
     {
@@ -23,12 +23,12 @@ const faqJsonLd = {
       name: 'How do credits work?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Each search costs 1 credit. A search scans all GMB profiles for a given niche + location combination and returns a prioritized prospect list with signal analysis. You get 5 free credits when you sign up, and can purchase additional credits or subscribe to a monthly plan.',
+        text: 'Each search costs 1 credit. A search scans all GBP profiles for a given niche + location combination and returns a prioritized prospect list with signal analysis. You get 5 free credits when you sign up, and can purchase additional credits or subscribe to a monthly plan.',
       },
     },
     {
       '@type': 'Question',
-      name: 'What GMB signals are analyzed?',
+      name: 'What GBP signals are analyzed?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall SEO Need Score.',
@@ -47,7 +47,7 @@ const faqJsonLd = {
       name: 'Is the data accurate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Scoutblind employs high-performance algorithms that integrate real-time GMB data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence.',
+        text: 'Scoutblind employs high-performance algorithms that integrate real-time GBP data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence.',
       },
     },
     {

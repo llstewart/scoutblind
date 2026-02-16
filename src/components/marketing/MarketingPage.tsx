@@ -15,11 +15,11 @@ import { MarketingFooter } from './MarketingFooter';
 const faqItems = [
   {
     q: 'What is Scoutblind?',
-    a: 'Scoutblind scans Google Business Profiles in any market and analyzes key GMB signals — like review response rates, owner activity, and local pack rankings — to help SEO agencies find prospects who actually need their services.',
+    a: 'Scoutblind scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, and local pack rankings — to help SEO agencies find prospects who actually need their services.',
   },
   {
     q: 'How do credits work?',
-    a: 'Each search costs 1 credit. A search scans all GMB profiles for a given niche + location and returns a prioritized prospect list. You get 5 free credits on signup, and can purchase more anytime.',
+    a: 'Each search costs 1 credit. A search scans all GBP profiles for a given niche + location and returns a prioritized prospect list. You get 5 free credits on signup, and can purchase more anytime.',
   },
   {
     q: 'Is the data accurate?',
@@ -200,12 +200,12 @@ export function MarketingPage() {
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-5 tracking-tight leading-[1.1]">
-              Identify unclaimed GMB profiles{' '}
+              Identify unclaimed business profiles{' '}
               <span className="text-violet-400">in seconds.</span>
             </h1>
 
             <p className="text-base md:text-lg text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Scan Google Business Profiles to identify businesses with <strong className="text-gray-700 font-semibold">weak GMB presence</strong>, <strong className="text-gray-700 font-semibold">poor review engagement</strong>, and <strong className="text-gray-700 font-semibold">local SEO gaps</strong>. The signals you hunt for — automated.
+              Scan Google Business Profiles to surface <strong className="text-gray-700 font-semibold">weak online presence</strong>, <strong className="text-gray-700 font-semibold">poor review engagement</strong>, and <strong className="text-gray-700 font-semibold">local SEO gaps</strong>. The signals you hunt for — automated.
             </p>
 
             <form

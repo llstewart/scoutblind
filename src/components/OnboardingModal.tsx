@@ -21,7 +21,7 @@ const SLIDES = [
   },
   {
     title: 'Read the signals',
-    description: 'We analyze 10+ GMB signals per business and score them by SEO need.',
+    description: 'We analyze 10+ GBP signals per business and score them by SEO need.',
     visual: 'analyze',
   },
   {

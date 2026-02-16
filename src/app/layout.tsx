@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
     template: '%s | Scoutblind',
   },
   description: 'Scan Google Business Profiles to find businesses with weak SEO presence. Identify unclaimed profiles, poor rankings, and dormant owners — then pitch them your services.',
-  keywords: ['SEO prospecting', 'Google Business Profile', 'GMB signals', 'SEO leads', 'local SEO', 'SEO agency tool', 'lead generation', 'business intelligence'],
+  keywords: ['SEO prospecting', 'Google Business Profile', 'GBP signals', 'GMB signals', 'SEO leads', 'local SEO', 'SEO agency tool', 'lead generation', 'business intelligence'],
   authors: [{ name: 'Scoutblind' }],
   creator: 'Scoutblind',
   alternates: {
@@ -110,6 +111,7 @@ export default function RootLayout({
           {children}
         </Providers>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

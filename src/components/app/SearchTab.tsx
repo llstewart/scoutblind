@@ -47,7 +47,7 @@ export function SearchTab({
             Find businesses that need your services.
           </p>
           <p className="text-gray-500 text-sm mb-8 max-w-md mx-auto">
-            Analyze Google Business Profiles to identify prospects with weak GMB presence, poor review engagement, and SEO gaps.
+            Analyze Google Business Profiles to identify prospects with weak GBP presence, poor review engagement, and SEO gaps.
           </p>
 
           {/* Search Form */}
@@ -70,7 +70,7 @@ export function SearchTab({
 
           {/* Credit info */}
           <p className="text-[10px] text-gray-400 mb-8">
-            1 credit per search · 1 credit per GMB analysis · <span className="text-violet-400">{credits} credits remaining</span>
+            1 credit per search · 1 credit per GBP analysis · <span className="text-violet-400">{credits} credits remaining</span>
           </p>
 
           {/* Recent Searches */}
@@ -129,7 +129,7 @@ export function SearchTab({
                 <div className="w-6 h-px bg-gray-200" />
                 <div className="flex items-center gap-1.5">
                   <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[10px] font-medium">2</div>
-                  <span>Scan GMB profiles</span>
+                  <span>Scan GBP profiles</span>
                 </div>
                 <div className="w-6 h-px bg-gray-200" />
                 <div className="flex items-center gap-1.5">

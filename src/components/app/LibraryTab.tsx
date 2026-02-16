@@ -121,12 +121,12 @@ export function LibraryTab({
                 </p>
               </div>
 
-              {/* GMB Signal badge */}
+              {/* GBP Signal badge */}
               <div className="flex items-center gap-1.5 px-2 py-1 bg-violet-500/10 rounded-md">
                 <svg className="w-3.5 h-3.5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                <span className="text-[10px] font-medium text-violet-400 uppercase tracking-wide">GMB Signals</span>
+                <span className="text-[10px] font-medium text-violet-400 uppercase tracking-wide">GBP Signals</span>
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export function LibraryTab({
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
                 <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-gray-500">Loading GMB analysis data...</p>
+                <p className="text-sm text-gray-500">Loading GBP analysis data...</p>
               </div>
             </div>
           ) : (
@@ -157,7 +157,7 @@ export function LibraryTab({
       <TabContent>
         <div className="mb-6">
           <h1 className="text-xl font-bold text-gray-900">Library</h1>
-          <p className="text-xs text-gray-500 mt-1">Your GMB prospect research</p>
+          <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
         </div>
         <div className="flex items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
@@ -172,7 +172,7 @@ export function LibraryTab({
       <TabContent>
         <div className="mb-6">
           <h1 className="text-xl font-bold text-gray-900">Library</h1>
-          <p className="text-xs text-gray-500 mt-1">Your GMB prospect research</p>
+          <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
         </div>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
@@ -182,7 +182,7 @@ export function LibraryTab({
           </div>
           <h3 className="text-base font-medium text-gray-900 mb-1">No prospects yet</h3>
           <p className="text-xs text-gray-500 max-w-xs">
-            Search for businesses in the Search tab to find prospects with weak GMB presence.
+            Search for businesses in the Search tab to find prospects with weak GBP presence.
           </p>
         </div>
       </TabContent>

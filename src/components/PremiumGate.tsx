@@ -86,7 +86,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Search Visibility</th>
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Response Rate</th>
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Last Activity</th>
-                <th className="py-4 px-4 text-sm font-semibold text-foreground">GMB Signals</th>
+                <th className="py-4 px-4 text-sm font-semibold text-foreground">GBP Signals</th>
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Opportunity Score</th>
               </tr>
             </thead>
