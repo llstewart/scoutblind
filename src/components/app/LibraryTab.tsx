@@ -80,6 +80,7 @@ export function LibraryTab({
 }: LibraryTabProps) {
   const [searchFilter, setSearchFilter] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Filter and group searches
   const filteredSearches = useMemo(() => {
@@ -201,11 +202,7 @@ export function LibraryTab({
         <div className="flex items-center gap-2">
           {onClearAll && searches.length > 0 && (
             <button
-              onClick={() => {
-                if (window.confirm('Clear all saved research? This cannot be undone.')) {
-                  onClearAll();
-                }
-              }}
+              onClick={() => setShowClearConfirm(true)}
               className="px-2 py-1 text-[10px] font-medium text-zinc-600 hover:text-red-400 transition-colors"
             >
               Clear all
@@ -347,6 +344,42 @@ export function LibraryTab({
           </div>
         ))}
       </div>
+      {/* Clear All Confirmation Modal */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowClearConfirm(false)} />
+          <div className="relative bg-zinc-900 rounded-2xl p-6 shadow-2xl shadow-black/40 w-full max-w-sm border border-zinc-800">
+            <div className="flex justify-center mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10">
+                <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-white text-center mb-2">Clear all research?</h3>
+            <p className="text-sm text-zinc-400 text-center mb-6">
+              This will permanently delete all {searches.length} saved {searches.length === 1 ? 'market' : 'markets'} and their analysis data. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowClearConfirm(false);
+                  onClearAll?.();
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </TabContent>
   );
 }

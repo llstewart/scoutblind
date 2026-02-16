@@ -162,12 +162,30 @@ CREATE INDEX idx_usage_logs_user_id ON public.usage_logs(user_id);
 CREATE INDEX idx_usage_logs_created_at ON public.usage_logs(created_at DESC);
 
 -- ============================================
+-- FREE CREDIT CLAIMS TABLE
+-- Tracks which emails have received welcome credits.
+-- NOT linked to auth.users — survives account deletion.
+-- ============================================
+CREATE TABLE public.free_credit_claims (
+  email TEXT PRIMARY KEY,
+  claimed_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- No RLS needed — only accessed by service role via triggers/API
+ALTER TABLE public.free_credit_claims ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage claims" ON public.free_credit_claims
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- ============================================
 -- FUNCTIONS & TRIGGERS
 -- ============================================
 
 -- Function to handle new user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_already_claimed BOOLEAN;
 BEGIN
   -- Create profile
   INSERT INTO public.profiles (id, email, full_name, avatar_url)
@@ -178,13 +196,27 @@ BEGIN
     NEW.raw_user_meta_data->>'avatar_url'
   );
 
-  -- Create free subscription with starter credits
-  INSERT INTO public.subscriptions (user_id, tier, status, credits_monthly_allowance, credits_remaining)
-  VALUES (NEW.id, 'free', 'active', 5, 5);
+  -- Check if this email already claimed free credits
+  SELECT EXISTS(
+    SELECT 1 FROM public.free_credit_claims WHERE email = LOWER(NEW.email)
+  ) INTO v_already_claimed;
 
-  -- Log initial credits
-  INSERT INTO public.credit_transactions (user_id, amount, type, description, balance_after)
-  VALUES (NEW.id, 5, 'bonus', 'Welcome credits for new users', 5);
+  IF v_already_claimed THEN
+    -- Returning user: create subscription with 0 credits
+    INSERT INTO public.subscriptions (user_id, tier, status, credits_monthly_allowance, credits_remaining)
+    VALUES (NEW.id, 'free', 'active', 0, 0);
+  ELSE
+    -- New user: grant welcome credits and record the claim
+    INSERT INTO public.subscriptions (user_id, tier, status, credits_monthly_allowance, credits_remaining)
+    VALUES (NEW.id, 'free', 'active', 5, 5);
+
+    INSERT INTO public.credit_transactions (user_id, amount, type, description, balance_after)
+    VALUES (NEW.id, 5, 'bonus', 'Welcome credits for new users', 5);
+
+    INSERT INTO public.free_credit_claims (email)
+    VALUES (LOWER(NEW.email))
+    ON CONFLICT (email) DO NOTHING;
+  END IF;
 
   RETURN NEW;
 END;

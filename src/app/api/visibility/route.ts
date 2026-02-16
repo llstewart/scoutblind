@@ -1,12 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkSearchVisibility } from '@/lib/visibility';
 import { VisibilityRequest, VisibilityResponse } from '@/lib/types';
-import { checkRateLimit } from '@/lib/api-rate-limit';
+import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   // Check rate limit
   const rateLimitResponse = await checkRateLimit(request, 'visibility');
   if (rateLimitResponse) return rateLimitResponse;
+
+  // Require authentication
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({
+      error: 'Authentication required',
+      requiresAuth: true
+    }, { status: 401 });
+  }
+
+  // Per-user rate limit
+  const userRateLimitResponse = await checkUserRateLimit(user.id, 'visibility');
+  if (userRateLimitResponse) return userRateLimitResponse;
+
+  // Check subscription tier - only paid users can check visibility
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('tier')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!subscription || subscription.tier === 'free') {
+    return NextResponse.json({
+      error: 'Upgrade to unlock visibility checks',
+      requiresUpgrade: true
+    }, { status: 403 });
+  }
 
   try {
     const body: VisibilityRequest = await request.json();

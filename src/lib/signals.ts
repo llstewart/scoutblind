@@ -1,4 +1,32 @@
-import { OutscraperReview, OutscraperPost, EnrichedBusiness } from './types';
+import { Business, OutscraperReview, OutscraperPost, EnrichedBusiness } from './types';
+
+// --- Categorized signal types ---
+export type SignalCategory = 'gbp' | 'rank' | 'web' | 'rep';
+
+export interface SignalGroup {
+  category: SignalCategory;
+  label: string;
+  signals: string[];
+}
+
+export interface CategorizedSignals {
+  groups: SignalGroup[];
+  totalCount: number;
+}
+
+export const SIGNAL_CATEGORY_COLORS: Record<SignalCategory, { bg: string; text: string; border: string }> = {
+  gbp:  { bg: 'bg-sky-500/10',    text: 'text-sky-400',    border: 'border-sky-500/20' },
+  rank: { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20' },
+  web:  { bg: 'bg-violet-500/10', text: 'text-violet-400', border: 'border-violet-500/20' },
+  rep:  { bg: 'bg-rose-500/10',   text: 'text-rose-400',   border: 'border-rose-500/20' },
+};
+
+export const SIGNAL_CATEGORY_LABELS: Record<SignalCategory, string> = {
+  gbp:  'GBP',
+  rank: 'Rank',
+  web:  'Web',
+  rep:  'Rep',
+};
 
 export function calculateDaysDormant(
   lastOwnerActivity: Date | string | null
@@ -126,10 +154,17 @@ export function getDormancyStatus(daysDormant: number | null): 'success' | 'warn
 export function calculateSeoNeedScore(business: EnrichedBusiness): number {
   let score = 0;
 
-  // Not ranked in search visibility: +30 points (biggest signal)
-  if (!business.searchVisibility) {
-    score += 30;
+  // Search visibility scoring (max 30 points)
+  if (business.searchVisibility === null) {
+    score += 30; // Not ranked at all
+  } else if (business.searchVisibility > 10) {
+    score += 22; // Page 2+, effectively invisible
+  } else if (business.searchVisibility > 6) {
+    score += 15; // Bottom of page 1
+  } else if (business.searchVisibility > 3) {
+    score += 8;  // Mid-pack
   }
+  // Top 3: +0, doing well
 
   // Days dormant scoring (max 25 points)
   // Only score if data is available (not null)
@@ -155,6 +190,11 @@ export function calculateSeoNeedScore(business: EnrichedBusiness): number {
     } else if (business.responseRate < 70) {
       score += 4;
     }
+  }
+
+  // No website: +10 points
+  if (!business.website) {
+    score += 10;
   }
 
   // No SEO optimization: +10 points
@@ -189,6 +229,69 @@ export function calculateSeoNeedScore(business: EnrichedBusiness): number {
 }
 
 /**
+ * Calculate basic opportunity score from search-level fields only (no enrichment needed).
+ * Higher score = bigger opportunity gap. Score range: 0-100
+ */
+export function calculateBasicOpportunityScore(business: Business): number {
+  let score = 0;
+
+  // Unclaimed profile: +30
+  if (!business.claimed) {
+    score += 30;
+  }
+
+  // No website: +25
+  if (!business.website) {
+    score += 25;
+  }
+
+  // Low rating: up to +20
+  if (business.rating === 0) {
+    score += 20;
+  } else if (business.rating < 3) {
+    score += 18;
+  } else if (business.rating < 3.5) {
+    score += 14;
+  } else if (business.rating < 4) {
+    score += 10;
+  } else if (business.rating < 4.5) {
+    score += 5;
+  }
+
+  // Few reviews: up to +15
+  if (business.reviewCount === 0) {
+    score += 15;
+  } else if (business.reviewCount < 5) {
+    score += 12;
+  } else if (business.reviewCount < 20) {
+    score += 8;
+  } else if (business.reviewCount < 50) {
+    score += 4;
+  }
+
+  // No phone: +5
+  if (!business.phone) {
+    score += 5;
+  }
+
+  // Not running ads (not sponsored): +5
+  if (!business.sponsored) {
+    score += 5;
+  }
+
+  return Math.min(score, 100);
+}
+
+/**
+ * Classify opportunity level based on score.
+ */
+export function getOpportunityLevel(score: number): 'high' | 'medium' | 'low' {
+  if (score >= 50) return 'high';
+  if (score >= 25) return 'medium';
+  return 'low';
+}
+
+/**
  * Sort businesses by SEO need (highest need first)
  */
 export function sortBySeoPriority(businesses: EnrichedBusiness[]): EnrichedBusiness[] {
@@ -200,28 +303,44 @@ export function sortBySeoPriority(businesses: EnrichedBusiness[]): EnrichedBusin
 }
 
 /**
- * Generate a summary of why this business needs SEO services
+ * Generate a categorized summary of why this business needs SEO services
  * Thresholds aligned with calculateSeoNeedScore for consistency
  */
-export function getSeoNeedSummary(business: EnrichedBusiness): string[] {
-  const signals: string[] = [];
+export function getSeoNeedSummary(business: EnrichedBusiness): CategorizedSignals {
+  const gbp: string[] = [];
+  const rank: string[] = [];
+  const web: string[] = [];
+  const rep: string[] = [];
 
-  // Not ranked in search visibility (+30 points in score)
-  if (!business.searchVisibility) {
-    signals.push('Not ranking in search');
+  // --- RANK signals ---
+  // Search visibility (up to +30 points in score)
+  if (business.searchVisibility === null) {
+    rank.push('Not ranking in search');
+  } else if (business.searchVisibility > 10) {
+    rank.push(`Buried in search (#${business.searchVisibility})`);
+  } else if (business.searchVisibility > 6) {
+    rank.push(`Low search rank (#${business.searchVisibility})`);
+  } else if (business.searchVisibility > 3) {
+    rank.push(`Mid-pack rank (#${business.searchVisibility})`);
+  }
+
+  // --- GBP signals ---
+  // Unclaimed profile (+10 points in score)
+  if (!business.claimed) {
+    gbp.push('Unclaimed profile');
   }
 
   // GBP Activity (up to +25 points in score)
   // Note: daysDormant is null when data is unavailable from API
   if (business.daysDormant !== null) {
     if (business.daysDormant > 365) {
-      signals.push(`No review reply in 1+ year`);
+      gbp.push(`No review reply in 1+ year`);
     } else if (business.daysDormant > 180) {
-      signals.push(`No review reply in ${business.daysDormant} days`);
+      gbp.push(`No review reply in ${business.daysDormant} days`);
     } else if (business.daysDormant > 90) {
-      signals.push(`No review reply in ${business.daysDormant} days`);
+      gbp.push(`No review reply in ${business.daysDormant} days`);
     } else if (business.daysDormant > 30) {
-      signals.push(`Last review reply ${business.daysDormant} days ago`);
+      gbp.push(`Last review reply ${business.daysDormant} days ago`);
     }
   }
 
@@ -229,46 +348,53 @@ export function getSeoNeedSummary(business: EnrichedBusiness): string[] {
   // Note: responseRate is 0 when data is unavailable from API
   if (business.responseRate > 0) {
     if (business.responseRate < 20) {
-      signals.push(`Rarely replies to reviews (${business.responseRate}%)`);
+      gbp.push(`Rarely replies to reviews (${business.responseRate}%)`);
     } else if (business.responseRate < 50) {
-      signals.push(`Low review reply rate (${business.responseRate}%)`);
+      gbp.push(`Low review reply rate (${business.responseRate}%)`);
     } else if (business.responseRate < 70) {
-      signals.push(`Sometimes replies to reviews (${business.responseRate}%)`);
+      gbp.push(`Sometimes replies to reviews (${business.responseRate}%)`);
     }
   }
 
-  // No SEO optimization (+10 points in score)
-  if (!business.seoOptimized) {
-    signals.push('No SEO optimization');
+  // --- WEB signals ---
+  // No website
+  if (!business.website) {
+    web.push('No website');
   }
 
-  // Unclaimed profile (+10 points in score)
-  if (!business.claimed) {
-    signals.push('Unclaimed profile');
+  // No SEO tools detected (+10 points in score)
+  // Only show when business HAS a website but lacks SEO tools
+  if (business.website && !business.seoOptimized) {
+    web.push('No SEO tools detected');
   }
 
+  // --- REP signals ---
   // Rating (up to +5 points in score)
   if (business.rating > 0 && business.rating < 3) {
-    signals.push(`Poor rating (${business.rating})`);
+    rep.push(`Poor rating (${business.rating})`);
   } else if (business.rating > 0 && business.rating < 4) {
-    signals.push(`Below avg rating (${business.rating})`);
+    rep.push(`Below avg rating (${business.rating})`);
   } else if (business.rating > 0 && business.rating < 4.5) {
-    signals.push(`Could improve rating (${business.rating})`);
+    rep.push(`Could improve rating (${business.rating})`);
   }
 
   // Review count (up to +5 points in score)
   if (business.reviewCount < 10) {
-    signals.push(`Very few reviews (${business.reviewCount})`);
+    rep.push(`Very few reviews (${business.reviewCount})`);
   } else if (business.reviewCount < 50) {
-    signals.push(`Few reviews (${business.reviewCount})`);
+    rep.push(`Few reviews (${business.reviewCount})`);
   } else if (business.reviewCount < 100) {
-    signals.push(`Moderate reviews (${business.reviewCount})`);
+    rep.push(`Moderate reviews (${business.reviewCount})`);
   }
 
-  // No website
-  if (!business.website) {
-    signals.push('No website');
-  }
+  // Build groups (only include non-empty categories)
+  const groups: SignalGroup[] = [];
+  if (gbp.length > 0) groups.push({ category: 'gbp', label: 'GBP', signals: gbp });
+  if (rank.length > 0) groups.push({ category: 'rank', label: 'Rank', signals: rank });
+  if (web.length > 0) groups.push({ category: 'web', label: 'Web', signals: web });
+  if (rep.length > 0) groups.push({ category: 'rep', label: 'Rep', signals: rep });
 
-  return signals;
+  const totalCount = gbp.length + rank.length + web.length + rep.length;
+
+  return { groups, totalCount };
 }

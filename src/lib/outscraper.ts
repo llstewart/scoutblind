@@ -114,7 +114,7 @@ async function searchGoogleMapsInternal(
         method: 'GET',
         headers: {
           'X-API-KEY': apiKey,
-          'client': 'TrueSignal',
+          'client': 'Scoutblind',
         },
         signal: controller.signal,
       });
@@ -239,7 +239,7 @@ async function fetchReviewsInternal(
         method: 'GET',
         headers: {
           'X-API-KEY': apiKey,
-          'client': 'TrueSignal',
+          'client': 'Scoutblind',
         },
         signal: controller.signal,
       });

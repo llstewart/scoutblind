@@ -21,6 +21,7 @@ export function useAppNavigation(): UseAppNavigationReturn {
   const getActiveTab = (): AppTab => {
     if (pathname === '/library') return 'library';
     if (pathname === '/account') return 'account';
+    if (pathname === '/dashboard') return 'search';
     return 'search';
   };
 
@@ -37,16 +38,16 @@ export function useAppNavigation(): UseAppNavigationReturn {
         break;
       case 'search':
       default:
-        router.push('/');
+        router.push('/dashboard');
         break;
     }
   }, [router]);
 
   const navigateToSearch = useCallback((searchId?: string) => {
     if (searchId) {
-      router.push(`/?search=${searchId}`);
+      router.push(`/dashboard?search=${searchId}`);
     } else {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [router]);
 

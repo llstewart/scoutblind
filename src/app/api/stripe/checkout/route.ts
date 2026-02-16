@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: `TrueSignal ${tierConfig.name} Plan`,
+                name: `Scoutblind ${tierConfig.name} Plan`,
                 description: `${tierConfig.credits} analyses per month`,
               },
               unit_amount: priceInCents,
@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
           tier: tier,
           type: 'subscription',
         },
-        success_url: `${origin}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}?checkout=canceled`,
+        success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/dashboard?checkout=canceled`,
         subscription_data: {
           metadata: {
             user_id: user.id,
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
               currency: 'usd',
               product_data: {
                 name: packConfig.name,
-                description: `${packConfig.credits} analysis credits for TrueSignal`,
+                description: `${packConfig.credits} analysis credits for Scoutblind`,
               },
               unit_amount: packConfig.price * 100,
             },
@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
           type: 'credits',
           pack: pack,
         },
-        success_url: `${origin}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}?checkout=canceled`,
+        success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/dashboard?checkout=canceled`,
       });
 
       return NextResponse.json({ sessionId: session.id, url: session.url });

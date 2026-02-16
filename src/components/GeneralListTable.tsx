@@ -65,6 +65,51 @@ interface GeneralListTableProps {
   businesses: Business[];
   selectedBusinesses?: Set<number>;
   onSelectionChange?: (selected: Set<number>) => void;
+  isPremium?: boolean;
+  onUpgradeClick?: () => void;
+}
+
+// Deterministic fake values for premium teaser columns
+function fakeClaimScore(index: number) {
+  return (index * 37 + 13) % 100;
+}
+function claimScoreBarColor(score: number) {
+  if (score >= 70) return 'bg-emerald-500';
+  if (score >= 40) return 'bg-amber-500';
+  return 'bg-red-500';
+}
+function claimScoreTextColor(score: number) {
+  if (score >= 70) return 'text-emerald-400';
+  if (score >= 40) return 'text-amber-400';
+  return 'text-red-400';
+}
+
+const LOCATION_TYPES = ['Storefront', 'Service Area', 'Hybrid', 'Virtual'];
+function fakeLocationType(index: number) {
+  return LOCATION_TYPES[(index * 23 + 5) % LOCATION_TYPES.length];
+}
+
+const WEBSITE_TECHS = ['WordPress', 'Shopify', 'Wix', 'Custom', 'Squarespace', 'GoDaddy', 'Webflow'];
+function fakeWebsiteTech(index: number) {
+  return WEBSITE_TECHS[(index * 41 + 11) % WEBSITE_TECHS.length];
+}
+
+function fakeLastReviewDays(index: number) {
+  return ((index * 17 + 7) % 28) + 1;
+}
+
+function fakeSearchVisibility(index: number) {
+  return (index * 53 + 29) % 100;
+}
+function visibilityBarColor(score: number) {
+  if (score >= 60) return 'bg-emerald-500';
+  if (score >= 30) return 'bg-amber-500';
+  return 'bg-red-500';
+}
+function visibilityTextColor(score: number) {
+  if (score >= 60) return 'text-emerald-400';
+  if (score >= 30) return 'text-amber-400';
+  return 'text-red-400';
 }
 
 const ITEMS_PER_PAGE = 25;
@@ -106,7 +151,9 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 export function GeneralListTable({
   businesses,
   selectedBusinesses = new Set(),
-  onSelectionChange
+  onSelectionChange,
+  isPremium,
+  onUpgradeClick
 }: GeneralListTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCompact, setIsCompact] = useState(false);
@@ -397,6 +444,50 @@ export function GeneralListTable({
             {business.sponsored ? 'Ads' : 'No Ads'}
           </StatusTag>
         </div>
+
+        {/* Blurred Premium Signals Preview (free tier only) */}
+        {!isPremium && (
+          <div className="mt-3 pt-3 border-t border-border/50 relative">
+            <div className="flex items-center gap-1.5 mb-2">
+              <svg className="w-3 h-3 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span className="text-[10px] font-medium text-violet-400 uppercase tracking-wide">Premium Signals</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3 blur-[5px] select-none pointer-events-none">
+              <div>
+                <div className="text-[10px] text-zinc-500 mb-0.5">Claim Status</div>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 flex-1 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full ${claimScoreBarColor(fakeClaimScore(index))}`} style={{ width: `${fakeClaimScore(index)}%` }} />
+                  </div>
+                  <span className={`text-xs font-medium ${claimScoreTextColor(fakeClaimScore(index))}`}>{fakeClaimScore(index)}</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 mb-0.5">Location Type</div>
+                <span className="text-xs text-zinc-300">{fakeLocationType(index)}</span>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 mb-0.5">Website Tech</div>
+                <span className="text-xs text-zinc-300">{fakeWebsiteTech(index)}</span>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 mb-0.5">Last Review</div>
+                <span className="text-xs text-zinc-300">{fakeLastReviewDays(index)}d ago</span>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 mb-0.5">Search Visibility</div>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 flex-1 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full ${visibilityBarColor(fakeSearchVisibility(index))}`} style={{ width: `${fakeSearchVisibility(index)}%` }} />
+                  </div>
+                  <span className={`text-xs font-medium ${visibilityTextColor(fakeSearchVisibility(index))}`}>{fakeSearchVisibility(index)}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -575,6 +666,105 @@ export function GeneralListTable({
               <th className={`${headerPadding} font-medium text-zinc-500 w-14`}>
                 Ads
               </th>
+              {!isPremium && (
+                <>
+                  <th className={`${headerPadding} font-medium text-violet-400/80 w-28`}>
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Claim Status
+                      <HeaderTooltip
+                        content={
+                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                            How optimized the Google Business Profile claim is. A higher score means the listing is more complete and actively managed.
+                          </p>
+                        }
+                      >
+                        <svg className="w-3 h-3 text-violet-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </HeaderTooltip>
+                    </div>
+                  </th>
+                  <th className={`${headerPadding} font-medium text-violet-400/80 w-28`}>
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Location Type
+                      <HeaderTooltip
+                        content={
+                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                            The type of business location — storefront, service area, virtual, or hybrid. Helps identify how customers interact with the business.
+                          </p>
+                        }
+                      >
+                        <svg className="w-3 h-3 text-violet-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </HeaderTooltip>
+                    </div>
+                  </th>
+                  <th className={`${headerPadding} font-medium text-violet-400/80 w-28`}>
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Website Tech
+                      <HeaderTooltip
+                        content={
+                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                            The CMS or website platform detected on the business website. Reveals tech sophistication and potential integration opportunities.
+                          </p>
+                        }
+                      >
+                        <svg className="w-3 h-3 text-violet-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </HeaderTooltip>
+                    </div>
+                  </th>
+                  <th className={`${headerPadding} font-medium text-violet-400/80 w-24`}>
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Last Review
+                      <HeaderTooltip
+                        content={
+                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                            When the most recent customer review was posted. Recent reviews indicate an active, engaged customer base.
+                          </p>
+                        }
+                      >
+                        <svg className="w-3 h-3 text-violet-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </HeaderTooltip>
+                    </div>
+                  </th>
+                  <th className={`${headerPadding} font-medium text-violet-400/80 w-32`}>
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Search Visibility
+                      <HeaderTooltip
+                        content={
+                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                            How visible this business is in local search results for relevant keywords. Higher visibility means more organic discovery.
+                          </p>
+                        }
+                      >
+                        <svg className="w-3 h-3 text-violet-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </HeaderTooltip>
+                    </div>
+                  </th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -686,10 +876,62 @@ export function GeneralListTable({
                       <span className="text-zinc-600">No</span>
                     )}
                   </td>
+                  {!isPremium && (
+                    <>
+                      <td className={`${cellPadding} blur-[5px] select-none`}>
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-1.5 w-12 bg-zinc-800 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${claimScoreBarColor(fakeClaimScore(index))}`} style={{ width: `${fakeClaimScore(index)}%` }} />
+                          </div>
+                          <span className={`tabular-nums text-xs font-medium ${claimScoreTextColor(fakeClaimScore(index))}`}>{fakeClaimScore(index)}</span>
+                        </div>
+                      </td>
+                      <td className={`${cellPadding} blur-[5px] select-none`}>
+                        <span className="text-zinc-300">{fakeLocationType(index)}</span>
+                      </td>
+                      <td className={`${cellPadding} blur-[5px] select-none`}>
+                        <span className="text-zinc-300">{fakeWebsiteTech(index)}</span>
+                      </td>
+                      <td className={`${cellPadding} blur-[5px] select-none`}>
+                        <span className="text-zinc-300 tabular-nums">{fakeLastReviewDays(index)}d ago</span>
+                      </td>
+                      <td className={`${cellPadding} blur-[5px] select-none`}>
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-1.5 w-12 bg-zinc-800 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${visibilityBarColor(fakeSearchVisibility(index))}`} style={{ width: `${fakeSearchVisibility(index)}%` }} />
+                          </div>
+                          <span className={`tabular-nums text-xs font-medium ${visibilityTextColor(fakeSearchVisibility(index))}`}>{fakeSearchVisibility(index)}%</span>
+                        </div>
+                      </td>
+                    </>
+                  )}
                 </tr>
               );
             })}
           </tbody>
+          {!isPremium && (
+            <tfoot>
+              <tr>
+                <td colSpan={99}>
+                  <div className="flex items-center justify-center gap-3 py-3 px-4 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 border-t border-violet-500/20">
+                    <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span className="text-xs text-zinc-400">Claim status, website tech, search visibility &amp; more hidden</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpgradeClick?.();
+                      }}
+                      className="px-3 py-1 text-xs font-medium rounded-md bg-violet-600 text-white hover:bg-violet-500 transition-colors"
+                    >
+                      Unlock Premium Signals
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
 

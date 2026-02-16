@@ -7,6 +7,7 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { BillingModal } from '@/components/BillingModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { BusinessLookupModal } from '@/components/BusinessLookupModal';
+import { OnboardingModal } from '@/components/OnboardingModal';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -31,6 +32,8 @@ export function AppLayout({ children }: AppLayoutProps) {
     setShowSettingsModal,
     showLookupModal,
     setShowLookupModal,
+    showOnboardingModal,
+    setShowOnboardingModal,
     refreshUser,
     fetchSavedSearchesList,
     toastMessage,
@@ -96,6 +99,12 @@ export function AppLayout({ children }: AppLayoutProps) {
           setShowBillingModal(true);
         }}
         onSaved={fetchSavedSearchesList}
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
       />
 
       {/* Toast Notification */}

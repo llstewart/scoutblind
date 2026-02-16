@@ -6,10 +6,10 @@ import { useUser } from '@/hooks/useUser';
 import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
-type TabType = 'general' | 'upgraded';
+type TabType = 'general' | 'upgraded' | 'market';
 
-const SESSION_STORAGE_KEY = 'truesignal_session';
-const PERSISTENT_SESSION_ID_KEY = 'truesignal_sid';
+const SESSION_STORAGE_KEY = 'scoutblind_session';
+const PERSISTENT_SESSION_ID_KEY = 'scoutblind_sid';
 
 function generateSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
@@ -75,6 +75,8 @@ interface AppContextValue {
   setShowSettingsModal: (show: boolean) => void;
   showLookupModal: boolean;
   setShowLookupModal: (show: boolean) => void;
+  showOnboardingModal: boolean;
+  setShowOnboardingModal: (show: boolean) => void;
 
   // Search State
   businesses: Business[];
@@ -161,6 +163,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showLookupModal, setShowLookupModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [tableBusinesses, setTableBusinesses] = useState<TableBusiness[]>([]);
@@ -190,6 +193,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
 
+  const onboardingCheckedRef = useRef(false);
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
   const analyzeWorkerRef = useRef<Worker | null>(null);
@@ -357,6 +361,15 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
+      // Show onboarding for users who signed up less than 2 minutes ago (once per session)
+      if (!onboardingCheckedRef.current) {
+        onboardingCheckedRef.current = true;
+        const createdAt = new Date(user.created_at).getTime();
+        if (Date.now() - createdAt < 2 * 60 * 1000) {
+          setShowOnboardingModal(true);
+        }
+      }
+
       try {
         const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (saved) {
@@ -657,7 +670,7 @@ export function AppProvider({ children }: AppProviderProps) {
     setSearchParams(null);
     setIsViewingSavedSearch(false);
     setError(null);
-    router.replace('/');
+    router.replace('/dashboard');
   };
 
   // Handle analyze (simplified - full implementation would be moved here)
@@ -926,6 +939,8 @@ export function AppProvider({ children }: AppProviderProps) {
     setShowSettingsModal,
     showLookupModal,
     setShowLookupModal,
+    showOnboardingModal,
+    setShowOnboardingModal,
 
     // Search State
     businesses,

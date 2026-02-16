@@ -14,7 +14,7 @@ export default function HistoryPage() {
 
   useEffect(() => {
     // Redirect to main app with library tab
-    router.replace('/?tab=library');
+    router.replace('/library');
   }, [router]);
 
   // Show loading state while redirecting

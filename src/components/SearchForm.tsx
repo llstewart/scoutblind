@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { LoadingSpinner } from './LoadingState';
 
-const STORAGE_KEY_NICHES = 'truesignal_recent_niches';
+const STORAGE_KEY_NICHES = 'scoutblind_recent_niches';
 const MAX_RECENT_ITEMS = 8;
 
 // US States

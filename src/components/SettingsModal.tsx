@@ -45,8 +45,8 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
       // Account deleted successfully - clear all local data and redirect
       try {
         sessionStorage.clear();
-        localStorage.removeItem('truesignal_session');
-        localStorage.removeItem('truesignal_sid');
+        localStorage.removeItem('scoutblind_session');
+        localStorage.removeItem('scoutblind_sid');
       } catch (e) {
         console.error('Failed to clear storage:', e);
       }
@@ -62,14 +62,15 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }} role="presentation" />
 
-      <div className="relative bg-zinc-900 rounded-2xl shadow-2xl shadow-black/40 w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
+      <div role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" className="relative bg-zinc-900 rounded-2xl shadow-2xl shadow-black/40 w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
         {/* Header */}
         <div className="sticky top-0 bg-zinc-900 p-6 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold text-white">Settings</h2>
+          <h2 id="settings-modal-title" className="text-xl font-bold text-white">Settings</h2>
           <button
             onClick={onClose}
+            aria-label="Close dialog"
             className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
           >
             <span className="text-sm hidden sm:inline">Back to Results</span>
@@ -203,7 +204,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
                       className="w-full px-4 py-2 bg-zinc-800/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                     />
                     {error && (
-                      <p className="text-sm text-red-400">{error}</p>
+                      <p role="alert" className="text-sm text-red-400">{error}</p>
                     )}
                     <div className="flex gap-3">
                       <button

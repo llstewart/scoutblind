@@ -132,13 +132,13 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }} role="presentation" />
 
-      <div className="relative bg-zinc-900 rounded-2xl shadow-2xl shadow-black/40 w-full max-w-5xl max-h-[90vh] overflow-y-auto m-2 sm:m-4">
+      <div role="dialog" aria-modal="true" aria-labelledby="billing-modal-title" className="relative bg-zinc-900 rounded-2xl shadow-2xl shadow-black/40 w-full max-w-5xl max-h-[90vh] overflow-y-auto m-2 sm:m-4">
         {/* Header */}
         <div className="sticky top-0 bg-zinc-900 p-4 sm:p-6 flex items-start sm:items-center justify-between z-10 gap-4">
           <div className="min-w-0">
-            <h2 className="text-xl sm:text-2xl font-bold text-white">Upgrade Your Plan</h2>
+            <h2 id="billing-modal-title" className="text-xl sm:text-2xl font-bold text-white">Upgrade Your Plan</h2>
             <p className="text-zinc-400 mt-1 text-sm sm:text-base">
               <span className="hidden sm:inline">Current: </span>
               {SUBSCRIPTION_TIERS[currentTier as keyof typeof SUBSCRIPTION_TIERS]?.name || 'Free'}
@@ -149,6 +149,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
           </div>
           <button
             onClick={onClose}
+            aria-label="Close dialog"
             className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-800 rounded-lg transition-colors flex-shrink-0 text-zinc-400 hover:text-white"
           >
             <span className="text-sm hidden sm:inline">Back to Results</span>
@@ -184,7 +185,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
 
         {/* Error Message */}
         {error && (
-          <div className="mx-6 mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+          <div role="alert" className="mx-6 mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
             {error}
           </div>
         )}

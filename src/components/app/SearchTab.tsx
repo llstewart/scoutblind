@@ -39,7 +39,7 @@ export function SearchTab({
         <div className="w-full max-w-2xl mx-auto text-center px-4">
           {/* Logo - visible on mobile since no sidebar */}
           <h1 className="md:hidden text-2xl font-bold text-white mb-2">
-            TrueSignal<span className="text-violet-500">.</span>
+            Scoutblind<span className="text-violet-500">.</span>
           </h1>
 
           {/* Main value prop - SEO focused */}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Business, EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
-import { calculateSeoNeedScore, getSeoNeedSummary } from '@/lib/signals';
+import { calculateSeoNeedScore, getSeoNeedSummary, SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
 import { useUser } from '@/hooks/useUser';
 
 interface BusinessLookupModalProps {
@@ -224,7 +224,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
   if (!isOpen) return null;
 
   const seoScore = enrichedBusiness ? calculateSeoNeedScore(enrichedBusiness) : 0;
-  const signals = enrichedBusiness ? getSeoNeedSummary(enrichedBusiness) : [];
+  const categorizedSignals = enrichedBusiness ? getSeoNeedSummary(enrichedBusiness) : { groups: [], totalCount: 0 };
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30';
@@ -453,19 +453,31 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   </div>
                 </div>
 
-                {/* Signals */}
-                {signals.length > 0 && (
+                {/* Signals - Grouped by category */}
+                {categorizedSignals.totalCount > 0 && (
                   <div className="mb-4">
                     <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Opportunity Signals</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {signals.map((signal, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-1 text-xs bg-rose-500/10 text-rose-400 rounded"
-                        >
-                          {signal}
-                        </span>
-                      ))}
+                    <div className="space-y-2">
+                      {categorizedSignals.groups.map((group) => {
+                        const colors = SIGNAL_CATEGORY_COLORS[group.category];
+                        return (
+                          <div key={group.category}>
+                            <span className={`inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded mb-1 ${colors.bg} ${colors.text}`}>
+                              {SIGNAL_CATEGORY_LABELS[group.category]}
+                            </span>
+                            <div className="flex flex-wrap gap-1 ml-1">
+                              {group.signals.map((signal, i) => (
+                                <span
+                                  key={i}
+                                  className={`px-2 py-1 text-xs rounded ${colors.bg} ${colors.text}`}
+                                >
+                                  {signal}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

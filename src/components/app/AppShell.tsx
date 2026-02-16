@@ -58,9 +58,9 @@ export function AppShell({
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
+        <div className="flex-1 min-h-0 overflow-y-auto pb-20 md:pb-0">
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-64">

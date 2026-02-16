@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { TabContent, TabHeader } from './AppShell';
 import { User } from '@supabase/supabase-js';
 
@@ -157,8 +158,8 @@ export function AccountTab({
           </svg>
         </button>
 
-        <a
-          href="mailto:support@truesignal.io"
+        <Link
+          href="/contact"
           className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-zinc-300 hover:bg-zinc-800/50 transition-colors"
         >
           <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,9 +167,9 @@ export function AccountTab({
           </svg>
           <span className="flex-1">Help & Support</span>
           <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-        </a>
+        </Link>
       </div>
 
       {/* Sign Out */}
@@ -185,7 +186,7 @@ export function AccountTab({
       {/* Footer */}
       <div className="mt-8 text-center">
         <p className="text-xs text-zinc-600">
-          © {new Date().getFullYear()} TrueSignal. All rights reserved.
+          © {new Date().getFullYear()} Scoutblind. All rights reserved.
         </p>
       </div>
     </TabContent>
