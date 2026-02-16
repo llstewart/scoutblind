@@ -254,17 +254,6 @@ export function MarketingPage() {
           {/* Right: Product Preview — App Frame */}
           <div className="relative order-2">
                 <div className="rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.08),0_30px_60px_-10px_rgba(0,0,0,0.06)] border border-gray-200/80">
-
-                  {/* Window chrome */}
-                  <div className="flex items-center gap-1.5 px-3.5 py-2 bg-gray-100 border-b border-gray-200">
-                    <span className="w-[10px] h-[10px] rounded-full bg-[#ff5f57]" />
-                    <span className="w-[10px] h-[10px] rounded-full bg-[#febc2e]" />
-                    <span className="w-[10px] h-[10px] rounded-full bg-[#28c840]" />
-                    <div className="flex-1 flex justify-center">
-                      <div className="px-4 py-0.5 bg-white rounded-md border border-gray-200/80 text-[10px] text-gray-400 font-mono tracking-tight">scoutblind.com/dashboard</div>
-                    </div>
-                  </div>
-
                   {/* App shell: sidebar + main */}
                   <div className="flex bg-white">
                     {/* Thin sidebar */}
