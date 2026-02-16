@@ -20,6 +20,7 @@ const SIGNAL_CATEGORIES = [
       'Review reply rates and response gaps',
       'Days since last owner activity',
       'Post frequency and engagement',
+      'Missing phone or contact info',
     ],
   },
   {
@@ -52,8 +53,8 @@ const SIGNAL_CATEGORIES = [
     accentColor: 'border-l-rose-500',
     textColor: 'text-rose-600',
     signals: [
-      'Star rating vs market average',
-      'Review volume compared to competitors',
+      'Star rating benchmarks',
+      'Review volume benchmarks',
       'How recently customers left feedback',
     ],
   },
