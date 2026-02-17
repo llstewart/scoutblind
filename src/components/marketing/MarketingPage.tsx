@@ -159,6 +159,30 @@ const MOCK_RADAR_DATA = [
   { axis: 'Local Ranking', value: 10 },
 ];
 
+// ─── Count-up hook (fires once on scroll) ────────────────────────────
+function useCountUp(target: number, duration: number, trigger: boolean) {
+  const [value, setValue] = useState(0);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (!trigger || hasRun.current) return;
+    hasRun.current = true;
+
+    const start = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out: fast start, slow landing
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [trigger, target, duration]);
+
+  return value;
+}
+
 // ─── Scroll-reveal hook (fires once) ────────────────────────────────
 function useReveal(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -187,8 +211,13 @@ export function MarketingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const router = useRouter();
 
-  // Scroll-reveal — only on charts (the one section where animation adds value)
+  // Scroll-reveal triggers
+  const stats = useReveal(0.3);
   const charts = useReveal(0.15);
+
+  // Count-up animations — both start on scroll, different durations
+  const signalCount = useCountUp(10, 700, stats.visible);      // 0.7s snap
+  const businessCount = useCountUp(10000, 2200, stats.visible); // 2.2s heavy spin
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -432,17 +461,23 @@ export function MarketingPage() {
             Stop scrolling Google Maps one listing at a time. Scoutblind scans an entire market in one click.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
-            {[
-              { value: '10+', label: 'Signals per business' },
-              { value: '10,000+', label: 'Businesses analyzed' },
-              { value: 'CSV', label: 'One-click export' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <div className="text-3xl md:text-4xl font-extrabold text-gray-900">{stat.value}</div>
-                <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
+          <div ref={stats.ref} className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-gray-900">
+                {stats.visible ? `${signalCount}+` : '0+'}
               </div>
-            ))}
+              <div className="text-xs text-gray-600 mt-1">Signals per business</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-gray-900">
+                {stats.visible ? `${businessCount.toLocaleString()}+` : '0+'}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">Businesses analyzed</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-extrabold text-gray-900">CSV</div>
+              <div className="text-xs text-gray-600 mt-1">One-click export</div>
+            </div>
           </div>
         </div>
       </section>
