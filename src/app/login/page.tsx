@@ -86,7 +86,16 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 sm:px-12 py-12">
+      <div className="flex-1 flex flex-col px-6 sm:px-12 py-12">
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            Home
+          </Link>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
         <div className="w-full max-w-md">
           {/* Mobile-only logo */}
           <div className="text-center mb-8 lg:hidden">
@@ -105,6 +114,7 @@ export default function LoginPage() {
               window.location.href = '/dashboard';
             }}
           />
+        </div>
         </div>
       </div>
     </div>
