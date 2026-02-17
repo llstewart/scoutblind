@@ -22,7 +22,7 @@ export default function SignupPage() {
         <div className="relative flex flex-col justify-center flex-1 px-12 xl:px-16">
           <div className="max-w-[360px]">
             <Link href="/" className="flex items-center gap-2.5 mb-12">
-              <img src="/icon.svg" alt="" className="w-8 h-8 brightness-0 invert" />
+              <img src="/icon.svg" alt="" className="w-8 h-8" />
               <span className="text-2xl font-semibold text-white">
                 Scoutblind<span className="text-violet-200">.</span>
               </span>
