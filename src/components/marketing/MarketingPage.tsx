@@ -223,14 +223,14 @@ export function MarketingPage() {
                   <input
                     type="text"
                     defaultValue="Plumbers"
-                    readOnly
-                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm cursor-pointer"
+                    placeholder="e.g. Plumbers"
+                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
                   />
                   <input
                     type="text"
                     defaultValue="Austin, TX"
-                    readOnly
-                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm cursor-pointer"
+                    placeholder="e.g. Austin, TX"
+                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
                   />
                 </div>
                 <button
