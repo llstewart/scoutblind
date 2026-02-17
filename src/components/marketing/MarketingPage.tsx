@@ -435,7 +435,7 @@ export function MarketingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
             {[
               { value: '10+', label: 'Signals per business' },
-              { value: '100+', label: 'Markets scanned' },
+              { value: '10,000+', label: 'Businesses analyzed' },
               { value: 'CSV', label: 'One-click export' },
             ].map((stat) => (
               <div key={stat.label}>
