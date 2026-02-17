@@ -38,7 +38,7 @@ const SIGNAL_CATEGORIES = [
   {
     label: 'Web',
     fullName: 'Web Presence',
-    desc: 'Find businesses with no website or zero SEO tooling. If they don\'t have analytics installed, they\'re not tracking anything.',
+    desc: 'Find businesses with no website or zero tracking tools. If they don\'t have analytics installed, they\'re not measuring anything.',
     accentColor: 'border-l-violet-500',
     textColor: 'text-violet-600',
     signals: [
@@ -78,7 +78,7 @@ export default function FeaturesPage() {
             What Scoutblind analyzes
           </h1>
           <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Every scan evaluates 10+ signals across four categories to surface which businesses genuinely need SEO help — and which are already covered.
+            Every scan evaluates 10+ signals across four categories to surface which businesses genuinely need help — and which are already covered.
           </p>
         </div>
       </section>
@@ -90,7 +90,7 @@ export default function FeaturesPage() {
             Four dimensions, one score
           </h2>
           <p className="text-sm text-gray-600 text-center mb-12 max-w-xl mx-auto">
-            Every business is evaluated across four categories. The result is a single SEO Need Score that tells you exactly who to call first.
+            Every business is evaluated across four categories. The result is a single Need Score that tells you exactly who to call first.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -124,10 +124,10 @@ export default function FeaturesPage() {
       <section className="py-16 md:py-24 border-t border-gray-200">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3 text-center">
-            SEO Need Score
+            Need Score
           </h2>
           <p className="text-sm text-gray-600 text-center mb-10 max-w-xl mx-auto">
-            Every business receives a 0–100 score based on how urgently they need SEO services. Higher means more opportunity for you.
+            Every business receives a 0–100 score based on how urgently they need digital services. Higher means more opportunity for you.
           </p>
 
           <div className="space-y-4">

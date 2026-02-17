@@ -13,7 +13,7 @@ export default function PricingPage() {
     {
       step: '2',
       title: 'Analyze',
-      description: 'Get SEO signals, review gaps, and visibility scores for every business found.',
+      description: 'Get digital signals, review gaps, and visibility scores for every business found.',
     },
     {
       step: '3',

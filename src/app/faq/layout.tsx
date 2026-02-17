@@ -15,7 +15,7 @@ const faqJsonLd = {
       name: 'What is Scoutblind?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Scoutblind is a prospecting tool for SEO agencies. It scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your SEO services.',
+        text: 'Scoutblind is a prospecting tool for agencies and freelancers who sell digital services to local businesses. It scans Google Business Profiles in any market and analyzes key signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your services.',
       },
     },
     {
@@ -31,7 +31,7 @@ const faqJsonLd = {
       name: 'What GBP signals are analyzed?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall SEO Need Score.',
+        text: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall Need Score.',
       },
     },
     {
@@ -47,7 +47,7 @@ const faqJsonLd = {
       name: 'Is the data accurate?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Scoutblind employs high-performance algorithms that integrate real-time GBP data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence.',
+        text: 'Scoutblind employs high-performance algorithms that integrate real-time GBP data with the same analytical methodologies used by industry experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence.',
       },
     },
     {

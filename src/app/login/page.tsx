@@ -80,7 +80,7 @@ export default function LoginPage() {
         {/* Bottom bar */}
         <div className="relative px-12 xl:px-16 py-6 border-t border-gray-200">
           <p className="text-xs text-gray-500">
-            Trusted by SEO agencies to scan 1,000+ businesses across 100+ markets.
+            Trusted by agencies and freelancers to scan 1,000+ businesses across 100+ markets.
           </p>
         </div>
       </div>

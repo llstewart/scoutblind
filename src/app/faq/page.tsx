@@ -7,7 +7,7 @@ import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 const faqItems = [
   {
     q: 'What is Scoutblind?',
-    a: 'Scoutblind is a prospecting tool for SEO agencies. It scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your SEO services.',
+    a: 'Scoutblind is a prospecting tool for agencies and freelancers who sell digital services to local businesses. It scans Google Business Profiles in any market and analyzes key signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your services.',
   },
   {
     q: 'How do credits work?',
@@ -15,7 +15,7 @@ const faqItems = [
   },
   {
     q: 'What GBP signals are analyzed?',
-    a: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall SEO Need Score.',
+    a: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall Need Score.',
   },
   {
     q: 'Where does the data come from?',

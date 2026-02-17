@@ -47,7 +47,7 @@ export function SearchTab({
             Find businesses that need your services.
           </p>
           <p className="text-gray-500 text-sm mb-8 max-w-md mx-auto">
-            Analyze Google Business Profiles to identify prospects with weak GBP presence, poor review engagement, and SEO gaps.
+            Analyze Google Business Profiles to identify prospects with weak online presence, poor review engagement, and digital gaps.
           </p>
 
           {/* Search Form */}

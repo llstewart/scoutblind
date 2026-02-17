@@ -29,7 +29,7 @@ export default function SignupPage() {
             </Link>
 
             <h1 className="text-2xl xl:text-3xl font-semibold text-white leading-tight mb-3">
-              Find SEO prospects<br />
+              Find qualified prospects<br />
               <span className="text-violet-200">in half the time.</span>
             </h1>
             <p className="text-sm text-violet-200/80 leading-relaxed mb-12">
@@ -61,7 +61,7 @@ export default function SignupPage() {
                 {[
                   { color: 'bg-sky-400', label: 'GBP Health', desc: 'Claim status & activity' },
                   { color: 'bg-amber-400', label: 'Search Rank', desc: 'Local pack position' },
-                  { color: 'bg-violet-300', label: 'Web Presence', desc: 'Site & SEO tools' },
+                  { color: 'bg-violet-300', label: 'Web Presence', desc: 'Site & tracking tools' },
                   { color: 'bg-rose-400', label: 'Reputation', desc: 'Reviews & ratings' },
                 ].map((cat) => (
                   <div key={cat.label} className="flex items-start gap-2.5 rounded-lg bg-white/[0.07] px-3.5 py-3">

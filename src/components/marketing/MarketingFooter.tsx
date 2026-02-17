@@ -14,7 +14,7 @@ export function MarketingFooter() {
               </span>
             </Link>
             <p className="mt-2 text-xs text-gray-600 leading-relaxed">
-              GBP signal analysis for SEO agencies. Find prospects who need your help.
+              GBP signal analysis for agencies and freelancers. Find prospects who need your help.
             </p>
           </div>
 

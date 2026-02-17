@@ -9,11 +9,11 @@ const siteUrl = 'https://scoutblind.com';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Scoutblind - Find SEO Prospects in Half the Time',
+    default: 'Scoutblind - Enriched Local Leads, Instantly',
     template: '%s | Scoutblind',
   },
-  description: 'Scan Google Business Profiles to find businesses with weak SEO presence. Identify unclaimed profiles, poor rankings, and dormant owners — then pitch them your services.',
-  keywords: ['SEO prospecting', 'Google Business Profile', 'GBP signals', 'GMB signals', 'SEO leads', 'local SEO', 'SEO agency tool', 'lead generation', 'business intelligence'],
+  description: 'Scan Google Business Profiles to find local businesses with weak online presence. Identify unclaimed profiles, poor rankings, and dormant owners — then pitch them your services.',
+  keywords: ['local lead generation', 'Google Business Profile', 'GBP signals', 'GMB signals', 'SEO leads', 'local SEO', 'SEO agency tool', 'web design leads', 'digital marketing leads', 'lead enrichment', 'business intelligence'],
   authors: [{ name: 'Scoutblind' }],
   creator: 'Scoutblind',
   alternates: {
@@ -24,21 +24,21 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: siteUrl,
     siteName: 'Scoutblind',
-    title: 'Scoutblind - Find SEO Prospects in Half the Time',
-    description: 'Scan Google Business Profiles to find businesses with weak SEO presence. The signals you hunt for — automated.',
+    title: 'Scoutblind - Enriched Local Leads, Instantly',
+    description: 'Scan Google Business Profiles to find local businesses with weak online presence. The signals you hunt for — automated.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Scoutblind - Market Intelligence for SEO Agencies',
+        alt: 'Scoutblind - Enriched Local Lead Generation',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Scoutblind - Find SEO Prospects in Half the Time',
-    description: 'Scan Google Business Profiles to find businesses with weak SEO presence. The signals you hunt for — automated.',
+    title: 'Scoutblind - Enriched Local Leads, Instantly',
+    description: 'Scan Google Business Profiles to find local businesses with weak online presence. The signals you hunt for — automated.',
     images: ['/og-image.png'],
   },
   icons: {
@@ -62,7 +62,7 @@ const jsonLdApp = {
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
   url: siteUrl,
-  description: 'Scan Google Business Profiles to find businesses with weak SEO presence. Identify unclaimed profiles, poor rankings, and dormant owners — then pitch them your services.',
+  description: 'Scan Google Business Profiles to find local businesses with weak online presence. Identify unclaimed profiles, poor rankings, and dormant owners — then pitch them your services.',
   offers: {
     '@type': 'AggregateOffer',
     priceCurrency: 'USD',
@@ -72,7 +72,7 @@ const jsonLdApp = {
   },
   featureList: [
     'Google Business Profile scanning',
-    'SEO signal analysis',
+    'Digital signal analysis',
     'Unclaimed profile detection',
     'Search visibility ranking',
     'Lead enrichment and scoring',

@@ -15,7 +15,7 @@ import { MarketingFooter } from './MarketingFooter';
 const faqItems = [
   {
     q: 'What is Scoutblind?',
-    a: 'Scoutblind scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, and local pack rankings — to help SEO agencies find prospects who actually need their services.',
+    a: 'Scoutblind scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, and local pack rankings — to help agencies and freelancers find prospects who actually need their services.',
   },
   {
     q: 'How do credits work?',
@@ -200,12 +200,11 @@ export function MarketingPage() {
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
-              Find local businesses that{' '}
-              <span className="text-violet-400">actually need your SEO services.</span>
+              Local leads enriched with the digital gaps that close deals.
             </h1>
 
             <p className="text-sm text-gray-600 mb-2 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Scan any market. See who&apos;s underserved. Export and pitch.
+              Scan any local market. Surface weak online presence. Export and pitch.
             </p>
             <p className="text-sm text-gray-500 mb-8 max-w-lg mx-auto lg:mx-0 italic">
               The signals you hunt for — automated.
@@ -319,7 +318,7 @@ export function MarketingPage() {
                               <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-10">Rating</th>
                               <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-12">Reviews</th>
                               <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-16">Status</th>
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider">SEO Signals</th>
+                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Signals</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -591,7 +590,7 @@ export function MarketingPage() {
                 {
                   num: '03',
                   title: 'Export and pitch',
-                  desc: 'Download a prioritized prospect list. Every business is sorted by who needs SEO help most.',
+                  desc: 'Download a prioritized prospect list. Every business is sorted by who needs your services most.',
                 },
               ].map((item, i) => (
                 <div key={i} className="flex gap-5">
@@ -632,7 +631,7 @@ export function MarketingPage() {
             {[
               'Name, phone, website, and address for every business',
               'Rating, review count, response rate, and days dormant',
-              'Search visibility, website tech, SEO status, and claim data',
+              'Search visibility, website tech, optimization status, and claim data',
             ].map((text) => (
               <div key={text} className="flex items-start gap-2.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 mt-1.5" />

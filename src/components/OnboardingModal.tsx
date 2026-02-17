@@ -11,7 +11,7 @@ interface OnboardingModalProps {
 const SLIDES = [
   {
     title: 'Welcome to Scoutblind',
-    description: 'Find businesses that need SEO help\u2009\u2014\u2009before your competitors do.',
+    description: 'Find businesses that need your help\u2009\u2014\u2009before your competitors do.',
     visual: 'welcome',
   },
   {
@@ -21,7 +21,7 @@ const SLIDES = [
   },
   {
     title: 'Read the signals',
-    description: 'We analyze 10+ GBP signals per business and score them by SEO need.',
+    description: 'We analyze 10+ GBP signals per business and score them by opportunity level.',
     visual: 'analyze',
   },
   {
