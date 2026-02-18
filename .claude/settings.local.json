@@ -35,7 +35,8 @@
       "WebFetch(domain:www.cdnfonts.com)",
       "WebFetch(domain:github.com)",
       "Bash(tee:*)",
-      "WebFetch(domain:app.outscraper.cloud)"
+      "WebFetch(domain:app.outscraper.cloud)",
+      "Bash(python3:*)"
     ]
   }
 }
