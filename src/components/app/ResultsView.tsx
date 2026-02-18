@@ -34,10 +34,11 @@ export function ResultsView() {
   } = useAppContext();
 
   return (
-    <div className="flex flex-col h-full p-4 gap-4">
+    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl gap-4"
+         style={{ boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)' }}>
       {/* Search Context Header */}
       {searchParams && !isViewingSavedSearch && (
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-gray-500 px-4 pt-4">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -52,13 +53,13 @@ export function ResultsView() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-red-500/10 rounded-lg text-red-400 text-sm">
+        <div className="p-4 bg-red-500/10 rounded-lg text-red-400 text-sm mx-4">
           {error}
         </div>
       )}
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 pt-4">
         {/* Tabs */}
         <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl shadow-sm overflow-x-auto">
           <button
@@ -178,7 +179,7 @@ export function ResultsView() {
 
       {/* Interrupted Analysis Banner */}
       {wasAnalysisInterrupted && !isAnalyzing && tableBusinesses.length > 0 && (
-        <div className="p-3 rounded-lg bg-amber-500/10 flex items-center justify-between">
+        <div className="p-3 rounded-lg bg-amber-500/10 flex items-center justify-between mx-4">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -206,7 +207,7 @@ export function ResultsView() {
 
       {/* Progress Bar */}
       {isAnalyzing && analyzeProgress && (
-        <div className={`p-3 rounded-lg ${analyzeProgress.firstPageComplete
+        <div className={`p-3 rounded-lg mx-4 ${analyzeProgress.firstPageComplete
           ? 'bg-emerald-500/5'
           : 'bg-violet-500/5'
           }`}>
@@ -248,11 +249,11 @@ export function ResultsView() {
 
       {/* Data Table / Market Dashboard */}
       {activeTab === 'market' ? (
-        <div className="flex-1 min-h-0 bg-white border border-gray-200 rounded-xl shadow-sm p-4 overflow-y-auto">
+        <div className="flex-1 min-h-0 border-t border-gray-200 p-4 overflow-y-auto">
           <MarketDashboard />
         </div>
       ) : (
-      <div className={`bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden ${activeTab === 'upgraded' && isPremium
+      <div className={`overflow-hidden border-t border-gray-200 ${activeTab === 'upgraded' && isPremium
         ? 'ring-1 ring-violet-500/20'
         : ''
         }`}>
@@ -304,7 +305,7 @@ export function ResultsView() {
       )}
 
       {/* Footer Summary */}
-      <div className="text-center text-sm text-gray-500 pb-4">
+      <div className="text-center text-sm text-gray-500 px-4 pb-4">
         {activeTab === 'market' ? (
           <span>
             Market insights for &quot;{searchParams?.niche}&quot; in {searchParams?.location}

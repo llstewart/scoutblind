@@ -131,17 +131,15 @@ function DashboardContent() {
         </div>
       ) : hasResults && !isViewingSavedSearch ? (
         // Show results inline after successful search
-        <div className="space-y-4">
+        <div className="space-y-4 p-4 md:p-6">
           {/* Compact search form at top for easy refinement */}
-          <div className="px-4 pt-4">
-            <SearchForm
-              onSearch={handleSearch}
-              isLoading={isSearching}
-              initialNiche={searchParams?.niche}
-              initialLocation={searchParams?.location}
-              compact={true}
-            />
-          </div>
+          <SearchForm
+            onSearch={handleSearch}
+            isLoading={isSearching}
+            initialNiche={searchParams?.niche}
+            initialLocation={searchParams?.location}
+            compact={true}
+          />
           {/* Results below */}
           <ResultsView />
         </div>
