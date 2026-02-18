@@ -86,7 +86,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Search Visibility</th>
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Response Rate</th>
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Last Activity</th>
-                <th className="py-4 px-4 text-sm font-semibold text-foreground">GMB Signals</th>
+                <th className="py-4 px-4 text-sm font-semibold text-foreground">GBP Signals</th>
                 <th className="py-4 px-4 text-sm font-semibold text-foreground">Opportunity Score</th>
               </tr>
             </thead>
@@ -134,7 +134,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
 
           {/* Content card */}
           <div className="relative z-10 w-full max-w-xl mx-auto px-6">
-            <div className="bg-zinc-900/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl shadow-black/40">
+            <div className="bg-white backdrop-blur-sm rounded-2xl p-8 shadow-2xl shadow-black/10">
               {/* Lock icon */}
               <div className="flex justify-center mb-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-500/10">
@@ -145,19 +145,19 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
               </div>
 
               {/* Title */}
-              <h3 className="text-2xl font-bold text-white text-center mb-3">
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
                 Unlock SEO Signals Pro
               </h3>
 
               {/* Description */}
-              <p className="text-zinc-400 text-center mb-6 leading-relaxed">
+              <p className="text-gray-500 text-center mb-6 leading-relaxed">
                 Subscribe to a paid plan to analyze{' '}
-                <span className="text-white font-medium">{niche || 'businesses'}</span> in{' '}
-                <span className="text-white font-medium">{location || 'your area'}</span>.
+                <span className="text-gray-900 font-medium">{niche || 'businesses'}</span> in{' '}
+                <span className="text-gray-900 font-medium">{location || 'your area'}</span>.
               </p>
 
               {/* Divider */}
-              <div className="border-t border-zinc-800/30 my-6" />
+              <div className="border-t border-gray-200 my-6" />
 
               {/* Feature list - 2 columns */}
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-8">
@@ -167,7 +167,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm text-zinc-300">Search visibility check</span>
+                  <span className="text-sm text-gray-700">Search visibility check</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -175,7 +175,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm text-zinc-300">Review response analysis</span>
+                  <span className="text-sm text-gray-700">Review response analysis</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -183,7 +183,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm text-zinc-300">Owner activity tracking</span>
+                  <span className="text-sm text-gray-700">Owner activity tracking</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -191,7 +191,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm text-zinc-300">Website & SEO analysis</span>
+                  <span className="text-sm text-gray-700">Website & SEO analysis</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -199,7 +199,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm text-zinc-300">Opportunity scoring</span>
+                  <span className="text-sm text-gray-700">Opportunity scoring</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -207,7 +207,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm text-zinc-300">Actionable lead signals</span>
+                  <span className="text-sm text-gray-700">Actionable lead signals</span>
                 </div>
               </div>
 
@@ -223,7 +223,7 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
               </button>
 
               {/* Subtext */}
-              <p className="text-xs text-zinc-500 text-center mt-4">
+              <p className="text-xs text-gray-500 text-center mt-4">
                 Starting at $29/month · Cancel anytime
               </p>
             </div>

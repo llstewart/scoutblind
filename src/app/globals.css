@@ -2,59 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap');
 
 :root {
-  /* Dark Refined Minimalism Palette */
-  --background: #0f0f10;
-  /* Soft black - slightly warmer */
-  --foreground: #fafafa;
-  /* Zinc 50 */
+  /* Light Theme — White + Purple Accents */
+  --background: #ffffff;
+  --foreground: #111827;
+  /* gray-900 */
 
-  --card: #18181b;
-  /* Zinc 900 - elevated surface */
-  --card-foreground: #fafafa;
+  --card: #f9fafb;
+  /* gray-50 */
+  --card-foreground: #111827;
 
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
 
   --primary: #8b5cf6;
-  /* Violet 500 - primary accent, used sparingly */
+  /* Violet 500 */
   --primary-foreground: #ffffff;
 
-  --secondary: #27272a;
-  /* Zinc 800 */
-  --secondary-foreground: #fafafa;
+  --secondary: #f3f4f6;
+  /* gray-100 */
+  --secondary-foreground: #111827;
 
-  --muted: #1f1f23;
-  /* Hover/interaction state */
-  --muted-foreground: #a1a1aa;
-  /* Zinc 400 - secondary text */
+  --muted: #f3f4f6;
+  /* gray-100 */
+  --muted-foreground: #6b7280;
+  /* gray-500 */
 
   --accent: #8b5cf6;
   /* Violet 500 */
-  --accent-foreground: #fafafa;
+  --accent-foreground: #ffffff;
 
   --destructive: #ef4444;
-  /* Red 500 - errors only */
-  --destructive-foreground: #fafafa;
+  /* Red 500 */
+  --destructive-foreground: #ffffff;
 
-  --border: #27272a;
-  /* Zinc 800 - used sparingly */
-  --input: #27272a;
+  --border: #e5e7eb;
+  /* gray-200 */
+  --input: #e5e7eb;
   --ring: #8b5cf6;
-  /* Match primary accent */
+  /* Violet 500 */
 
   --radius: 0.5rem;
 
-  /* Semantic colors - used sparingly */
+  /* Semantic colors */
   --success: #22c55e;
-  /* Green 500 */
   --warning: #f59e0b;
-  /* Amber 500 */
   --error: #ef4444;
-  /* Red 500 */
 }
 
 * {
@@ -74,8 +69,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
-  /* Updated font choice for headers */
+  font-family: 'General Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -123,9 +117,9 @@ th {
 }
 
 .glass-panel {
-  background: rgba(24, 24, 27, 0.6);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* Elevation utilities */
@@ -143,9 +137,9 @@ th {
 
 /* Card pattern with shadow instead of border */
 .card-elevated {
-  background: #18181b;
+  background: #ffffff;
   border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
 }
 
 /* Subtle header shadow */

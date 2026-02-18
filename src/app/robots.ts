@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/dashboard', '/account', '/library', '/history', '/api/', '/auth/'],
       },
     ],
-    sitemap: 'https://scoutblind.com/sitemap.xml',
+    sitemap: 'https://packleads.io/sitemap.xml',
   };
 }

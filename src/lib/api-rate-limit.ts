@@ -10,7 +10,7 @@ const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_RE
     })
   : null;
 
-// Rate limit configurations for different endpoints
+// IP-based rate limits (first line of defense against unauthenticated abuse)
 export const rateLimiters = {
   // Search endpoint: 10 requests per minute per IP
   search: redis
@@ -38,6 +38,36 @@ export const rateLimiters = {
         redis,
         limiter: Ratelimit.slidingWindow(20, '1 m'),
         prefix: 'ratelimit:visibility',
+        analytics: true,
+      })
+    : null,
+};
+
+// Per-user rate limits (authenticated users — more generous than IP limits)
+export const userRateLimiters = {
+  search: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(20, '1 m'),
+        prefix: 'ratelimit:user:search',
+        analytics: true,
+      })
+    : null,
+
+  analyze: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(10, '1 m'),
+        prefix: 'ratelimit:user:analyze',
+        analytics: true,
+      })
+    : null,
+
+  visibility: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(40, '1 m'),
+        prefix: 'ratelimit:user:visibility',
         analytics: true,
       })
     : null,
@@ -130,6 +160,37 @@ export async function checkRateLimit(
   // Log rate limit status in development
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Rate Limit] ${ip} - ${type}: ${remaining}/${limit} remaining`);
+  }
+
+  return null;
+}
+
+/**
+ * Check per-user rate limit for authenticated requests
+ * Returns null if allowed, or a 429 response if rate limited
+ */
+export async function checkUserRateLimit(
+  userId: string,
+  type: RateLimitType
+): Promise<NextResponse | null> {
+  const limiter = userRateLimiters[type];
+
+  if (!limiter) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[User Rate Limit] Skipped (no Redis configured) for ${type}`);
+    }
+    return null;
+  }
+
+  const { success, limit, remaining, reset } = await limiter.limit(userId);
+
+  if (!success) {
+    console.log(`[User Rate Limit] Blocked user ${userId} for ${type} endpoint`);
+    return rateLimitResponse(reset, type);
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[User Rate Limit] ${userId} - ${type}: ${remaining}/${limit} remaining`);
   }
 
   return null;

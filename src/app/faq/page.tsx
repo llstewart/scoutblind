@@ -6,16 +6,16 @@ import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 
 const faqItems = [
   {
-    q: 'What is Scoutblind?',
-    a: 'Scoutblind is a prospecting tool for SEO agencies. It scans Google Business Profiles in any market and analyzes key GMB signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your SEO services.',
+    q: 'What is Packleads?',
+    a: 'Packleads is a prospecting tool for agencies and freelancers who sell digital services to local businesses. It scans Google Business Profiles in any market and analyzes key signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your services.',
   },
   {
     q: 'How do credits work?',
-    a: 'Each search costs 1 credit. A search scans all GMB profiles for a given niche + location combination and returns a prioritized prospect list with signal analysis. You get 5 free credits when you sign up, and can purchase additional credits or subscribe to a monthly plan.',
+    a: 'Each search costs 1 credit. A search scans all GBP profiles for a given niche + location combination and returns a prioritized prospect list with signal analysis. You get 5 free credits when you sign up, and can purchase additional credits or subscribe to a monthly plan.',
   },
   {
-    q: 'What GMB signals are analyzed?',
-    a: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall SEO Need Score.',
+    q: 'What GBP signals are analyzed?',
+    a: 'We analyze 10+ signals including: local pack ranking, review count and average rating, review response rate, last owner activity date, profile claim status, website presence and tech stack, business category optimization, photo count, and more. These signals are combined into an overall Need Score.',
   },
   {
     q: 'Where does the data come from?',
@@ -23,11 +23,11 @@ const faqItems = [
   },
   {
     q: 'Is the data accurate?',
-    a: 'Scoutblind employs high-performance algorithms that integrate real-time GMB data with the same analytical methodologies used by SEO experts. Our system processes complex signals—like review trends and response metrics—through a technical lens to provide consistent, actionable intelligence. We prioritize high-integrity data to ensure you are always working with a reliable competitive advantage.',
+    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Packleads automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
   },
   {
     q: 'How does pricing work?',
-    a: 'Scoutblind offers a free tier (5 credits), a Starter plan ($29/mo for 50 credits), and a Pro plan ($79/mo for 200 credits). All plans include full signal analysis, CSV export, and search history. Subscriptions are billed monthly via Stripe and can be canceled anytime.',
+    a: 'Packleads offers a free tier (5 credits), a Starter plan ($29/mo for 50 credits), and a Pro plan ($79/mo for 200 credits). All plans include full signal analysis, CSV export, and search history. Subscriptions are billed monthly via Stripe and can be canceled anytime.',
   },
   {
     q: 'Can I export my data?',
@@ -49,21 +49,22 @@ export default function FaqPage() {
   return (
     <MarketingLayout>
       <div className="max-w-2xl mx-auto px-4 py-12 md:py-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Frequently Asked Questions</h1>
-        <p className="text-sm text-zinc-500 mb-10">
-          Everything you need to know about Scoutblind.
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Frequently Asked Questions</h1>
+        <p className="text-sm text-gray-600 mb-10">
+          Everything you need to know about Packleads.
         </p>
 
         <div className="space-y-3">
           {faqItems.map((item, i) => (
-            <div key={i} className="border border-zinc-800/50 rounded-lg overflow-hidden">
+            <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-800/20 transition-colors"
+                aria-expanded={openIndex === i}
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
               >
-                <span className="text-sm font-medium text-white pr-4">{item.q}</span>
+                <span className="text-sm font-medium text-gray-900 pr-4">{item.q}</span>
                 <svg
-                  className={`w-4 h-4 text-zinc-500 flex-shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-gray-500 flex-shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -73,7 +74,7 @@ export default function FaqPage() {
               </button>
               {openIndex === i && (
                 <div className="px-4 pb-4">
-                  <p className="text-sm text-zinc-400 leading-relaxed">{item.a}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{item.a}</p>
                 </div>
               )}
             </div>
@@ -81,9 +82,9 @@ export default function FaqPage() {
         </div>
 
         {/* Still have questions? */}
-        <div className="mt-12 p-6 rounded-xl bg-zinc-800/30 border border-zinc-800/50 text-center">
-          <h3 className="text-base font-semibold text-white mb-2">Still have questions?</h3>
-          <p className="text-sm text-zinc-500 mb-4">
+        <div className="mt-12 p-6 rounded-xl bg-gray-50 border border-gray-200 text-center">
+          <h3 className="text-base font-semibold text-gray-900 mb-2">Still have questions?</h3>
+          <p className="text-sm text-gray-600 mb-4">
             Can&apos;t find what you&apos;re looking for? Our team is happy to help.
           </p>
           <Link

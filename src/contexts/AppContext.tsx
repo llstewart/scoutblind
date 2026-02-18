@@ -8,8 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 
 type TabType = 'general' | 'upgraded' | 'market';
 
-const SESSION_STORAGE_KEY = 'scoutblind_session';
-const PERSISTENT_SESSION_ID_KEY = 'scoutblind_sid';
+const SESSION_STORAGE_KEY = 'packleads_session';
+const PERSISTENT_SESSION_ID_KEY = 'packleads_sid';
 
 function generateSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
@@ -75,6 +75,8 @@ interface AppContextValue {
   setShowSettingsModal: (show: boolean) => void;
   showLookupModal: boolean;
   setShowLookupModal: (show: boolean) => void;
+  showOnboardingModal: boolean;
+  setShowOnboardingModal: (show: boolean) => void;
 
   // Search State
   businesses: Business[];
@@ -161,6 +163,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showLookupModal, setShowLookupModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [tableBusinesses, setTableBusinesses] = useState<TableBusiness[]>([]);
@@ -190,6 +193,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
 
+  const onboardingCheckedRef = useRef(false);
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
   const analyzeWorkerRef = useRef<Worker | null>(null);
@@ -357,6 +361,15 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
+      // Show onboarding for users who signed up less than 2 minutes ago (once per session)
+      if (!onboardingCheckedRef.current) {
+        onboardingCheckedRef.current = true;
+        const createdAt = new Date(user.created_at).getTime();
+        if (Date.now() - createdAt < 2 * 60 * 1000) {
+          setShowOnboardingModal(true);
+        }
+      }
+
       try {
         const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (saved) {
@@ -382,13 +395,14 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isAuthLoading]);
 
-  // Fetch saved count and library list when user is logged in
+  // Fetch saved count and library list when user is logged in (paid users only)
+  // Free users get 403 from /api/session GET, so skip to avoid console spam
   useEffect(() => {
-    if (user) {
+    if (user && isPremium) {
       fetchSavedCount();
       fetchSavedSearchesList();
     }
-  }, [user, fetchSavedCount, fetchSavedSearchesList]);
+  }, [user, isPremium, fetchSavedCount, fetchSavedSearchesList]);
 
   // Clear analyzed data for free tier users
   useEffect(() => {
@@ -542,6 +556,11 @@ export function AppProvider({ children }: AppProviderProps) {
 
       const data = await response.json();
 
+      if (!data.businesses || data.businesses.length === 0) {
+        setError('No businesses found for that search. Try a different niche or location.');
+        return;
+      }
+
       setBusinesses(data.businesses);
       setTableBusinesses([]);
       setSelectedBusinesses(new Set());
@@ -553,9 +572,7 @@ export function AppProvider({ children }: AppProviderProps) {
         refreshUser();
       }
 
-      if (data.businesses && data.businesses.length > 0) {
-        saveToLibrary(data.businesses, niche, location);
-      }
+      saveToLibrary(data.businesses, niche, location);
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
@@ -926,6 +943,8 @@ export function AppProvider({ children }: AppProviderProps) {
     setShowSettingsModal,
     showLookupModal,
     setShowLookupModal,
+    showOnboardingModal,
+    setShowOnboardingModal,
 
     // Search State
     businesses,

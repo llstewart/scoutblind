@@ -35,6 +35,22 @@ export async function POST() {
   // Use service role client to bypass RLS
   const serviceClient = getServiceClient();
 
+  // Check if this email already claimed free credits
+  const userEmail = user.email?.toLowerCase();
+  let grantCredits = FREE_SIGNUP_CREDITS;
+
+  if (userEmail) {
+    const { data: claim } = await serviceClient
+      .from('free_credit_claims')
+      .select('email')
+      .eq('email', userEmail)
+      .single();
+
+    if (claim) {
+      grantCredits = 0;
+    }
+  }
+
   // ATOMIC: Try to insert, if conflict (user_id already exists), do nothing
   // This prevents the SELECT → INSERT race condition
   const { data: newSub, error } = await serviceClient
@@ -43,7 +59,7 @@ export async function POST() {
       user_id: user.id,
       tier: 'free',
       status: 'active',
-      credits_remaining: FREE_SIGNUP_CREDITS,
+      credits_remaining: grantCredits,
       credits_purchased: 0,
       credits_monthly_allowance: 0,
     }, {
@@ -78,7 +94,14 @@ export async function POST() {
 
   // Check if this was a new insert or existing record
   if (newSub) {
-    console.log(`[Init Subscription] Created subscription with ${FREE_SIGNUP_CREDITS} credits for user ${user.id.slice(0, 8)}...`);
+    // Record the claim if credits were granted
+    if (grantCredits > 0 && userEmail) {
+      await serviceClient
+        .from('free_credit_claims')
+        .upsert({ email: userEmail }, { onConflict: 'email', ignoreDuplicates: true });
+    }
+
+    console.log(`[Init Subscription] Created subscription with ${grantCredits} credits for user ${user.id.slice(0, 8)}...`);
     return NextResponse.json({
       success: true,
       message: 'Subscription created',

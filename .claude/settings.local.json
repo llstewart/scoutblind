@@ -24,7 +24,19 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:pypi.org)",
       "WebFetch(domain:outscraper.com)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(xargs cat:*)",
+      "Bash(node -e:*)",
+      "Bash(del:*)",
+      "Bash(python:*)",
+      "Bash(copy:*)",
+      "Bash(where:*)",
+      "WebFetch(domain:www.fontshare.com)",
+      "WebFetch(domain:www.cdnfonts.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(tee:*)",
+      "WebFetch(domain:app.outscraper.cloud)",
+      "Bash(python3:*)"
     ]
   }
 }

@@ -42,7 +42,7 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0 }: BottomNa
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Background with blur */}
-      <div className="absolute inset-0 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50" />
+      <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-t border-gray-200" />
 
       {/* Safe area padding for iOS */}
       <div className="relative flex items-center justify-around px-2 pt-2 pb-safe">
@@ -54,7 +54,7 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0 }: BottomNa
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`relative flex flex-col items-center justify-center w-full py-2 transition-colors ${
-                isActive ? 'text-violet-400' : 'text-zinc-500'
+                isActive ? 'text-violet-600' : 'text-gray-400'
               }`}
             >
               {/* Active indicator line */}
@@ -75,7 +75,7 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0 }: BottomNa
               </div>
 
               {/* Label */}
-              <span className={`text-[10px] font-medium mt-1 ${isActive ? 'text-violet-400' : 'text-zinc-500'}`}>
+              <span className={`text-[10px] font-medium mt-1 ${isActive ? 'text-violet-600' : 'text-gray-400'}`}>
                 {tab.label}
               </span>
             </button>

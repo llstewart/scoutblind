@@ -6,7 +6,7 @@ import { fetchBatchReviews, ReviewData } from '@/lib/outscraper';
 import { classifyLocationType } from '@/utils/address';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { Semaphore, sleep } from '@/lib/rate-limiter';
-import { checkRateLimit } from '@/lib/api-rate-limit';
+import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { deductCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
@@ -49,6 +49,10 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
   }
+
+  // Per-user rate limit
+  const userRateLimitResponse = await checkUserRateLimit(user.id, 'analyze');
+  if (userRateLimitResponse) return userRateLimitResponse;
 
   // Check subscription tier - only paid users can analyze
   const { data: subscription } = await supabase

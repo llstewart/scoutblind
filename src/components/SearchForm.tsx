@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { LoadingSpinner } from './LoadingState';
 
-const STORAGE_KEY_NICHES = 'scoutblind_recent_niches';
+const STORAGE_KEY_NICHES = 'packleads_recent_niches';
 const MAX_RECENT_ITEMS = 8;
 
 // US States
@@ -200,10 +200,10 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   if (compact) {
     return (
       <form ref={formRef} onSubmit={handleSubmit} className="w-full">
-        <div className="flex items-center gap-3 bg-zinc-900/60 rounded-full px-4 py-2 shadow-lg shadow-black/20">
+        <div className="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 shadow-lg shadow-black/5">
           {/* Niche Section */}
           <div ref={nicheInputRef} className="relative flex items-center gap-2">
-            <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -215,12 +215,12 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               }}
               onFocus={() => setShowNicheSuggestions(true)}
               placeholder="Business type"
-              className="w-20 sm:w-28 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
+              className="w-20 sm:w-28 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none font-medium"
               disabled={isLoading}
               autoComplete="off"
             />
             {showNicheSuggestions && filteredNiches.length > 0 && (
-              <div className="absolute top-full left-0 mt-3 w-48 bg-zinc-900 rounded-xl shadow-lg shadow-black/30 z-50 py-1 overflow-hidden">
+              <div className="absolute top-full left-0 mt-3 w-48 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1 overflow-hidden">
                 {filteredNiches.map((item, index) => (
                   <button
                     key={index}
@@ -229,7 +229,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                       setNiche(item);
                       setShowNicheSuggestions(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                   >
                     {item}
                   </button>
@@ -239,11 +239,11 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
           </div>
 
           {/* Divider */}
-          <div className="w-px h-5 bg-zinc-700 flex-shrink-0" />
+          <div className="w-px h-5 bg-gray-200 flex-shrink-0" />
 
           {/* Location Section */}
           <div className="flex items-center gap-2 min-w-0">
-            <svg className="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -252,7 +252,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="City"
-              className="w-16 sm:w-24 bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none font-medium"
+              className="w-16 sm:w-24 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none font-medium"
               disabled={isLoading}
             />
 
@@ -264,27 +264,27 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                   setShowRegionPicker(!showRegionPicker);
                   setRegionSearch('');
                 }}
-                className="px-2 py-1 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-md flex items-center gap-1 transition-colors"
+                className="px-2 py-1 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md flex items-center gap-1 transition-colors"
                 disabled={isLoading}
               >
-                <span className={`font-medium leading-none ${!region ? 'text-zinc-500' : 'text-white'}`}>
+                <span className={`font-medium leading-none ${!region ? 'text-gray-500' : 'text-gray-900'}`}>
                   {selectedRegion?.code || regionPlaceholder}
                 </span>
-                <svg className="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {showRegionPicker && (
-                <div className="absolute top-full right-0 mt-3 w-52 bg-zinc-900 rounded-xl shadow-lg shadow-black/30 z-50 overflow-hidden">
-                  <div className="px-3 py-2 border-b border-zinc-800">
+                <div className="absolute top-full right-0 mt-3 w-52 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
+                  <div className="px-3 py-2 border-b border-gray-200">
                     <input
                       autoFocus
                       type="text"
                       value={regionSearch}
                       onChange={(e) => setRegionSearch(e.target.value)}
                       placeholder={`Search ${regionPlaceholder.toLowerCase()}...`}
-                      className="w-full px-3 py-1.5 text-sm bg-zinc-800 text-zinc-200 rounded-lg outline-none placeholder:text-zinc-500"
+                      className="w-full px-3 py-1.5 text-sm bg-gray-100 text-gray-800 rounded-lg outline-none placeholder:text-gray-400"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -300,7 +300,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                             setShowRegionPicker(false);
                             setRegionSearch('');
                           }}
-                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                             }`}
                         >
                           {r.name}
@@ -316,19 +316,19 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               <button
                 type="button"
                 onClick={() => setShowCountryPicker(!showCountryPicker)}
-                className="px-2 py-1 hover:bg-zinc-800 rounded-md transition-colors flex items-center gap-1"
+                className="px-2 py-1 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1"
                 title={selectedCountry?.name}
               >
                 <span className="text-sm leading-none">{selectedCountry?.flag}</span>
-                <svg className="w-3 h-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {showCountryPicker && (
-                <div className="absolute top-full right-0 mt-3 w-44 bg-zinc-900 rounded-xl shadow-lg shadow-black/30 z-50 py-1 overflow-hidden">
-                  <div className="px-3 py-1.5 border-b border-zinc-800">
-                    <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Country</span>
+                <div className="absolute top-full right-0 mt-3 w-44 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1 overflow-hidden">
+                  <div className="px-3 py-1.5 border-b border-gray-200">
+                    <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Country</span>
                   </div>
                   {COUNTRIES.map((c) => (
                     <button
@@ -339,7 +339,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                         setRegion('');
                         setShowCountryPicker(false);
                       }}
-                      className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                      className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                         }`}
                     >
                       <span className="text-base">{c.flag}</span>
@@ -362,7 +362,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             disabled={isLoading || !isFormValid}
             className={`ml-auto px-4 py-1.5 text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${isFormValid
               ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25'
-              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
           >
             {isLoading ? (
@@ -386,11 +386,11 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   // ============================================
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="w-full max-w-lg mx-auto px-4 sm:px-0">
-      <div className="bg-zinc-900/60 rounded-2xl shadow-lg shadow-black/20 p-3 sm:p-6 space-y-3 sm:space-y-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-6 space-y-3 sm:space-y-4">
 
         {/* Niche Input */}
         <div ref={nicheInputRef} className="relative">
-          <label className="block text-[10px] sm:text-[11px] font-medium text-zinc-500 mb-1 sm:mb-1.5 uppercase tracking-wide">
+          <label className="block text-[10px] sm:text-[11px] font-medium text-gray-500 mb-1 sm:mb-1.5 uppercase tracking-wide">
             Business Type
           </label>
           <input
@@ -402,15 +402,15 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             }}
             onFocus={() => setShowNicheSuggestions(true)}
             placeholder="e.g. Dentist, Plumber, Lawyer"
-            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800/50 rounded-lg text-sm sm:text-base text-zinc-100 placeholder:text-zinc-500 outline-none focus:ring-1 focus:ring-violet-500/50 focus:bg-zinc-800 transition-all"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-100 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-violet-500/50 focus:bg-white transition-all"
             disabled={isLoading}
             autoComplete="off"
           />
 
           {showNicheSuggestions && filteredNiches.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 rounded-xl shadow-lg shadow-black/30 z-50 overflow-hidden">
-              <div className="px-3 py-2 border-b border-zinc-800 flex items-center justify-between">
-                <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Recent</span>
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
+              <div className="px-3 py-2 border-b border-gray-200 flex items-center justify-between">
+                <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Recent</span>
                 <button
                   type="button"
                   onClick={(e) => {
@@ -418,7 +418,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                     clearRecentItems(STORAGE_KEY_NICHES);
                     setRecentNiches([]);
                   }}
-                  className="text-[10px] text-zinc-600 hover:text-zinc-400"
+                  className="text-[10px] text-gray-400 hover:text-gray-500"
                 >
                   Clear
                 </button>
@@ -432,7 +432,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                       setNiche(item);
                       setShowNicheSuggestions(false);
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
                   >
                     {item}
                   </button>
@@ -444,7 +444,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
 
         {/* Location Section */}
         <div>
-          <label className="block text-[10px] sm:text-[11px] font-medium text-zinc-500 mb-1 sm:mb-1.5 uppercase tracking-wide">
+          <label className="block text-[10px] sm:text-[11px] font-medium text-gray-500 mb-1 sm:mb-1.5 uppercase tracking-wide">
             Location
           </label>
 
@@ -456,7 +456,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="City"
-              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800/50  rounded-lg text-sm sm:text-base text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-violet-500/50 focus:bg-zinc-800 transition-all"
+              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-100 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none focus:border-violet-500/50 focus:bg-white transition-all"
               disabled={isLoading}
             />
 
@@ -470,27 +470,27 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                     setShowRegionPicker(!showRegionPicker);
                     setRegionSearch('');
                   }}
-                  className="w-full sm:w-auto h-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sm:justify-start gap-2 bg-zinc-800/50  rounded-lg hover:border-zinc-600 transition-colors min-w-[80px]"
+                  className="w-full sm:w-auto h-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between sm:justify-start gap-2 bg-gray-100 rounded-lg hover:border-gray-300 transition-colors min-w-[80px]"
                   disabled={isLoading}
                 >
-                  <span className={`text-sm ${!region ? 'text-zinc-500' : 'text-zinc-100'}`}>
+                  <span className={`text-sm ${!region ? 'text-gray-500' : 'text-gray-900'}`}>
                     {selectedRegion?.code || regionPlaceholder}
                   </span>
-                  <svg className={`w-3 h-3 text-zinc-500 transition-transform ${showRegionPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`w-3 h-3 text-gray-500 transition-transform ${showRegionPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
                 {showRegionPicker && (
-                  <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-56 bg-zinc-900 rounded-xl shadow-lg shadow-black/30 z-50 overflow-hidden">
-                    <div className="px-2 py-2 border-b border-zinc-800">
+                  <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
+                    <div className="px-2 py-2 border-b border-gray-200">
                       <input
                         autoFocus
                         type="text"
                         value={regionSearch}
                         onChange={(e) => setRegionSearch(e.target.value)}
                         placeholder={`Search ${regionPlaceholder.toLowerCase()}...`}
-                        className="w-full px-3 py-2 text-sm bg-zinc-800 text-zinc-200 rounded outline-none placeholder:text-zinc-500"
+                        className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-800 rounded outline-none placeholder:text-gray-400"
                         onClick={(e) => e.stopPropagation()}
                       />
                     </div>
@@ -506,14 +506,14 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                               setShowRegionPicker(false);
                               setRegionSearch('');
                             }}
-                            className={`w-full px-3 py-2 text-left text-sm transition-colors ${region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                            className={`w-full px-3 py-2 text-left text-sm transition-colors ${region === r.code ? 'text-violet-400 bg-violet-500/10' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
                               }`}
                           >
                             {r.name}
                           </button>
                         ))}
                       {regions.filter(r => r.name.toLowerCase().includes(regionSearch.toLowerCase())).length === 0 && (
-                        <div className="px-3 py-3 text-center text-xs text-zinc-500">
+                        <div className="px-3 py-3 text-center text-xs text-gray-500">
                           No results
                         </div>
                       )}
@@ -527,18 +527,18 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                 <button
                   type="button"
                   onClick={() => setShowCountryPicker(!showCountryPicker)}
-                  className="h-full px-3 py-2.5 sm:py-3 flex items-center gap-1.5 bg-zinc-800/50  rounded-lg hover:border-zinc-600 hover:bg-zinc-800 transition-colors"
+                  className="h-full px-3 py-2.5 sm:py-3 flex items-center gap-1.5 bg-gray-100 rounded-lg hover:border-gray-300 hover:bg-gray-100 transition-colors"
                 >
                   <span className="text-base">{selectedCountry?.flag}</span>
-                  <svg className={`w-3 h-3 text-zinc-400 transition-transform ${showCountryPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`w-3 h-3 text-gray-500 transition-transform ${showCountryPicker ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
                 {showCountryPicker && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 rounded-xl shadow-lg shadow-black/30 z-50 py-1">
-                    <div className="px-3 py-1.5 border-b border-zinc-800">
-                      <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Country</span>
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1">
+                    <div className="px-3 py-1.5 border-b border-gray-200">
+                      <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Country</span>
                     </div>
                     {COUNTRIES.map((c) => (
                       <button
@@ -549,7 +549,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                           setRegion('');
                           setShowCountryPicker(false);
                         }}
-                        className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        className={`w-full px-3 py-2 text-left flex items-center gap-2 text-sm transition-colors ${country === c.code ? 'text-violet-400 bg-violet-500/10' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
                           }`}
                       >
                         <span className="text-base">{c.flag}</span>
@@ -575,7 +575,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             disabled={isLoading || !isFormValid}
             className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${isFormValid
               ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25'
-              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
           >
             {isLoading ? (

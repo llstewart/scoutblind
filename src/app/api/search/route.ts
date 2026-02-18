@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchGoogleMaps } from '@/lib/outscraper';
 import { SearchRequest, SearchResponse, Business } from '@/lib/types';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
-import { checkRateLimit } from '@/lib/api-rate-limit';
+import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { deductCredits, refundCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
       requiresAuth: true
     }, { status: 401 });
   }
+
+  // Per-user rate limit
+  const userRateLimitResponse = await checkUserRateLimit(user.id, 'search');
+  if (userRateLimitResponse) return userRateLimitResponse;
 
   try {
     const body: SearchRequest = await request.json();

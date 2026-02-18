@@ -17,32 +17,32 @@ const COLORS = {
   low: '#ef4444',     // red-500
   primary: '#8b5cf6', // violet-500
   neutral: '#71717a', // zinc-500
-  neutralDark: '#3f3f46', // zinc-700
+  neutralDark: '#d1d5db', // gray-300
   claimed: '#10b981',
   unclaimed: '#ef4444',
 };
 
 const TOOLTIP_STYLE = {
   contentStyle: {
-    backgroundColor: '#18181b',
-    border: '1px solid #27272a',
+    backgroundColor: '#ffffff',
+    border: '1px solid #e5e7eb',
     borderRadius: '8px',
-    color: '#e4e4e7',
+    color: '#374151',
     fontSize: '13px',
   },
-  cursor: { fill: 'rgba(113, 113, 122, 0.1)' },
+  cursor: { fill: 'rgba(139, 92, 246, 0.05)' },
 };
 
-const GRID_STROKE = '#27272a';
+const GRID_STROKE = '#e5e7eb';
 
 // ─── Sub-components ─────────────────────────────────────────────────
 
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
-    <div className="bg-zinc-900/60 rounded-xl p-5 shadow-lg shadow-black/20">
+    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-zinc-200">{title}</h3>
-        {subtitle && <p className="text-xs text-zinc-500 mt-0.5">{subtitle}</p>}
+        <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+        {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -70,15 +70,15 @@ function LockedChartWrapper({
         {children}
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/60 to-zinc-950/80 rounded-xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/60 to-white/80 rounded-xl" />
         <div className="relative z-10 text-center px-4">
           <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-violet-500/10 mb-3">
             <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-zinc-200 mb-1">{title}</p>
-          <p className="text-xs text-zinc-500 mb-3 max-w-[220px] mx-auto">{message}</p>
+          <p className="text-sm font-medium text-gray-700 mb-1">{title}</p>
+          <p className="text-xs text-gray-500 mb-3 max-w-[220px] mx-auto">{message}</p>
           <button
             onClick={onUpgrade}
             className="px-4 py-2 text-xs font-semibold rounded-lg bg-violet-600 hover:bg-violet-500 text-white transition-all shadow-lg shadow-violet-500/20"
@@ -234,13 +234,13 @@ export function MarketDashboard() {
   if (businesses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-zinc-800/50 flex items-center justify-center mb-5">
-          <svg className="w-7 h-7 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-5">
+          <svg className="w-7 h-7 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
-        <h3 className="text-sm font-medium text-zinc-300 mb-1">No market data yet</h3>
-        <p className="text-xs text-zinc-500 max-w-xs">
+        <h3 className="text-sm font-medium text-gray-700 mb-1">No market data yet</h3>
+        <p className="text-xs text-gray-500 max-w-xs">
           Run a search to see market opportunity charts and insights.
         </p>
       </div>
@@ -257,8 +257,8 @@ export function MarketDashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={opportunityData} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} horizontal={false} />
-                <XAxis type="number" tick={{ fill: '#a1a1aa', fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="level" tick={{ fill: '#e4e4e7', fontSize: 13 }} axisLine={false} tickLine={false} width={60} />
+                <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="level" tick={{ fill: '#374151', fontSize: 13 }} axisLine={false} tickLine={false} width={60} />
                 <Tooltip {...TOOLTIP_STYLE} />
                 <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={28}>
                   {opportunityData.map((entry, index) => (
@@ -294,7 +294,7 @@ export function MarketDashboard() {
                   verticalAlign="bottom"
                   iconType="circle"
                   iconSize={8}
-                  formatter={(value: string) => <span className="text-xs text-zinc-400">{value}</span>}
+                  formatter={(value: string) => <span className="text-xs text-gray-500">{value}</span>}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -314,7 +314,7 @@ export function MarketDashboard() {
           >
             {needsEnrichment && topProspects.length === 0 ? (
               <div className="h-[260px] flex items-center justify-center">
-                <p className="text-xs text-zinc-500">Analyze businesses first to see prospect rankings.</p>
+                <p className="text-xs text-gray-500">Analyze businesses first to see prospect rankings.</p>
               </div>
             ) : (
               <div className="h-[260px]">
@@ -323,7 +323,7 @@ export function MarketDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                     <XAxis
                       dataKey="name"
-                      tick={{ fill: '#a1a1aa', fontSize: 10 }}
+                      tick={{ fill: '#6b7280', fontSize: 10 }}
                       axisLine={false}
                       tickLine={false}
                       interval={0}
@@ -331,7 +331,7 @@ export function MarketDashboard() {
                       textAnchor="end"
                       height={60}
                     />
-                    <YAxis tick={{ fill: '#a1a1aa', fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+                    <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, 100]} />
                     <Tooltip {...TOOLTIP_STYLE} />
                     <Bar dataKey="score" fill={COLORS.primary} radius={[4, 4, 0, 0]} barSize={24} />
                   </BarChart>
@@ -351,14 +351,14 @@ export function MarketDashboard() {
           >
             {needsEnrichment && radarData.length === 0 ? (
               <div className="h-[260px] flex items-center justify-center">
-                <p className="text-xs text-zinc-500">Analyze businesses first to see health radar.</p>
+                <p className="text-xs text-gray-500">Analyze businesses first to see health radar.</p>
               </div>
             ) : (
               <div className="h-[260px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                     <PolarGrid stroke={GRID_STROKE} />
-                    <PolarAngleAxis dataKey="axis" tick={{ fill: '#a1a1aa', fontSize: 11 }} />
+                    <PolarAngleAxis dataKey="axis" tick={{ fill: '#6b7280', fontSize: 11 }} />
                     <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} axisLine={false} />
                     <Radar dataKey="value" stroke={COLORS.primary} fill={COLORS.primary} fillOpacity={0.25} strokeWidth={2} />
                     <Tooltip {...TOOLTIP_STYLE} />
@@ -374,9 +374,9 @@ export function MarketDashboard() {
       {showPortfolio && (
         <>
           <div className="flex items-center gap-3 pt-2">
-            <div className="h-px flex-1 bg-zinc-800" />
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Portfolio Overview</span>
-            <div className="h-px flex-1 bg-zinc-800" />
+            <div className="h-px flex-1 bg-gray-200" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Portfolio Overview</span>
+            <div className="h-px flex-1 bg-gray-200" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -394,7 +394,7 @@ export function MarketDashboard() {
                       <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                       <XAxis
                         dataKey="market"
-                        tick={{ fill: '#a1a1aa', fontSize: 10 }}
+                        tick={{ fill: '#6b7280', fontSize: 10 }}
                         axisLine={false}
                         tickLine={false}
                         interval={0}
@@ -402,13 +402,13 @@ export function MarketDashboard() {
                         textAnchor="end"
                         height={50}
                       />
-                      <YAxis tick={{ fill: '#a1a1aa', fontSize: 12 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
                       <Tooltip {...TOOLTIP_STYLE} />
                       <Legend
                         verticalAlign="top"
                         iconType="circle"
                         iconSize={8}
-                        formatter={(value: string) => <span className="text-xs text-zinc-400">{value}</span>}
+                        formatter={(value: string) => <span className="text-xs text-gray-500">{value}</span>}
                       />
                       <Bar dataKey="total" name="Found" fill={COLORS.neutralDark} radius={[4, 4, 0, 0]} barSize={18} />
                       <Bar dataKey="analyzed" name="Analyzed" fill={COLORS.primary} radius={[4, 4, 0, 0]} barSize={18} />
@@ -429,16 +429,16 @@ export function MarketDashboard() {
                 <div className="h-[260px] flex items-center justify-center">
                   <div className="grid grid-cols-3 gap-6 w-full max-w-sm">
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-zinc-100">{activityStats.totalProspects}</p>
-                      <p className="text-xs text-zinc-500 mt-1">Total Prospects</p>
+                      <p className="text-3xl font-bold text-gray-900">{activityStats.totalProspects}</p>
+                      <p className="text-xs text-gray-500 mt-1">Total Prospects</p>
                     </div>
                     <div className="text-center">
                       <p className="text-3xl font-bold text-violet-400">{activityStats.markets}</p>
-                      <p className="text-xs text-zinc-500 mt-1">Markets</p>
+                      <p className="text-xs text-gray-500 mt-1">Markets</p>
                     </div>
                     <div className="text-center">
                       <p className="text-3xl font-bold text-emerald-400">{activityStats.avgScore}</p>
-                      <p className="text-xs text-zinc-500 mt-1">Avg Analyzed</p>
+                      <p className="text-xs text-gray-500 mt-1">Avg Analyzed</p>
                     </div>
                   </div>
                 </div>

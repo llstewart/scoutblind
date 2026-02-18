@@ -48,7 +48,7 @@ function HeaderTooltip({
       </div>
       {isVisible && typeof window !== 'undefined' && createPortal(
         <div
-          className="fixed w-72 p-3 bg-zinc-900 rounded-lg shadow-2xl shadow-black/40 z-[9999] animate-in fade-in duration-150"
+          className="fixed w-72 p-3 bg-white rounded-lg shadow-2xl shadow-black/10 z-[9999] animate-in fade-in duration-150"
           style={{ top: position.top, left: position.left }}
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
@@ -419,7 +419,7 @@ export function GeneralListTable({
                 href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline hover:text-white truncate max-w-[200px]"
+                className="text-primary hover:underline hover:text-gray-900 truncate max-w-[200px]"
                 onClick={(e) => e.stopPropagation()}
               >
                 {(() => {
@@ -436,13 +436,17 @@ export function GeneralListTable({
         </div>
 
         {/* Footer: Tags */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
-          <StatusTag status={business.claimed ? 'success' : 'warning'}>
-            {business.claimed ? 'Claimed' : 'Unclaimed'}
-          </StatusTag>
-          <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
-            {business.sponsored ? 'Ads' : 'No Ads'}
-          </StatusTag>
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/50 text-xs">
+          {business.claimed ? (
+            <span className="text-gray-400">Claimed</span>
+          ) : (
+            <span className="text-violet-400 font-medium">Unclaimed</span>
+          )}
+          {business.sponsored ? (
+            <span className="text-gray-400">Ads</span>
+          ) : (
+            <span className="text-violet-400 font-medium">No Ads</span>
+          )}
         </div>
 
         {/* Blurred Premium Signals Preview (free tier only) */}
@@ -456,30 +460,30 @@ export function GeneralListTable({
             </div>
             <div className="grid grid-cols-3 gap-3 blur-[5px] select-none pointer-events-none">
               <div>
-                <div className="text-[10px] text-zinc-500 mb-0.5">Claim Status</div>
+                <div className="text-[10px] text-gray-500 mb-0.5">Claim Status</div>
                 <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 flex-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${claimScoreBarColor(fakeClaimScore(index))}`} style={{ width: `${fakeClaimScore(index)}%` }} />
                   </div>
                   <span className={`text-xs font-medium ${claimScoreTextColor(fakeClaimScore(index))}`}>{fakeClaimScore(index)}</span>
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-zinc-500 mb-0.5">Location Type</div>
-                <span className="text-xs text-zinc-300">{fakeLocationType(index)}</span>
+                <div className="text-[10px] text-gray-500 mb-0.5">Location Type</div>
+                <span className="text-xs text-gray-700">{fakeLocationType(index)}</span>
               </div>
               <div>
-                <div className="text-[10px] text-zinc-500 mb-0.5">Website Tech</div>
-                <span className="text-xs text-zinc-300">{fakeWebsiteTech(index)}</span>
+                <div className="text-[10px] text-gray-500 mb-0.5">Website Tech</div>
+                <span className="text-xs text-gray-700">{fakeWebsiteTech(index)}</span>
               </div>
               <div>
-                <div className="text-[10px] text-zinc-500 mb-0.5">Last Review</div>
-                <span className="text-xs text-zinc-300">{fakeLastReviewDays(index)}d ago</span>
+                <div className="text-[10px] text-gray-500 mb-0.5">Last Review</div>
+                <span className="text-xs text-gray-700">{fakeLastReviewDays(index)}d ago</span>
               </div>
               <div>
-                <div className="text-[10px] text-zinc-500 mb-0.5">Search Visibility</div>
+                <div className="text-[10px] text-gray-500 mb-0.5">Search Visibility</div>
                 <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 flex-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${visibilityBarColor(fakeSearchVisibility(index))}`} style={{ width: `${fakeSearchVisibility(index)}%` }} />
                   </div>
                   <span className={`text-xs font-medium ${visibilityTextColor(fakeSearchVisibility(index))}`}>{fakeSearchVisibility(index)}%</span>
@@ -495,15 +499,15 @@ export function GeneralListTable({
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800/50 bg-zinc-900/50">
-        <span className="text-xs text-zinc-400">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95">
+        <span className="text-xs text-gray-500">
           {businesses.length.toLocaleString()} businesses
         </span>
         <button
           onClick={() => setIsCompact(!isCompact)}
           className={`hidden md:flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${isCompact
               ? 'bg-violet-600/20 text-violet-400'
-              : 'text-zinc-500 hover:text-zinc-300'
+              : 'text-gray-500 hover:text-gray-700'
             }`}
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -526,10 +530,10 @@ export function GeneralListTable({
             >
               {selectedBusinesses.size === businesses.length ? 'Deselect all' : `Select all ${businesses.length}`}
             </button>
-            <span className="text-zinc-600">|</span>
+            <span className="text-gray-400">|</span>
             <button
               onClick={() => onSelectionChange(new Set())}
-              className="text-xs text-zinc-500 hover:text-zinc-300"
+              className="text-xs text-gray-500 hover:text-gray-700"
             >
               Clear
             </button>
@@ -559,8 +563,8 @@ export function GeneralListTable({
 
         {/* Desktop Table View */}
         <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left text-xs">
-          <thead className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-sm">
-            <tr className="border-b border-zinc-800/50">
+          <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
+            <tr className="border-b border-gray-200">
               {onSelectionChange && (
                 <th className={`${headerPadding} w-12`}>
                   <input
@@ -574,11 +578,11 @@ export function GeneralListTable({
                   />
                 </th>
               )}
-              <th className={`${headerPadding} font-medium text-zinc-500 w-8`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-8`}>
                 #
               </th>
               <th
-                className={`${headerPadding} font-medium text-zinc-500 relative group`}
+                className={`${headerPadding} font-medium text-gray-700 relative group`}
                 style={{ width: columnWidths['name'] || 'auto', minWidth: '100px' }}
               >
                 <div className="flex items-center justify-between">
@@ -605,7 +609,7 @@ export function GeneralListTable({
                 </div>
               </th>
               <th
-                className={`${headerPadding} font-medium text-zinc-500 relative group`}
+                className={`${headerPadding} font-medium text-gray-700 relative group`}
                 style={{ width: columnWidths['address'] || 'auto', minWidth: '80px' }}
               >
                 <div className="flex items-center justify-between">
@@ -627,43 +631,43 @@ export function GeneralListTable({
                   />
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 Phone
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 Website
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500 text-center w-14`}>
+              <th className={`${headerPadding} font-medium text-gray-700 text-center w-14`}>
                 Rating
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500 text-right w-16`}>
+              <th className={`${headerPadding} font-medium text-gray-700 text-right w-16`}>
                 Reviews
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 Category
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500 w-20`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-20`}>
                 <div className="flex items-center gap-1">
                   Status
                   <HeaderTooltip
                     content={
                       <>
-                        <p className="text-xs text-zinc-300 leading-relaxed font-normal">
-                          <span className="font-semibold text-emerald-400">Claimed:</span> Owner verified. Actively managed.
+                        <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                          <span className="font-semibold text-violet-400">Unclaimed:</span> No owner — open opportunity to offer services.
                         </p>
-                        <p className="text-xs text-zinc-300 leading-relaxed mt-1.5 font-normal">
-                          <span className="font-semibold text-amber-400">Unclaimed:</span> No owner. Good opportunity.
+                        <p className="text-xs text-gray-700 leading-relaxed mt-1.5 font-normal">
+                          <span className="font-semibold text-gray-400">Claimed:</span> Already managed by someone. Lower priority.
                         </p>
                       </>
                     }
                   >
-                    <svg className="w-3 h-3 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-zinc-500 w-14`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-14`}>
                 Ads
               </th>
               {!isPremium && (
@@ -676,7 +680,7 @@ export function GeneralListTable({
                       Claim Status
                       <HeaderTooltip
                         content={
-                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                          <p className="text-xs text-gray-700 leading-relaxed font-normal">
                             How optimized the Google Business Profile claim is. A higher score means the listing is more complete and actively managed.
                           </p>
                         }
@@ -695,8 +699,8 @@ export function GeneralListTable({
                       Location Type
                       <HeaderTooltip
                         content={
-                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
-                            The type of business location — storefront, service area, virtual, or hybrid. Helps identify how customers interact with the business.
+                          <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                            The type of business location -- storefront, service area, virtual, or hybrid. Helps identify how customers interact with the business.
                           </p>
                         }
                       >
@@ -714,7 +718,7 @@ export function GeneralListTable({
                       Website Tech
                       <HeaderTooltip
                         content={
-                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                          <p className="text-xs text-gray-700 leading-relaxed font-normal">
                             The CMS or website platform detected on the business website. Reveals tech sophistication and potential integration opportunities.
                           </p>
                         }
@@ -733,7 +737,7 @@ export function GeneralListTable({
                       Last Review
                       <HeaderTooltip
                         content={
-                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                          <p className="text-xs text-gray-700 leading-relaxed font-normal">
                             When the most recent customer review was posted. Recent reviews indicate an active, engaged customer base.
                           </p>
                         }
@@ -752,7 +756,7 @@ export function GeneralListTable({
                       Search Visibility
                       <HeaderTooltip
                         content={
-                          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                          <p className="text-xs text-gray-700 leading-relaxed font-normal">
                             How visible this business is in local search results for relevant keywords. Higher visibility means more organic discovery.
                           </p>
                         }
@@ -778,8 +782,8 @@ export function GeneralListTable({
                   key={index}
                   data-row-index={index}
                   onClick={() => setFocusedRow(index)}
-                  className={`border-b border-zinc-800/30 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
-                      isSelected ? 'bg-violet-500/5' : 'hover:bg-white/[0.02]'
+                  className={`border-b border-gray-200 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
+                      isSelected ? 'bg-violet-500/5' : 'hover:bg-gray-50'
                     }`}
                 >
                   {onSelectionChange && (
@@ -792,10 +796,10 @@ export function GeneralListTable({
                       />
                     </td>
                   )}
-                  <td className={`${cellPadding} text-zinc-600 tabular-nums`}>
+                  <td className={`${cellPadding} text-gray-400 tabular-nums`}>
                     {globalIndex + 1}
                   </td>
-                  <td className={`${cellPadding} font-medium text-zinc-200`}>
+                  <td className={`${cellPadding} font-medium text-gray-800`}>
                     <div className="flex items-center gap-1.5">
                       <span className="truncate max-w-[180px]">{business.name}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -803,7 +807,7 @@ export function GeneralListTable({
                       </div>
                     </div>
                   </td>
-                  <td className={`${cellPadding} text-zinc-500`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     <div className="flex items-center gap-1.5">
                       <span className="truncate max-w-[160px]">{business.address}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -811,7 +815,7 @@ export function GeneralListTable({
                       </div>
                     </div>
                   </td>
-                  <td className={`${cellPadding} text-zinc-400`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {business.phone ? (
                       <div className="flex items-center gap-1.5">
                         <span className="tabular-nums">{business.phone}</span>
@@ -820,7 +824,7 @@ export function GeneralListTable({
                         </div>
                       </div>
                     ) : (
-                      <span className="text-zinc-700">—</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
                   <td className={cellPadding}>
@@ -846,58 +850,58 @@ export function GeneralListTable({
                         </div>
                       </div>
                     ) : (
-                      <span className="text-zinc-700">—</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
                   <td className={`${cellPadding} text-center tabular-nums`}>
                     {business.rating > 0 ? (
-                      <span className="text-zinc-300">{business.rating}</span>
+                      <span className="text-gray-700">{business.rating}</span>
                     ) : (
-                      <span className="text-zinc-700">—</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
-                  <td className={`${cellPadding} text-right tabular-nums text-zinc-400`}>
+                  <td className={`${cellPadding} text-right tabular-nums text-gray-600`}>
                     {business.reviewCount.toLocaleString()}
                   </td>
-                  <td className={`${cellPadding} text-zinc-500`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     <span className="truncate block max-w-[100px]">{business.category}</span>
                   </td>
                   <td className={cellPadding}>
                     {business.claimed ? (
-                      <span className="text-emerald-500">Claimed</span>
+                      <span className="text-gray-400">Claimed</span>
                     ) : (
-                      <span className="text-amber-500">Unclaimed</span>
+                      <span className="text-violet-400 font-medium">Unclaimed</span>
                     )}
                   </td>
                   <td className={cellPadding}>
                     {business.sponsored ? (
-                      <span className="text-emerald-500">Yes</span>
+                      <span className="text-gray-400">Yes</span>
                     ) : (
-                      <span className="text-zinc-600">No</span>
+                      <span className="text-violet-400 font-medium">No</span>
                     )}
                   </td>
                   {!isPremium && (
                     <>
                       <td className={`${cellPadding} blur-[5px] select-none`}>
                         <div className="flex items-center gap-1.5">
-                          <div className="h-1.5 w-12 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-1.5 w-12 bg-gray-100 rounded-full overflow-hidden">
                             <div className={`h-full rounded-full ${claimScoreBarColor(fakeClaimScore(index))}`} style={{ width: `${fakeClaimScore(index)}%` }} />
                           </div>
                           <span className={`tabular-nums text-xs font-medium ${claimScoreTextColor(fakeClaimScore(index))}`}>{fakeClaimScore(index)}</span>
                         </div>
                       </td>
                       <td className={`${cellPadding} blur-[5px] select-none`}>
-                        <span className="text-zinc-300">{fakeLocationType(index)}</span>
+                        <span className="text-gray-700">{fakeLocationType(index)}</span>
                       </td>
                       <td className={`${cellPadding} blur-[5px] select-none`}>
-                        <span className="text-zinc-300">{fakeWebsiteTech(index)}</span>
+                        <span className="text-gray-700">{fakeWebsiteTech(index)}</span>
                       </td>
                       <td className={`${cellPadding} blur-[5px] select-none`}>
-                        <span className="text-zinc-300 tabular-nums">{fakeLastReviewDays(index)}d ago</span>
+                        <span className="text-gray-700 tabular-nums">{fakeLastReviewDays(index)}d ago</span>
                       </td>
                       <td className={`${cellPadding} blur-[5px] select-none`}>
                         <div className="flex items-center gap-1.5">
-                          <div className="h-1.5 w-12 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-1.5 w-12 bg-gray-100 rounded-full overflow-hidden">
                             <div className={`h-full rounded-full ${visibilityBarColor(fakeSearchVisibility(index))}`} style={{ width: `${fakeSearchVisibility(index)}%` }} />
                           </div>
                           <span className={`tabular-nums text-xs font-medium ${visibilityTextColor(fakeSearchVisibility(index))}`}>{fakeSearchVisibility(index)}%</span>
@@ -917,7 +921,7 @@ export function GeneralListTable({
                     <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
-                    <span className="text-xs text-zinc-400">Claim status, website tech, search visibility &amp; more hidden</span>
+                    <span className="text-xs text-gray-500">Claim status, website tech, search visibility &amp; more hidden</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -949,15 +953,15 @@ export function GeneralListTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-3 py-2 border-t border-zinc-800/50 bg-zinc-900/30">
-          <div className="text-xs text-zinc-500 tabular-nums">
+        <div className="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-white/95">
+          <div className="text-xs text-gray-500 tabular-nums">
             {startIndex + 1}–{Math.min(endIndex, businesses.length)} of {businesses.length.toLocaleString()}
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-2 py-1 text-xs text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Prev
             </button>
@@ -979,7 +983,7 @@ export function GeneralListTable({
                     onClick={() => setCurrentPage(page)}
                     className={`w-6 h-6 text-xs rounded ${currentPage === page
                       ? 'bg-violet-600 text-white'
-                      : 'text-zinc-500 hover:text-white'
+                      : 'text-gray-500 hover:text-gray-900'
                       }`}
                   >
                     {page}
@@ -990,7 +994,7 @@ export function GeneralListTable({
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 text-xs text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Next
             </button>

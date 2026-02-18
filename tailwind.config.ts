@@ -50,7 +50,7 @@ const config: Config = {
         neutral: '#a1a1aa',
       },
       fontFamily: {
-        sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['"General Sans"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

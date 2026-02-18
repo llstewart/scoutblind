@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Business, EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
-import { calculateSeoNeedScore, getSeoNeedSummary } from '@/lib/signals';
+import { calculateSeoNeedScore, getSeoNeedSummary, SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
 import { useUser } from '@/hooks/useUser';
 
 interface BusinessLookupModalProps {
@@ -224,12 +224,12 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
   if (!isOpen) return null;
 
   const seoScore = enrichedBusiness ? calculateSeoNeedScore(enrichedBusiness) : 0;
-  const signals = enrichedBusiness ? getSeoNeedSummary(enrichedBusiness) : [];
+  const categorizedSignals = enrichedBusiness ? getSeoNeedSummary(enrichedBusiness) : { groups: [], totalCount: 0 };
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30';
     if (score >= 40) return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
-    return 'text-zinc-400 bg-zinc-700 border-zinc-600';
+    return 'text-gray-500 bg-gray-200 border-gray-300';
   };
 
   const getScoreLabel = (score: number) => {
@@ -247,7 +247,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-zinc-900 rounded-xl shadow-2xl shadow-black/40 overflow-hidden">
+      <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl shadow-black/10 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
@@ -257,13 +257,13 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Business Lookup</h2>
-              <p className="text-sm text-zinc-500">Search for a specific business</p>
+              <h2 className="text-lg font-semibold text-gray-900">Business Lookup</h2>
+              <p className="text-sm text-gray-500">Search for a specific business</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 text-zinc-500 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -277,7 +277,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
           {(state === 'idle' || state === 'searching' || state === 'not-found' || state === 'error') && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                <label className="block text-sm font-medium text-gray-500 mb-2">
                   Business Name
                 </label>
                 <input
@@ -285,13 +285,13 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder="e.g., Joe's Plumbing"
-                  className="w-full px-4 py-3 bg-zinc-800/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   disabled={state === 'searching'}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                <label className="block text-sm font-medium text-gray-500 mb-2">
                   City / Location
                 </label>
                 <input
@@ -299,7 +299,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g., Austin, TX"
-                  className="w-full px-4 py-3 bg-zinc-800/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   disabled={state === 'searching'}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
@@ -323,7 +323,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               <button
                 onClick={handleSearch}
                 disabled={!businessName.trim() || !location.trim() || state === 'searching'}
-                className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {state === 'searching' ? (
                   <>
@@ -348,16 +348,16 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
           {/* Found Business - Pre-Intel */}
           {(state === 'found' || state === 'analyzing') && foundBusiness && (
             <div className="space-y-4">
-              <div className="p-4 bg-zinc-800/50 rounded-lg">
+              <div className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white truncate">{foundBusiness.name}</h3>
-                    <p className="text-sm text-zinc-500 mt-1 truncate">{foundBusiness.address}</p>
+                    <h3 className="font-semibold text-gray-900 truncate">{foundBusiness.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1 truncate">{foundBusiness.address}</p>
                     <div className="flex items-center gap-4 mt-3 text-sm">
                       {foundBusiness.rating > 0 && (
-                        <span className="text-zinc-400">{foundBusiness.rating}★</span>
+                        <span className="text-gray-500">{foundBusiness.rating}★</span>
                       )}
-                      <span className="text-zinc-500">{foundBusiness.reviewCount} reviews</span>
+                      <span className="text-gray-500">{foundBusiness.reviewCount} reviews</span>
                       {foundBusiness.website && (
                         <a
                           href={foundBusiness.website.startsWith('http') ? foundBusiness.website : `https://${foundBusiness.website}`}
@@ -384,10 +384,10 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
 
               {/* Credit cost indicator */}
               {isPremium && (
-                <div className="flex items-center justify-between px-3 py-2 bg-zinc-800/50 rounded-lg text-xs">
-                  <span className="text-zinc-500">Lead Intel cost</span>
-                  <span className="text-zinc-300">
-                    1 credit <span className="text-zinc-500">({credits} available)</span>
+                <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-xs">
+                  <span className="text-gray-500">Lead Intel cost</span>
+                  <span className="text-gray-700">
+                    1 credit <span className="text-gray-500">({credits} available)</span>
                   </span>
                 </div>
               )}
@@ -395,7 +395,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               <div className="flex gap-3">
                 <button
                   onClick={handleReset}
-                  className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-lg transition-colors"
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
                 >
                   Search Again
                 </button>
@@ -441,11 +441,11 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
           {state === 'complete' && enrichedBusiness && (
             <div className="space-y-4">
               {/* Business Header with Score */}
-              <div className="p-4 bg-zinc-800/50 rounded-lg">
+              <div className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white truncate">{enrichedBusiness.name}</h3>
-                    <p className="text-sm text-zinc-500 mt-1 truncate">{enrichedBusiness.address}</p>
+                    <h3 className="font-semibold text-gray-900 truncate">{enrichedBusiness.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1 truncate">{enrichedBusiness.address}</p>
                   </div>
                   <div className={`px-3 py-2 rounded-lg border text-center ${getScoreColor(seoScore)}`}>
                     <div className="text-2xl font-bold">{seoScore}</div>
@@ -453,56 +453,68 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   </div>
                 </div>
 
-                {/* Signals */}
-                {signals.length > 0 && (
+                {/* Signals - Grouped by category */}
+                {categorizedSignals.totalCount > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Opportunity Signals</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {signals.map((signal, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-1 text-xs bg-rose-500/10 text-rose-400 rounded"
-                        >
-                          {signal}
-                        </span>
-                      ))}
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Opportunity Signals</p>
+                    <div className="space-y-2">
+                      {categorizedSignals.groups.map((group) => {
+                        const colors = SIGNAL_CATEGORY_COLORS[group.category];
+                        return (
+                          <div key={group.category}>
+                            <span className={`inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded mb-1 ${colors.bg} ${colors.text}`}>
+                              {SIGNAL_CATEGORY_LABELS[group.category]}
+                            </span>
+                            <div className="flex flex-wrap gap-1 ml-1">
+                              {group.signals.map((signal, i) => (
+                                <span
+                                  key={i}
+                                  className={`px-2 py-1 text-xs rounded ${colors.bg} ${colors.text}`}
+                                >
+                                  {signal}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
                 {/* Intel Grid */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-zinc-900/50 rounded-lg">
-                    <p className="text-zinc-500 text-xs mb-1">Rating</p>
-                    <p className="text-white font-medium">
+                  <div className="p-3 bg-white rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">Rating</p>
+                    <p className="text-gray-900 font-medium">
                       {enrichedBusiness.rating ? `${enrichedBusiness.rating}★` : 'No rating'}
                     </p>
                   </div>
-                  <div className="p-3 bg-zinc-900/50 rounded-lg">
-                    <p className="text-zinc-500 text-xs mb-1">Reviews</p>
-                    <p className="text-white font-medium">{enrichedBusiness.reviewCount || 0}</p>
+                  <div className="p-3 bg-white rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">Reviews</p>
+                    <p className="text-gray-900 font-medium">{enrichedBusiness.reviewCount || 0}</p>
                   </div>
-                  <div className="p-3 bg-zinc-900/50 rounded-lg">
-                    <p className="text-zinc-500 text-xs mb-1">Response Rate</p>
-                    <p className="text-white font-medium">{enrichedBusiness.responseRate}%</p>
+                  <div className="p-3 bg-white rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">Response Rate</p>
+                    <p className="text-gray-900 font-medium">{enrichedBusiness.responseRate}%</p>
                   </div>
-                  <div className="p-3 bg-zinc-900/50 rounded-lg">
-                    <p className="text-zinc-500 text-xs mb-1">Search Rank</p>
+                  <div className="p-3 bg-white rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">Search Rank</p>
                     <StatusTag status={enrichedBusiness.searchVisibility !== null ? 'success' : 'error'}>
                       {enrichedBusiness.searchVisibility !== null
                         ? `#${enrichedBusiness.searchVisibility}`
                         : 'Not in Top 20'}
                     </StatusTag>
                   </div>
-                  <div className="p-3 bg-zinc-900/50 rounded-lg">
-                    <p className="text-zinc-500 text-xs mb-1">Claim Status</p>
+                  <div className="p-3 bg-white rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">Claim Status</p>
                     <StatusTag status={enrichedBusiness.claimed ? 'success' : 'warning'}>
                       {enrichedBusiness.claimed ? 'Claimed' : 'Unclaimed'}
                     </StatusTag>
                   </div>
-                  <div className="p-3 bg-zinc-900/50 rounded-lg">
-                    <p className="text-zinc-500 text-xs mb-1">Website Tech</p>
-                    <p className="text-white font-medium text-xs truncate">
+                  <div className="p-3 bg-white rounded-lg">
+                    <p className="text-gray-500 text-xs mb-1">Website Tech</p>
+                    <p className="text-gray-900 font-medium text-xs truncate">
                       {enrichedBusiness.websiteTech || 'No website'}
                     </p>
                   </div>
@@ -510,15 +522,15 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
 
                 {/* Contact Info */}
                 {(enrichedBusiness.phone || enrichedBusiness.website) && (
-                  <div className="mt-4 pt-4 border-t border-zinc-800/50">
-                    <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Contact</p>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Contact</p>
                     <div className="space-y-2">
                       {enrichedBusiness.phone && (
                         <a
                           href={`tel:${enrichedBusiness.phone}`}
-                          className="flex items-center gap-2 text-sm text-zinc-300 hover:text-white"
+                          className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
                         >
-                          <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
                           {enrichedBusiness.phone}
@@ -545,7 +557,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               <div className="flex gap-3">
                 <button
                   onClick={handleReset}
-                  className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-lg transition-colors"
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
                 >
                   Look Up Another
                 </button>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkSearchVisibility } from '@/lib/visibility';
 import { VisibilityRequest, VisibilityResponse } from '@/lib/types';
-import { checkRateLimit } from '@/lib/api-rate-limit';
+import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
@@ -19,6 +19,10 @@ export async function POST(request: NextRequest) {
       requiresAuth: true
     }, { status: 401 });
   }
+
+  // Per-user rate limit
+  const userRateLimitResponse = await checkUserRateLimit(user.id, 'visibility');
+  if (userRateLimitResponse) return userRateLimitResponse;
 
   // Check subscription tier - only paid users can check visibility
   const { data: subscription } = await supabase

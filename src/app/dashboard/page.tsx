@@ -13,10 +13,10 @@ import { ResultsView } from '@/components/app/ResultsView';
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-500 text-sm">Loading...</p>
+          <p className="text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     }>
@@ -97,10 +97,10 @@ function DashboardContent() {
   // Redirect to marketing page if not authenticated
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-500 text-sm">Loading...</p>
+          <p className="text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     );
