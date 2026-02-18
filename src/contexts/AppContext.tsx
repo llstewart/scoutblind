@@ -395,13 +395,14 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isAuthLoading]);
 
-  // Fetch saved count and library list when user is logged in
+  // Fetch saved count and library list when user is logged in (paid users only)
+  // Free users get 403 from /api/session GET, so skip to avoid console spam
   useEffect(() => {
-    if (user) {
+    if (user && isPremium) {
       fetchSavedCount();
       fetchSavedSearchesList();
     }
-  }, [user, fetchSavedCount, fetchSavedSearchesList]);
+  }, [user, isPremium, fetchSavedCount, fetchSavedSearchesList]);
 
   // Clear analyzed data for free tier users
   useEffect(() => {
@@ -555,6 +556,11 @@ export function AppProvider({ children }: AppProviderProps) {
 
       const data = await response.json();
 
+      if (!data.businesses || data.businesses.length === 0) {
+        setError('No businesses found for that search. Try a different niche or location.');
+        return;
+      }
+
       setBusinesses(data.businesses);
       setTableBusinesses([]);
       setSelectedBusinesses(new Set());
@@ -566,9 +572,7 @@ export function AppProvider({ children }: AppProviderProps) {
         refreshUser();
       }
 
-      if (data.businesses && data.businesses.length > 0) {
-        saveToLibrary(data.businesses, niche, location);
-      }
+      saveToLibrary(data.businesses, niche, location);
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
