@@ -282,7 +282,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             </div>
             <div className="min-w-0 w-full">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-medium text-gray-500 truncate pr-2">
+                <h3 className="text-sm font-semibold text-foreground truncate pr-2">
                   {business.name}
                 </h3>
                 {isEnriched && (
@@ -539,11 +539,11 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left text-xs">
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
             <tr className="border-b border-gray-200">
-              <th className={`text-left ${headerPadding} font-medium text-gray-500 w-12`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700 w-12`}>
                 #
               </th>
               <th
-                className={`text-left ${headerPadding} font-medium text-gray-500 min-w-[200px] relative group`}
+                className={`text-left ${headerPadding} font-medium text-gray-700 min-w-[200px] relative group`}
                 style={{ width: columnWidths['signals'] || 'auto' }}
               >
                 <div className="flex items-center justify-between">
@@ -566,7 +566,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                 </div>
               </th>
               <th
-                className={`text-left ${headerPadding} font-medium text-gray-500 relative group`}
+                className={`text-left ${headerPadding} font-medium text-gray-700 relative group`}
                 style={{ width: columnWidths['name'] || 'auto', minWidth: '120px' }}
               >
                 <div className="flex items-center justify-between">
@@ -588,25 +588,25 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   />
                 </div>
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Address
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Phone
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Website
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 text-center w-14`}>
+              <th className={`${headerPadding} font-medium text-gray-700 text-center w-14`}>
                 Rating
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 text-right w-16`}>
+              <th className={`${headerPadding} font-medium text-gray-700 text-right w-16`}>
                 Reviews
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Category
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 w-20`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-20`}>
                 <div className="flex items-center gap-1">
                   Status
                   <HeaderTooltip
@@ -627,16 +627,16 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 w-14`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-14`}>
                 Ads
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Owner Name
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Owner Phone
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 <div className="flex items-center gap-1">
                   Last Review
                   <HeaderTooltip
@@ -652,7 +652,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 <div className="flex items-center gap-1">
                   Owner Response
                   <HeaderTooltip
@@ -668,7 +668,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 <div className="flex items-center gap-1">
                   Profile Update
                   <HeaderTooltip
@@ -684,7 +684,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 <div className="flex items-center gap-1">
                   Search Visibility
                   <HeaderTooltip
@@ -700,7 +700,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 <div className="flex items-center gap-1">
                   Response Rate
                   <HeaderTooltip
@@ -716,10 +716,10 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Location Type
               </th>
-              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Website Tech
               </th>
             </tr>
@@ -812,7 +812,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                     )}
                   </td>
                   {/* General List columns */}
-                  <td className={`${cellPadding} text-sm font-medium text-foreground`}>
+                  <td className={`${cellPadding} font-medium text-gray-800`}>
                     <div className="flex items-center gap-2">
                       <span className="truncate">{business.name}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -820,7 +820,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       </div>
                     </div>
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground max-w-xs`}>
+                  <td className={`${cellPadding} text-gray-600 max-w-xs`}>
                     <div className="flex items-center gap-2">
                       <span className="truncate">{business.address}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -828,7 +828,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       </div>
                     </div>
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {business.phone ? (
                       <div className="flex items-center gap-2">
                         <span>{business.phone}</span>
@@ -837,7 +837,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-300">&mdash;</span>
+                      <span className="text-gray-400">&mdash;</span>
                     )}
                   </td>
                   <td className={cellPadding}>
@@ -863,20 +863,20 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-300">&mdash;</span>
+                      <span className="text-gray-400">&mdash;</span>
                     )}
                   </td>
                   <td className={`${cellPadding} text-center tabular-nums`}>
                     {business.rating > 0 ? (
                       <span className="text-gray-700">{business.rating}</span>
                     ) : (
-                      <span className="text-gray-300">&mdash;</span>
+                      <span className="text-gray-400">&mdash;</span>
                     )}
                   </td>
-                  <td className={`${cellPadding} text-right tabular-nums text-gray-500`}>
+                  <td className={`${cellPadding} text-right tabular-nums text-gray-600`}>
                     {business.reviewCount.toLocaleString()}
                   </td>
-                  <td className={`${cellPadding} text-gray-500`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     <span className="truncate block max-w-[100px]">{business.category}</span>
                   </td>
                   <td className={cellPadding}>
@@ -900,7 +900,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   <td className={`${cellPadding} text-sm`}>
                     <span className="text-muted-foreground/60 text-xs italic">Feature coming soon</span>
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {isPending ? <CellSpinner /> : !isEnriched ? (
                       <span className="text-amber-400/70 text-xs">—</span>
                     ) : (
@@ -916,7 +916,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                         )
                     )}
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {isPending ? <CellSpinner /> : !isEnriched ? (
                       <span className="text-amber-400/70 text-xs">—</span>
                     ) : (
@@ -932,7 +932,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                         )
                     )}
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {isPending ? <CellSpinner /> : !isEnriched ? (
                       <span className="text-amber-400/70 text-xs">—</span>
                     ) : (
@@ -993,7 +993,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       </StatusTag>
                     )}
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {isPending ? <CellSpinner /> : !isEnriched ? (
                       <span className="text-amber-400/70 text-xs">—</span>
                     ) : (

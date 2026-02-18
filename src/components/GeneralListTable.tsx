@@ -574,11 +574,11 @@ export function GeneralListTable({
                   />
                 </th>
               )}
-              <th className={`${headerPadding} font-medium text-gray-500 w-8`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-8`}>
                 #
               </th>
               <th
-                className={`${headerPadding} font-medium text-gray-500 relative group`}
+                className={`${headerPadding} font-medium text-gray-700 relative group`}
                 style={{ width: columnWidths['name'] || 'auto', minWidth: '100px' }}
               >
                 <div className="flex items-center justify-between">
@@ -605,7 +605,7 @@ export function GeneralListTable({
                 </div>
               </th>
               <th
-                className={`${headerPadding} font-medium text-gray-500 relative group`}
+                className={`${headerPadding} font-medium text-gray-700 relative group`}
                 style={{ width: columnWidths['address'] || 'auto', minWidth: '80px' }}
               >
                 <div className="flex items-center justify-between">
@@ -627,22 +627,22 @@ export function GeneralListTable({
                   />
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 Phone
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 Website
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 text-center w-14`}>
+              <th className={`${headerPadding} font-medium text-gray-700 text-center w-14`}>
                 Rating
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 text-right w-16`}>
+              <th className={`${headerPadding} font-medium text-gray-700 text-right w-16`}>
                 Reviews
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500`}>
+              <th className={`${headerPadding} font-medium text-gray-700`}>
                 Category
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 w-20`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-20`}>
                 <div className="flex items-center gap-1">
                   Status
                   <HeaderTooltip
@@ -663,7 +663,7 @@ export function GeneralListTable({
                   </HeaderTooltip>
                 </div>
               </th>
-              <th className={`${headerPadding} font-medium text-gray-500 w-14`}>
+              <th className={`${headerPadding} font-medium text-gray-700 w-14`}>
                 Ads
               </th>
               {!isPremium && (
@@ -803,7 +803,7 @@ export function GeneralListTable({
                       </div>
                     </div>
                   </td>
-                  <td className={`${cellPadding} text-gray-500`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     <div className="flex items-center gap-1.5">
                       <span className="truncate max-w-[160px]">{business.address}</span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
@@ -811,7 +811,7 @@ export function GeneralListTable({
                       </div>
                     </div>
                   </td>
-                  <td className={`${cellPadding} text-gray-500`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     {business.phone ? (
                       <div className="flex items-center gap-1.5">
                         <span className="tabular-nums">{business.phone}</span>
@@ -820,7 +820,7 @@ export function GeneralListTable({
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-300">—</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
                   <td className={cellPadding}>
@@ -846,20 +846,20 @@ export function GeneralListTable({
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-300">—</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
                   <td className={`${cellPadding} text-center tabular-nums`}>
                     {business.rating > 0 ? (
                       <span className="text-gray-700">{business.rating}</span>
                     ) : (
-                      <span className="text-gray-300">—</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
-                  <td className={`${cellPadding} text-right tabular-nums text-gray-500`}>
+                  <td className={`${cellPadding} text-right tabular-nums text-gray-600`}>
                     {business.reviewCount.toLocaleString()}
                   </td>
-                  <td className={`${cellPadding} text-gray-500`}>
+                  <td className={`${cellPadding} text-gray-600`}>
                     <span className="truncate block max-w-[100px]">{business.category}</span>
                   </td>
                   <td className={cellPadding}>
