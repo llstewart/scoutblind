@@ -50,68 +50,67 @@ interface MockBusiness {
 const MOCK_BUSINESSES: MockBusiness[] = [
   {
     name: 'Lone Star Plumbing Co',
-    score: 82,
-    rating: 3.8,
-    reviewCount: 12,
+    score: 15,
+    rating: 2.9,
+    reviewCount: 4,
     searchRank: 'Not ranked',
     claimed: false,
     signals: [
       { category: 'gbp', text: 'Unclaimed profile' },
-      { category: 'gbp', text: '0% reply rate (280d)' },
+      { category: 'web', text: 'No website' },
       { category: 'rank', text: 'Not in local pack' },
-      { category: 'web', text: 'No analytics detected' },
+      { category: 'rep', text: '2.9★ — 4 reviews' },
     ],
   },
   {
     name: 'Austin Family Dental',
-    score: 61,
-    rating: 4.1,
+    score: 32,
+    rating: 3.4,
     reviewCount: 8,
     searchRank: '#14',
     claimed: true,
     signals: [
-      { category: 'gbp', text: '18% reply rate (6 mo)' },
-      { category: 'rank', text: 'Position #14 of 20' },
+      { category: 'gbp', text: '12% reply rate (6 mo)' },
+      { category: 'rank', text: 'Buried at #14' },
       { category: 'rep', text: '8 reviews (avg is 47)' },
     ],
   },
   {
     name: 'Garcia & Sons Law Firm',
-    score: 47,
+    score: 28,
     rating: 3.2,
     reviewCount: 23,
-    searchRank: '#5',
+    searchRank: 'Not ranked',
     claimed: true,
     signals: [
-      { category: 'rank', text: 'Position #5 of 20' },
       { category: 'web', text: 'No website linked' },
+      { category: 'rank', text: 'Not in local pack' },
       { category: 'rep', text: '3.2★ avg (market 4.1)' },
     ],
   },
   {
     name: 'Summit Mechanical HVAC',
-    score: 73,
-    rating: 4.5,
-    reviewCount: 3,
-    searchRank: 'Not ranked',
+    score: 44,
+    rating: 4.0,
+    reviewCount: 11,
+    searchRank: '#8',
     claimed: true,
     signals: [
       { category: 'gbp', text: '0% reply rate (12 mo)' },
-      { category: 'rank', text: 'Not in local pack' },
       { category: 'web', text: 'No analytics detected' },
-      { category: 'rep', text: '3 reviews total' },
+      { category: 'rep', text: '11 reviews total' },
     ],
   },
   {
     name: 'Prestige Auto Detail',
-    score: 38,
-    rating: 4.2,
-    reviewCount: 47,
-    searchRank: '#3',
+    score: 74,
+    rating: 4.7,
+    reviewCount: 112,
+    searchRank: '#2',
     claimed: true,
     signals: [
-      { category: 'gbp', text: 'Last reply 45d ago' },
-      { category: 'rep', text: '4.2★ (12 negative)' },
+      { category: 'gbp', text: 'Active — replies in 24h' },
+      { category: 'rank', text: 'Top 3 in local pack' },
     ],
   },
 ];
@@ -229,57 +228,25 @@ export function MarketingPage() {
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
-              Local leads enriched with the digital gaps that close deals.
+              The Agency Standard for Local Lead Generation.
             </h1>
 
-            <p className="text-sm text-gray-600 mb-2 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Scan any local market. Surface weak online presence. Export and pitch.
-            </p>
-            <p className="text-sm text-gray-500 mb-8 max-w-lg mx-auto lg:mx-0 italic">
-              The signals you hunt for — automated.
+            <p className="text-sm text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              Stop scrolling maps. Instantly scan any city for businesses with unclaimed profiles, missing websites, and bad rankings. Export the data. Pitch the solution.
             </p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                router.push('/signup');
-              }}
-              className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2"
-            >
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="text"
-                    defaultValue="Plumbers"
-                    placeholder="e.g. Plumbers"
-                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
-                  />
-                  <input
-                    type="text"
-                    defaultValue="Austin, TX"
-                    placeholder="e.g. Austin, TX"
-                    className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-colors text-sm"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
-                >
-                  Scan market
-                </button>
-              </div>
-            </form>
-
-            <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">
-              <p className="text-xs text-gray-500">No credit card required. 5 free searches.</p>
-              <span className="text-xs text-gray-300">·</span>
+            <div className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2">
               <Link
-                href="/login"
-                className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
+                href="/signup"
+                className="w-full px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors text-center"
               >
-                Sign in
+                Start Your First Scan
               </Link>
             </div>
+
+            <p className="text-xs text-gray-500 mt-4 text-center lg:text-left">
+              No credit card required. 50 leads on us.
+            </p>
           </div>
 
           {/* Right: Product Preview — App Frame */}
@@ -358,9 +325,9 @@ export function MarketingPage() {
                                   <div className="flex items-center gap-1.5">
                                     <span className="text-gray-800 font-medium text-[11px]">{biz.name}</span>
                                     <span className={`text-[9px] font-bold px-1 py-px rounded ${
-                                      biz.score >= 70 ? 'bg-rose-500/10 text-rose-500' :
-                                      biz.score >= 40 ? 'bg-amber-500/10 text-amber-500' :
-                                      'bg-emerald-500/10 text-emerald-500'
+                                      biz.score >= 60 ? 'bg-emerald-500/10 text-emerald-500' :
+                                      biz.score >= 35 ? 'bg-amber-500/10 text-amber-500' :
+                                      'bg-rose-500/10 text-rose-500'
                                     }`}>
                                       {biz.score}
                                     </span>
