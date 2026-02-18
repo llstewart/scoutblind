@@ -8,11 +8,13 @@ import { CellSpinner } from './CellSpinner';
 import { formatDate } from '@/utils/date';
 import {
   getDormancyStatus,
-  sortBySeoPriority,
   getSeoNeedSummary,
   calculateSeoNeedScore,
+  sortEnrichedBusinesses,
+  SORT_OPTIONS,
   SIGNAL_CATEGORY_COLORS,
   SIGNAL_CATEGORY_LABELS,
+  type SortOption,
   type CategorizedSignals,
   type SignalCategory,
 } from '@/lib/signals';
@@ -118,7 +120,8 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 }
 
 export function UpgradedListTable({ businesses, niche, location, isLoadingMore, expectedTotal }: UpgradedListTableProps) {
-  const [sortByPriority, setSortByPriority] = useState(false);
+  const [activeSortOption, setActiveSortOption] = useState<SortOption>('default');
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedSignals, setExpandedSignals] = useState<Set<number>>(new Set());
   const [isCompact, setIsCompact] = useState(false);
@@ -129,6 +132,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleSignals = (index: number) => {
     setExpandedSignals(prev => {
@@ -154,11 +158,11 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   ).length;
 
   const displayedBusinesses = useMemo(() => {
-    if (sortByPriority && pendingCount === 0) {
-      return sortBySeoPriority(enrichedBusinesses) as TableBusiness[];
+    if (activeSortOption !== 'default' && pendingCount === 0) {
+      return sortEnrichedBusinesses(enrichedBusinesses, activeSortOption) as TableBusiness[];
     }
     return businesses;
-  }, [businesses, enrichedBusinesses, sortByPriority, pendingCount]);
+  }, [businesses, enrichedBusinesses, activeSortOption, pendingCount]);
 
   const totalPages = Math.ceil(displayedBusinesses.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -233,12 +237,25 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Reset to page 1 when sorting changes
-  const handleSortToggle = () => {
-    setSortByPriority(!sortByPriority);
+  // Sort change handler
+  const handleSortChange = (option: SortOption) => {
+    setActiveSortOption(option);
+    setSortDropdownOpen(false);
     setCurrentPage(1);
     setFocusedRow(null);
   };
+
+  // Click-outside handler for sort dropdown
+  useEffect(() => {
+    if (!sortDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target as Node)) {
+        setSortDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [sortDropdownOpen]);
 
   // Column resize handler
   const handleColumnResize = (columnId: string, delta: number) => {
@@ -499,19 +516,49 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             </span>
           )}
         </div>
-        <button
-          onClick={handleSortToggle}
-          disabled={pendingCount > 0}
-          className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-all ${sortByPriority
-            ? 'bg-violet-600 text-white'
-            : 'text-gray-500 hover:text-gray-900'
-            } ${pendingCount > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-          </svg>
-          {sortByPriority ? 'By Priority' : 'Sort'}
-        </button>
+        <div ref={sortDropdownRef} className="relative">
+          <button
+            onClick={() => pendingCount === 0 && setSortDropdownOpen(!sortDropdownOpen)}
+            disabled={pendingCount > 0}
+            className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded transition-all ${activeSortOption !== 'default'
+              ? 'bg-violet-600/15 text-violet-600'
+              : 'text-gray-500 hover:text-gray-900'
+              } ${pendingCount > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            {activeSortOption !== 'default'
+              ? `Sort: ${SORT_OPTIONS.find(o => o.value === activeSortOption)?.label}`
+              : 'Sort'}
+            <svg className={`w-3 h-3 transition-transform ${sortDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {sortDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-xl shadow-black/10 border border-gray-200 z-50 py-1">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleSortChange(option.value)}
+                  className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors flex items-center justify-between gap-2 ${activeSortOption === option.value ? 'bg-violet-50' : ''}`}
+                >
+                  <div>
+                    <div className={`font-medium ${activeSortOption === option.value ? 'text-violet-600' : 'text-gray-800'}`}>
+                      {option.label}
+                    </div>
+                    <div className="text-[10px] text-gray-400">{option.description}</div>
+                  </div>
+                  {activeSortOption === option.value && (
+                    <svg className="w-3.5 h-3.5 text-violet-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Scroll shadow indicator */}
@@ -762,7 +809,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       </span>
                     ) : (
                       <div className="flex flex-col gap-1">
-                        {sortByPriority && (
+                        {activeSortOption === 'seo-score' && (
                           <span className="text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
                             Score: {score}/100
                             <span className="relative group/tooltip">

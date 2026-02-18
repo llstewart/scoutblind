@@ -302,6 +302,39 @@ export function sortBySeoPriority(businesses: EnrichedBusiness[]): EnrichedBusin
   });
 }
 
+// --- Multi-column sort ---
+
+export type SortOption = 'default' | 'seo-score' | 'rating' | 'reviews' | 'response-rate' | 'dormancy' | 'search-rank';
+
+export const SORT_OPTIONS: { value: SortOption; label: string; description: string }[] = [
+  { value: 'default',       label: 'Default',         description: 'Original search order' },
+  { value: 'seo-score',     label: 'SEO Score',       description: 'Composite need score (high → low)' },
+  { value: 'rating',        label: 'Rating',           description: 'Lowest rated first' },
+  { value: 'reviews',       label: 'Reviews',          description: 'Fewest reviews first' },
+  { value: 'response-rate', label: 'Response Rate',    description: 'Least responsive first' },
+  { value: 'dormancy',      label: 'Dormancy',         description: 'Most inactive first' },
+  { value: 'search-rank',   label: 'Search Rank',      description: 'Worst visibility first' },
+];
+
+export function sortEnrichedBusinesses(businesses: EnrichedBusiness[], sortBy: SortOption): EnrichedBusiness[] {
+  if (sortBy === 'default') return businesses;
+  return [...businesses].sort((a, b) => {
+    switch (sortBy) {
+      case 'seo-score':     return calculateSeoNeedScore(b) - calculateSeoNeedScore(a);
+      case 'rating':        return a.rating - b.rating;
+      case 'reviews':       return a.reviewCount - b.reviewCount;
+      case 'response-rate': return a.responseRate - b.responseRate;
+      case 'dormancy':      return (b.daysDormant ?? -1) - (a.daysDormant ?? -1);
+      case 'search-rank':
+        if (a.searchVisibility === null && b.searchVisibility !== null) return -1;
+        if (a.searchVisibility !== null && b.searchVisibility === null) return 1;
+        if (a.searchVisibility === null && b.searchVisibility === null) return 0;
+        return (b.searchVisibility!) - (a.searchVisibility!);
+      default: return 0;
+    }
+  });
+}
+
 /**
  * Generate a categorized summary of why this business needs SEO services
  * Thresholds aligned with calculateSeoNeedScore for consistency
