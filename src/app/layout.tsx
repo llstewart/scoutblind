@@ -4,18 +4,18 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { Providers } from './providers';
 
-const siteUrl = 'https://scoutblind.com';
+const siteUrl = 'https://packleads.io';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Scoutblind - Enriched Local Leads, Instantly',
-    template: '%s | Scoutblind',
+    default: 'Packleads - Enriched Local Leads, Instantly',
+    template: '%s | Packleads',
   },
   description: 'Scan Google Business Profiles to find local businesses with weak online presence. Identify unclaimed profiles, poor rankings, and dormant owners — then pitch them your services.',
   keywords: ['local lead generation', 'Google Business Profile', 'GBP signals', 'GMB signals', 'SEO leads', 'local SEO', 'SEO agency tool', 'web design leads', 'digital marketing leads', 'lead enrichment', 'business intelligence'],
-  authors: [{ name: 'Scoutblind' }],
-  creator: 'Scoutblind',
+  authors: [{ name: 'Packleads' }],
+  creator: 'Packleads',
   alternates: {
     canonical: siteUrl,
   },
@@ -23,21 +23,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteUrl,
-    siteName: 'Scoutblind',
-    title: 'Scoutblind - Enriched Local Leads, Instantly',
+    siteName: 'Packleads',
+    title: 'Packleads - Enriched Local Leads, Instantly',
     description: 'Scan Google Business Profiles to find local businesses with weak online presence. The signals you hunt for — automated.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Scoutblind - Enriched Local Lead Generation',
+        alt: 'Packleads - Enriched Local Lead Generation',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Scoutblind - Enriched Local Leads, Instantly',
+    title: 'Packleads - Enriched Local Leads, Instantly',
     description: 'Scan Google Business Profiles to find local businesses with weak online presence. The signals you hunt for — automated.',
     images: ['/og-image.png'],
   },
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 const jsonLdApp = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Scoutblind',
+  name: 'Packleads',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
   url: siteUrl,
@@ -83,7 +83,7 @@ const jsonLdApp = {
 const jsonLdOrg = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Scoutblind',
+  name: 'Packleads',
   url: siteUrl,
   logo: `${siteUrl}/icon-512.png`,
   sameAs: [],

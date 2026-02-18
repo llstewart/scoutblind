@@ -186,7 +186,7 @@ export function AccountTab({
       {/* Footer */}
       <div className="mt-8 text-center">
         <p className="text-xs text-gray-400">
-          © {new Date().getFullYear()} Scoutblind. All rights reserved.
+          © {new Date().getFullYear()} Packleads. All rights reserved.
         </p>
       </div>
     </TabContent>

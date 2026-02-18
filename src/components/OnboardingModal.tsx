@@ -10,7 +10,7 @@ interface OnboardingModalProps {
 
 const SLIDES = [
   {
-    title: 'Welcome to Scoutblind',
+    title: 'Welcome to Packleads',
     description: 'Find businesses that need your help\u2009\u2014\u2009before your competitors do.',
     visual: 'welcome',
   },
@@ -180,7 +180,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Welcome to Scoutblind"
+        aria-label="Welcome to Packleads"
         className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-black/10 w-full max-w-lg m-4 overflow-hidden"
       >
         {/* Close button */}

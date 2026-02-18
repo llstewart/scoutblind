@@ -14,8 +14,8 @@ import { MarketingFooter } from './MarketingFooter';
 
 const faqItems = [
   {
-    q: 'What is Scoutblind?',
-    a: 'Scoutblind scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, and local pack rankings — to help agencies and freelancers find prospects who actually need their services.',
+    q: 'What is Packleads?',
+    a: 'Packleads scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, and local pack rankings — to help agencies and freelancers find prospects who actually need their services.',
   },
   {
     q: 'How do credits work?',
@@ -23,7 +23,7 @@ const faqItems = [
   },
   {
     q: 'Is the data accurate?',
-    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Scoutblind automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
+    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Packleads automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
   },
   {
     q: 'Can I export my data?',
@@ -425,7 +425,7 @@ export function MarketingPage() {
             Hours of manual research, done in minutes.
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            Stop scrolling Google Maps one listing at a time. Scoutblind scans an entire market in one click.
+            Stop scrolling Google Maps one listing at a time. Packleads scans an entire market in one click.
           </p>
 
           <div ref={stats.ref} className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">

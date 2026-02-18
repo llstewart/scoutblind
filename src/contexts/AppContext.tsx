@@ -8,8 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 
 type TabType = 'general' | 'upgraded' | 'market';
 
-const SESSION_STORAGE_KEY = 'scoutblind_session';
-const PERSISTENT_SESSION_ID_KEY = 'scoutblind_sid';
+const SESSION_STORAGE_KEY = 'packleads_session';
+const PERSISTENT_SESSION_ID_KEY = 'packleads_sid';
 
 function generateSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;

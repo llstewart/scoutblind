@@ -4,8 +4,8 @@ import { MarketingHeader } from '@/components/marketing/MarketingHeader';
 import { MarketingFooter } from '@/components/marketing/MarketingFooter';
 
 export const metadata: Metadata = {
-  title: 'Features — Scoutblind',
-  description: 'Discover what Scoutblind analyzes: GBP signals, local rankings, web presence, and reputation metrics across every business in a market.',
+  title: 'Features — Packleads',
+  description: 'Discover what Packleads analyzes: GBP signals, local rankings, web presence, and reputation metrics across every business in a market.',
 };
 
 const SIGNAL_CATEGORIES = [
@@ -75,7 +75,7 @@ export default function FeaturesPage() {
       <section className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 mb-5 tracking-tight leading-[1.1]">
-            What Scoutblind analyzes
+            What Packleads analyzes
           </h1>
           <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
             Every scan evaluates 10+ signals across four categories to surface which businesses genuinely need help — and which are already covered.

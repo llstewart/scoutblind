@@ -10,7 +10,7 @@ export function MarketingFooter() {
             <Link href="/" className="flex items-center gap-2">
               <img src="/icon.svg" alt="" className="w-6 h-6" />
               <span className="text-base font-semibold text-gray-900">
-                Scoutblind<span className="text-violet-500">.</span>
+                Packleads<span className="text-violet-500">.</span>
               </span>
             </Link>
             <p className="mt-2 text-xs text-gray-600 leading-relaxed">
@@ -77,7 +77,7 @@ export function MarketingFooter() {
 
         <div className="pt-6 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} Scoutblind. All rights reserved.
+            &copy; {new Date().getFullYear()} Packleads. All rights reserved.
           </div>
           <div className="flex items-center gap-4 text-xs text-gray-600">
             <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
@@ -87,7 +87,7 @@ export function MarketingFooter() {
         </div>
 
         <p className="mt-4 text-[10px] text-gray-400 text-center">
-          Google and Google Business Profile are trademarks of Google LLC. Scoutblind is not affiliated with or endorsed by Google.
+          Google and Google Business Profile are trademarks of Google LLC. Packleads is not affiliated with or endorsed by Google.
         </p>
       </div>
     </footer>

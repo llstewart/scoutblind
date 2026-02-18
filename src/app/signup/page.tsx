@@ -24,7 +24,7 @@ export default function SignupPage() {
             <Link href="/" className="flex items-center gap-2.5 mb-12">
               <img src="/icon.svg" alt="" className="w-8 h-8" />
               <span className="text-2xl font-semibold text-white">
-                Scoutblind<span className="text-violet-200">.</span>
+                Packleads<span className="text-violet-200">.</span>
               </span>
             </Link>
 
@@ -121,7 +121,7 @@ export default function SignupPage() {
             <Link href="/" className="inline-flex items-center gap-2">
               <img src="/icon.svg" alt="" className="w-7 h-7" />
               <span className="text-xl font-semibold text-gray-900">
-                Scoutblind<span className="text-violet-500">.</span>
+                Packleads<span className="text-violet-500">.</span>
               </span>
             </Link>
           </div>

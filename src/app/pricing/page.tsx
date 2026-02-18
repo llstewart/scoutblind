@@ -29,7 +29,7 @@ export default function PricingPage() {
           Simple, Transparent Pricing
         </h1>
         <p className="text-sm text-gray-600 text-center mb-12">
-          One scan could pay for a year of Scoutblind.
+          One scan could pay for a year of Packleads.
         </p>
 
         {/* Pricing Cards */}

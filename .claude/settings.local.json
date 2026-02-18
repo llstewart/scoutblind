@@ -33,7 +33,8 @@
       "Bash(where:*)",
       "WebFetch(domain:www.fontshare.com)",
       "WebFetch(domain:www.cdnfonts.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(tee:*)"
     ]
   }
 }

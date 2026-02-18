@@ -33,8 +33,8 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
     // Clear all storage FIRST
     try {
       sessionStorage.clear();
-      localStorage.removeItem('scoutblind_session');
-      localStorage.removeItem('scoutblind_sid');
+      localStorage.removeItem('packleads_session');
+      localStorage.removeItem('packleads_sid');
     } catch (e) {
       console.error('Failed to clear storage:', e);
     }

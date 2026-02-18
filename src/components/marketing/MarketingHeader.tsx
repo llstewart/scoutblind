@@ -29,7 +29,7 @@ export function MarketingHeader() {
         <Link href="/" className="flex items-center gap-2">
           <img src="/icon.svg" alt="" className="w-7 h-7" />
           <span className="text-lg font-semibold text-gray-900">
-            Scoutblind<span className="text-violet-500">.</span>
+            Packleads<span className="text-violet-500">.</span>
           </span>
         </Link>
         <nav aria-label="Main navigation" className="flex items-center gap-1">

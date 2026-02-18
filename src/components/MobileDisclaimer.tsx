@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Monitor, X } from 'lucide-react';
 
-const DISCLAIMER_STORAGE_KEY = 'scoutblind_mobile_disclaimer_dismissed';
+const DISCLAIMER_STORAGE_KEY = 'packleads_mobile_disclaimer_dismissed';
 
 export function MobileDisclaimer() {
     const [isVisible, setIsVisible] = useState(false);
@@ -39,7 +39,7 @@ export function MobileDisclaimer() {
                     <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-sm mb-1">Desktop Recommended</h3>
                         <p className="text-xs text-gray-500 leading-relaxed mb-3">
-                            Scoutblind is optimized for larger screens. For the best analysis experience, we recommend using a desktop computer.
+                            Packleads is optimized for larger screens. For the best analysis experience, we recommend using a desktop computer.
                         </p>
 
                         <button

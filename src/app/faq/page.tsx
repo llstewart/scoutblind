@@ -6,8 +6,8 @@ import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 
 const faqItems = [
   {
-    q: 'What is Scoutblind?',
-    a: 'Scoutblind is a prospecting tool for agencies and freelancers who sell digital services to local businesses. It scans Google Business Profiles in any market and analyzes key signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your services.',
+    q: 'What is Packleads?',
+    a: 'Packleads is a prospecting tool for agencies and freelancers who sell digital services to local businesses. It scans Google Business Profiles in any market and analyzes key signals — like review response rates, owner activity, profile completeness, and local pack rankings — to help you find businesses that actually need your services.',
   },
   {
     q: 'How do credits work?',
@@ -23,11 +23,11 @@ const faqItems = [
   },
   {
     q: 'Is the data accurate?',
-    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Scoutblind automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
+    a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Packleads automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
   },
   {
     q: 'How does pricing work?',
-    a: 'Scoutblind offers a free tier (5 credits), a Starter plan ($29/mo for 50 credits), and a Pro plan ($79/mo for 200 credits). All plans include full signal analysis, CSV export, and search history. Subscriptions are billed monthly via Stripe and can be canceled anytime.',
+    a: 'Packleads offers a free tier (5 credits), a Starter plan ($29/mo for 50 credits), and a Pro plan ($79/mo for 200 credits). All plans include full signal analysis, CSV export, and search history. Subscriptions are billed monthly via Stripe and can be canceled anytime.',
   },
   {
     q: 'Can I export my data?',
@@ -51,7 +51,7 @@ export default function FaqPage() {
       <div className="max-w-2xl mx-auto px-4 py-12 md:py-16">
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">Frequently Asked Questions</h1>
         <p className="text-sm text-gray-600 mb-10">
-          Everything you need to know about Scoutblind.
+          Everything you need to know about Packleads.
         </p>
 
         <div className="space-y-3">
