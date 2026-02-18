@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
 import { CellSpinner } from './CellSpinner';
@@ -15,6 +16,62 @@ import {
   type CategorizedSignals,
   type SignalCategory,
 } from '@/lib/signals';
+
+// Tooltip component that renders in a portal to avoid overflow clipping
+function HeaderTooltip({
+  children,
+  content
+}: {
+  children: React.ReactNode;
+  content: React.ReactNode;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 8,
+        left: Math.min(rect.left, window.innerWidth - 300),
+      });
+    }
+  }, []);
+
+  const handleMouseEnter = () => {
+    updatePosition();
+    setIsVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsVisible(false);
+  };
+
+  return (
+    <>
+      <div
+        ref={triggerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="inline-flex cursor-help"
+      >
+        {children}
+      </div>
+      {isVisible && typeof window !== 'undefined' && createPortal(
+        <div
+          className="fixed w-72 p-3 bg-white rounded-lg shadow-2xl shadow-black/10 z-[9999] animate-in fade-in duration-150"
+          style={{ top: position.top, left: position.left }}
+          onMouseEnter={() => setIsVisible(true)}
+          onMouseLeave={() => setIsVisible(false)}
+        >
+          {content}
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
 
 interface UpgradedListTableProps {
   businesses: TableBusiness[];
@@ -225,7 +282,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             </div>
             <div className="min-w-0 w-full">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-semibold text-foreground truncate pr-2">
+                <h3 className="font-medium text-gray-500 truncate pr-2">
                   {business.name}
                 </h3>
                 {isEnriched && (
@@ -300,8 +357,8 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                 <svg className="w-3 h-3 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                 </svg>
-                <a href={business.website.startsWith('http') ? business.website : `https://${business.website}`} target="_blank" rel="noopener noreferrer" className="text-primary truncate max-w-[120px]">
-                  {(() => { try { return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname; } catch { return 'Website'; } })()}
+                <a href={business.website.startsWith('http') ? business.website : `https://${business.website}`} target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 truncate max-w-[120px]">
+                  {(() => { try { return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname.replace('www.', ''); } catch { return 'Website'; } })()}
                 </a>
               </div>
             )}
@@ -344,13 +401,17 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         )}
 
         {/* Footer: Tags */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50 pl-9">
-          <StatusTag status={business.claimed ? 'success' : 'warning'}>
-            {business.claimed ? 'Claimed' : 'Unclaimed'}
-          </StatusTag>
-          <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
-            {business.sponsored ? 'Ads' : 'No Ads'}
-          </StatusTag>
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/50 pl-9 text-xs">
+          {business.claimed ? (
+            <span className="text-emerald-500">Claimed</span>
+          ) : (
+            <span className="text-amber-500">Unclaimed</span>
+          )}
+          {business.sponsored ? (
+            <span className="text-emerald-500">Ads</span>
+          ) : (
+            <span className="text-gray-400">No Ads</span>
+          )}
           {isEnriched && (business as EnrichedBusiness).websiteTech !== 'Analysis Failed' && (
             <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border">
               Tech: {(business as EnrichedBusiness).websiteTech}
@@ -397,7 +458,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95">
         <span className="text-xs text-gray-500">
           {businesses.length.toLocaleString()} analyzed
         </span>
@@ -423,7 +484,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
       )}
 
       {/* Filter Controls */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95">
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500">
             {enrichedBusinesses.length}/{businesses.length} enriched
@@ -475,14 +536,14 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         </div>
 
         {/* Desktop Table View */}
-        <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-xs">
+        <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left text-xs">
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
             <tr className="border-b border-gray-200">
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground w-12`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500 w-12`}>
                 #
               </th>
               <th
-                className={`text-left ${headerPadding} text-sm font-semibold text-foreground min-w-[200px] relative group`}
+                className={`text-left ${headerPadding} font-medium text-gray-500 min-w-[200px] relative group`}
                 style={{ width: columnWidths['signals'] || 'auto' }}
               >
                 <div className="flex items-center justify-between">
@@ -505,7 +566,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                 </div>
               </th>
               <th
-                className={`text-left ${headerPadding} text-sm font-semibold text-foreground relative group`}
+                className={`text-left ${headerPadding} font-medium text-gray-500 relative group`}
                 style={{ width: columnWidths['name'] || 'auto', minWidth: '120px' }}
               >
                 <div className="flex items-center justify-between">
@@ -527,115 +588,138 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   />
                 </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Address
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Phone
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Website
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`${headerPadding} font-medium text-gray-500 text-center w-14`}>
                 Rating
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`${headerPadding} font-medium text-gray-500 text-right w-16`}>
                 Reviews
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Category
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                <span className="flex items-center gap-1">
-                  Claim Status
-                  <span className="relative group/tooltip">
-                    <svg className="w-4 h-4 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <th className={`${headerPadding} font-medium text-gray-500 w-20`}>
+                <div className="flex items-center gap-1">
+                  Status
+                  <HeaderTooltip
+                    content={
+                      <>
+                        <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                          <span className="font-semibold text-emerald-400">Claimed:</span> Owner verified. Actively managed.
+                        </p>
+                        <p className="text-xs text-gray-700 leading-relaxed mt-1.5 font-normal">
+                          <span className="font-semibold text-amber-400">Unclaimed:</span> No owner. Good opportunity.
+                        </p>
+                      </>
+                    }
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="absolute left-0 top-full mt-2 px-3 py-2 text-xs font-normal text-primary-foreground bg-primary rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                      Indicates if the business owner has claimed this profile
-                    </span>
-                  </span>
-                </span>
+                  </HeaderTooltip>
+                </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                Ad Status
+              <th className={`${headerPadding} font-medium text-gray-500 w-14`}>
+                Ads
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Owner Name
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Owner Phone
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                <span className="flex items-center gap-1">
+              <th className={`${headerPadding} font-medium text-gray-500`}>
+                <div className="flex items-center gap-1">
                   Last Review
-                  <span className="relative group/tooltip">
-                    <svg className="w-4 h-4 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <HeaderTooltip
+                    content={
+                      <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                        Date of the most recent customer review
+                      </p>
+                    }
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="absolute left-0 top-full mt-2 px-3 py-2 text-xs font-normal text-primary-foreground bg-primary rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                      Date of the most recent customer review
-                    </span>
-                  </span>
-                </span>
+                  </HeaderTooltip>
+                </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                <span className="flex items-center gap-1">
+              <th className={`${headerPadding} font-medium text-gray-500`}>
+                <div className="flex items-center gap-1">
                   Owner Response
-                  <span className="relative group/tooltip">
-                    <svg className="w-4 h-4 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <HeaderTooltip
+                    content={
+                      <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                        Date of last owner action (reply to review or Google Business Profile post)
+                      </p>
+                    }
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="absolute left-0 top-full mt-2 px-3 py-2 text-xs font-normal text-primary-foreground bg-primary rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                      Date of last owner action (reply to review or Google Business Profile post)
-                    </span>
-                  </span>
-                </span>
+                  </HeaderTooltip>
+                </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                <span className="flex items-center gap-1">
+              <th className={`${headerPadding} font-medium text-gray-500`}>
+                <div className="flex items-center gap-1">
                   Profile Update
-                  <span className="relative group/tooltip">
-                    <svg className="w-4 h-4 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <HeaderTooltip
+                    content={
+                      <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                        Days since owner last engaged with their Google Business Profile
+                      </p>
+                    }
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="absolute left-0 top-full mt-2 px-3 py-2 text-xs font-normal text-primary-foreground bg-primary rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                      Days since owner last engaged with their Google Business Profile
-                    </span>
-                  </span>
-                </span>
+                  </HeaderTooltip>
+                </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                <span className="flex items-center gap-1">
+              <th className={`${headerPadding} font-medium text-gray-500`}>
+                <div className="flex items-center gap-1">
                   Search Visibility
-                  <span className="relative group/tooltip">
-                    <svg className="w-4 h-4 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <HeaderTooltip
+                    content={
+                      <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                        Shows if this business appears when searching for {niche || 'this niche'} in {location || 'this area'}
+                      </p>
+                    }
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="absolute left-0 top-full mt-2 px-3 py-2 text-xs font-normal text-primary-foreground bg-primary rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                      Shows if this business appears when searching for {niche || 'this niche'} in {location || 'this area'}
-                    </span>
-                  </span>
-                </span>
+                  </HeaderTooltip>
+                </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
-                <span className="flex items-center gap-1">
+              <th className={`${headerPadding} font-medium text-gray-500`}>
+                <div className="flex items-center gap-1">
                   Response Rate
-                  <span className="relative group/tooltip">
-                    <svg className="w-4 h-4 text-muted-foreground cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <HeaderTooltip
+                    content={
+                      <p className="text-xs text-gray-700 leading-relaxed font-normal">
+                        Percentage of customer reviews the owner has replied to
+                      </p>
+                    }
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="absolute left-0 top-full mt-2 px-3 py-2 text-xs font-normal text-primary-foreground bg-primary rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                      Percentage of customer reviews the owner has replied to
-                    </span>
-                  </span>
-                </span>
+                  </HeaderTooltip>
+                </div>
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Location Type
               </th>
-              <th className={`text-left ${headerPadding} text-sm font-semibold text-foreground`}>
+              <th className={`text-left ${headerPadding} font-medium text-gray-500`}>
                 Website Tech
               </th>
             </tr>
@@ -662,7 +746,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       isPending ? 'bg-violet-500/5' : 'hover:bg-gray-50'
                     }`}
                 >
-                  <td className={`${cellPadding} text-sm font-medium text-muted-foreground`}>
+                  <td className={`${cellPadding} text-gray-400 tabular-nums`}>
                     {startIndex + index + 1}
                   </td>
                   {/* SEO Signals column */}
@@ -753,22 +837,22 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                         </div>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground/50">No Phone Listed</span>
+                      <span className="text-gray-300">&mdash;</span>
                     )}
                   </td>
-                  <td className={`${cellPadding} text-sm`}>
+                  <td className={cellPadding}>
                     {business.website ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <a
                           href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline hover:text-gray-900 truncate block max-w-[180px]"
+                          className="text-violet-400 hover:text-violet-300 truncate block max-w-[140px]"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {(() => {
                             try {
-                              return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname;
+                              return new URL(business.website.startsWith('http') ? business.website : `https://${business.website}`).hostname.replace('www.', '');
                             } catch {
                               return business.website;
                             }
@@ -779,27 +863,35 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                         </div>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground/50">No Website Listed</span>
+                      <span className="text-gray-300">&mdash;</span>
                     )}
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {business.rating > 0 ? `${business.rating} Stars` : 'No Rating'}
+                  <td className={`${cellPadding} text-center tabular-nums`}>
+                    {business.rating > 0 ? (
+                      <span className="text-gray-700">{business.rating}</span>
+                    ) : (
+                      <span className="text-gray-300">&mdash;</span>
+                    )}
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {business.reviewCount} Reviews
+                  <td className={`${cellPadding} text-right tabular-nums text-gray-500`}>
+                    {business.reviewCount.toLocaleString()}
                   </td>
-                  <td className={`${cellPadding} text-sm text-muted-foreground`}>
-                    {business.category}
+                  <td className={`${cellPadding} text-gray-500`}>
+                    <span className="truncate block max-w-[100px]">{business.category}</span>
                   </td>
                   <td className={cellPadding}>
-                    <StatusTag status={business.claimed ? 'success' : 'warning'}>
-                      {business.claimed ? 'Claimed' : 'Unclaimed'}
-                    </StatusTag>
+                    {business.claimed ? (
+                      <span className="text-emerald-500">Claimed</span>
+                    ) : (
+                      <span className="text-amber-500">Unclaimed</span>
+                    )}
                   </td>
                   <td className={cellPadding}>
-                    <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
-                      {business.sponsored ? 'Active Ads' : 'No Ads'}
-                    </StatusTag>
+                    {business.sponsored ? (
+                      <span className="text-emerald-500">Yes</span>
+                    ) : (
+                      <span className="text-gray-400">No</span>
+                    )}
                   </td>
                   {/* Upgraded List additional columns */}
                   <td className={`${cellPadding} text-sm`}>
