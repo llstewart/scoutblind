@@ -436,13 +436,17 @@ export function GeneralListTable({
         </div>
 
         {/* Footer: Tags */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
-          <StatusTag status={business.claimed ? 'success' : 'warning'}>
-            {business.claimed ? 'Claimed' : 'Unclaimed'}
-          </StatusTag>
-          <StatusTag status={business.sponsored ? 'success' : 'neutral'}>
-            {business.sponsored ? 'Ads' : 'No Ads'}
-          </StatusTag>
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/50 text-xs">
+          {business.claimed ? (
+            <span className="text-gray-400">Claimed</span>
+          ) : (
+            <span className="text-violet-400 font-medium">Unclaimed</span>
+          )}
+          {business.sponsored ? (
+            <span className="text-gray-400">Ads</span>
+          ) : (
+            <span className="text-violet-400 font-medium">No Ads</span>
+          )}
         </div>
 
         {/* Blurred Premium Signals Preview (free tier only) */}
@@ -649,10 +653,10 @@ export function GeneralListTable({
                     content={
                       <>
                         <p className="text-xs text-gray-700 leading-relaxed font-normal">
-                          <span className="font-semibold text-emerald-400">Claimed:</span> Owner verified. Actively managed.
+                          <span className="font-semibold text-violet-400">Unclaimed:</span> No owner — open opportunity to offer services.
                         </p>
                         <p className="text-xs text-gray-700 leading-relaxed mt-1.5 font-normal">
-                          <span className="font-semibold text-amber-400">Unclaimed:</span> No owner. Good opportunity.
+                          <span className="font-semibold text-gray-400">Claimed:</span> Already managed by someone. Lower priority.
                         </p>
                       </>
                     }
@@ -864,16 +868,16 @@ export function GeneralListTable({
                   </td>
                   <td className={cellPadding}>
                     {business.claimed ? (
-                      <span className="text-emerald-500">Claimed</span>
+                      <span className="text-gray-400">Claimed</span>
                     ) : (
-                      <span className="text-amber-500">Unclaimed</span>
+                      <span className="text-violet-400 font-medium">Unclaimed</span>
                     )}
                   </td>
                   <td className={cellPadding}>
                     {business.sponsored ? (
-                      <span className="text-emerald-500">Yes</span>
+                      <span className="text-gray-400">Yes</span>
                     ) : (
-                      <span className="text-gray-400">No</span>
+                      <span className="text-violet-400 font-medium">No</span>
                     )}
                   </td>
                   {!isPremium && (
