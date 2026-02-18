@@ -139,7 +139,7 @@ export default function PricingPage() {
             >
               Try it free
             </Link>
-            <p className="text-xs text-gray-500 mt-2">No credit card required. 5 free scans.</p>
+            <p className="text-xs text-gray-500 mt-2">No credit card required. 5 free searches.</p>
           </div>
         </div>
 

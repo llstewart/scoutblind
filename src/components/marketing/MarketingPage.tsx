@@ -271,7 +271,7 @@ export function MarketingPage() {
             </form>
 
             <div className="flex items-center gap-3 mt-4 justify-center lg:justify-start">
-              <p className="text-xs text-gray-500">No credit card required. 5 free scans.</p>
+              <p className="text-xs text-gray-500">No credit card required. 5 free searches.</p>
               <span className="text-xs text-gray-300">·</span>
               <Link
                 href="/login"
@@ -729,7 +729,7 @@ export function MarketingPage() {
             Every day you prospect manually is a day someone else closes the deal.
           </h2>
           <p className="text-sm text-gray-600 mb-8">
-            5 free scans. No credit card required.
+            5 free searches. No credit card required.
           </p>
           <Link
             href="/signup"

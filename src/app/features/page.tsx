@@ -175,7 +175,7 @@ export default function FeaturesPage() {
             See it in action
           </h2>
           <p className="text-sm text-gray-600 mb-8">
-            5 free scans. No credit card required.
+            5 free searches. No credit card required.
           </p>
           <Link
             href="/"
