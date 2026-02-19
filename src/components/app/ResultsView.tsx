@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAppContext } from '@/contexts/AppContext';
 import { GeneralListTable } from '@/components/GeneralListTable';
@@ -7,6 +8,8 @@ import { UpgradedListTable } from '@/components/UpgradedListTable';
 import { PremiumGate } from '@/components/PremiumGate';
 import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/types';
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
+import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
+import { PitchReportModal } from '@/components/PitchReportModal';
 
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
 
@@ -31,7 +34,17 @@ export function ResultsView() {
     handleNewSearch,
     handleUpgradeClick,
     setShowBillingModal,
+    updateLeadStatus,
+    updateLeadNotes,
+    statusFilter,
+    setStatusFilter,
+    isPreviewMode,
+    isPreviewEnriching,
   } = useAppContext();
+
+  // Modal state for outreach templates and pitch report
+  const [outreachBusiness, setOutreachBusiness] = useState<EnrichedBusiness | null>(null);
+  const [reportBusiness, setReportBusiness] = useState<EnrichedBusiness | null>(null);
 
   return (
     <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl gap-4"
@@ -83,6 +96,10 @@ export function ResultsView() {
             {isPremium ? (
               <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400">
                 PRO
+              </span>
+            ) : isPreviewMode ? (
+              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-500">
+                PREVIEW
               </span>
             ) : (
               <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-violet-500/20 text-violet-400">
@@ -287,11 +304,46 @@ export function ResultsView() {
             />
           )
         ) : !isPremium ? (
-          <PremiumGate
-            onUpgradeClick={handleUpgradeClick}
-            niche={searchParams?.niche}
-            location={searchParams?.location}
-          />
+          isPreviewMode ? (
+            <div>
+              {/* Conversion Banner */}
+              <div className="px-4 py-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-violet-200 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="text-sm text-gray-700">
+                    You&apos;re seeing <strong className="text-violet-600">3 of {businesses.length}</strong> enriched results.{' '}
+                    <button onClick={handleUpgradeClick} className="text-violet-600 font-semibold hover:underline">
+                      Upgrade to analyze all {businesses.length} businesses
+                    </button>
+                  </span>
+                </div>
+              </div>
+              {isPreviewEnriching && (
+                <div className="px-4 py-2 bg-violet-50 border-b border-violet-100 flex items-center gap-2 text-xs text-violet-600">
+                  <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Enriching preview results...
+                </div>
+              )}
+              <UpgradedListTable
+                businesses={tableBusinesses}
+                niche={searchParams?.niche}
+                location={searchParams?.location}
+                onOutreachClick={setOutreachBusiness}
+                onReportClick={setReportBusiness}
+              />
+            </div>
+          ) : (
+            <PremiumGate
+              onUpgradeClick={handleUpgradeClick}
+              niche={searchParams?.niche}
+              location={searchParams?.location}
+            />
+          )
         ) : (
           <UpgradedListTable
             businesses={tableBusinesses}
@@ -299,6 +351,12 @@ export function ResultsView() {
             location={searchParams?.location}
             isLoadingMore={isAnalyzing}
             expectedTotal={analyzeProgress?.total || businesses.length}
+            onStatusChange={updateLeadStatus}
+            onNotesChange={updateLeadNotes}
+            onOutreachClick={setOutreachBusiness}
+            onReportClick={setReportBusiness}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
           />
         )}
       </div>
@@ -320,6 +378,25 @@ export function ResultsView() {
           </span>
         ) : null}
       </div>
+
+      {/* Outreach Templates Modal */}
+      {outreachBusiness && (
+        <OutreachTemplatesModal
+          business={outreachBusiness}
+          niche={searchParams?.niche || ''}
+          onClose={() => setOutreachBusiness(null)}
+        />
+      )}
+
+      {/* Pitch Report Modal */}
+      {reportBusiness && (
+        <PitchReportModal
+          business={reportBusiness}
+          niche={searchParams?.niche}
+          location={searchParams?.location}
+          onClose={() => setReportBusiness(null)}
+        />
+      )}
     </div>
   );
 }

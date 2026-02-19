@@ -41,6 +41,16 @@ export const rateLimiters = {
         analytics: true,
       })
     : null,
+
+  // Preview endpoint: 3 requests per hour per IP (free tier preview)
+  preview: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(3, '1 h'),
+        prefix: 'ratelimit:preview',
+        analytics: true,
+      })
+    : null,
 };
 
 // Per-user rate limits (authenticated users — more generous than IP limits)
@@ -68,6 +78,16 @@ export const userRateLimiters = {
         redis,
         limiter: Ratelimit.slidingWindow(40, '1 m'),
         prefix: 'ratelimit:user:visibility',
+        analytics: true,
+      })
+    : null,
+
+  // Preview: 3 per hour per user
+  preview: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(3, '1 h'),
+        prefix: 'ratelimit:user:preview',
         analytics: true,
       })
     : null,
@@ -110,6 +130,7 @@ function rateLimitResponse(reset: number, type: RateLimitType): NextResponse {
     search: `You've made too many searches. Please wait ${retryAfter} seconds before searching again.`,
     analyze: `You've made too many analysis requests. Please wait ${retryAfter} seconds before analyzing again.`,
     visibility: `Too many visibility checks. Please wait ${retryAfter} seconds.`,
+    preview: `You've used all your free previews. Please wait ${retryAfter} seconds or upgrade for unlimited analysis.`,
   };
 
   return NextResponse.json(

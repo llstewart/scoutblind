@@ -91,6 +91,8 @@ export function exportEnrichedListToCSV(
     'SEO Optimized',
     'Owner Name',
     'Owner Phone',
+    'Lead Status',
+    'Lead Notes',
   ];
 
   const rows = enrichedBusinesses.map((b) => [
@@ -112,6 +114,8 @@ export function exportEnrichedListToCSV(
     escapeCSV(b.seoOptimized ? 'Yes' : 'No'),
     escapeCSV(b.ownerName),
     escapeCSV(b.ownerPhone),
+    escapeCSV(b.leadStatus || 'new'),
+    escapeCSV(b.leadNotes),
   ]);
 
   downloadCSV(headers, rows, `leads-signals-${niche || 'export'}-${location || 'all'}`);

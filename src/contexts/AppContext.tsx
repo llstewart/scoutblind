@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
-import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
+import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
 type TabType = 'general' | 'upgraded' | 'market';
@@ -119,6 +119,17 @@ interface AppContextValue {
   rateLimitCountdown: number | null;
   setRateLimitCountdown: (countdown: number | null) => void;
 
+  // Lead Status
+  updateLeadStatus: (businessId: string, status: LeadStatus) => void;
+  updateLeadNotes: (businessId: string, notes: string) => void;
+  statusFilter: LeadStatus | null;
+  setStatusFilter: (filter: LeadStatus | null) => void;
+
+  // Preview
+  isPreviewEnriching: boolean;
+  isPreviewMode: boolean;
+  triggerFreePreview: (businesses: Business[], niche: string, location: string) => Promise<void>;
+
   // Functions
   handleSearch: (niche: string, location: string) => Promise<void>;
   handleAnalyze: () => Promise<void>;
@@ -186,6 +197,12 @@ export function AppProvider({ children }: AppProviderProps) {
   const [savedSearchesList, setSavedSearchesList] = useState<SavedSearch[]>([]);
   const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
 
+  // Lead status
+  const [statusFilter, setStatusFilter] = useState<LeadStatus | null>(null);
+
+  // Preview state
+  const [isPreviewEnriching, setIsPreviewEnriching] = useState(false);
+
   // User is considered premium only if they have a paid subscription (not free tier)
   const isPremium = !!user && !!subscription && subscription.tier !== 'free';
 
@@ -193,6 +210,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
 
+  const leadSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onboardingCheckedRef = useRef(false);
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
@@ -405,12 +423,20 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isPremium, fetchSavedCount, fetchSavedSearchesList]);
 
-  // Clear analyzed data for free tier users
+  // Clear analyzed data for free tier users (but preserve preview data)
   useEffect(() => {
     if (!isAuthLoading && (!subscription || subscription.tier === 'free')) {
-      setTableBusinesses([]);
+      // Don't clear if we have preview data or are currently enriching preview
+      if (!isPreviewEnriching) {
+        setTableBusinesses(prev => {
+          // Keep preview businesses (max 3 enriched for free users)
+          const enriched = prev.filter(b => !isPendingBusiness(b) && isEnrichedBusiness(b));
+          if (enriched.length <= 3 && enriched.length > 0) return prev;
+          return [];
+        });
+      }
     }
-  }, [isAuthLoading, subscription]);
+  }, [isAuthLoading, subscription, isPreviewEnriching]);
 
   // Save state to sessionStorage
   useEffect(() => {
@@ -469,6 +495,81 @@ export function AppProvider({ children }: AppProviderProps) {
       }
     };
   }, []);
+
+  // Debounced save after lead status/notes change
+  const debouncedLeadSave = useCallback(() => {
+    if (leadSaveTimerRef.current) clearTimeout(leadSaveTimerRef.current);
+    leadSaveTimerRef.current = setTimeout(() => {
+      if (!searchParams) return;
+      // Get current tableBusinesses to save
+      setTableBusinesses(current => {
+        const enrichedOnly = current.filter((b): b is EnrichedBusiness =>
+          !isPendingBusiness(b) && isEnrichedBusiness(b)
+        );
+        if (enrichedOnly.length > 0) {
+          saveToLibrary(enrichedOnly, searchParams.niche, searchParams.location);
+        }
+        return current;
+      });
+    }, 2000);
+  }, [searchParams, saveToLibrary]);
+
+  // Update lead status for a business
+  const updateLeadStatus = useCallback((businessId: string, status: LeadStatus) => {
+    setTableBusinesses(prev => prev.map(b => {
+      if ((b.placeId || b.name) === businessId && !isPendingBusiness(b) && isEnrichedBusiness(b)) {
+        return { ...b, leadStatus: status };
+      }
+      return b;
+    }));
+    debouncedLeadSave();
+  }, [debouncedLeadSave]);
+
+  // Update lead notes for a business
+  const updateLeadNotes = useCallback((businessId: string, notes: string) => {
+    setTableBusinesses(prev => prev.map(b => {
+      if ((b.placeId || b.name) === businessId && !isPendingBusiness(b) && isEnrichedBusiness(b)) {
+        return { ...b, leadNotes: notes };
+      }
+      return b;
+    }));
+    debouncedLeadSave();
+  }, [debouncedLeadSave]);
+
+  // Computed: is preview mode (free user with enriched table businesses)
+  const isPreviewMode = !isPremium && tableBusinesses.length > 0 && tableBusinesses.some(b => !isPendingBusiness(b) && isEnrichedBusiness(b));
+
+  // Trigger free preview enrichment for top 3 businesses
+  const triggerFreePreview = useCallback(async (previewBusinesses: Business[], niche: string, location: string) => {
+    if (isPremium) return; // Paid users don't need preview
+    setIsPreviewEnriching(true);
+    try {
+      // Sort by basic opportunity score and pick top 3
+      const { calculateBasicOpportunityScore } = await import('@/lib/signals');
+      const sorted = [...previewBusinesses].sort((a, b) =>
+        calculateBasicOpportunityScore(b) - calculateBasicOpportunityScore(a)
+      );
+      const top3 = sorted.slice(0, 3);
+
+      const response = await fetch('/api/analyze-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businesses: top3, niche, location }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.enrichedBusinesses && data.enrichedBusinesses.length > 0) {
+          setTableBusinesses(data.enrichedBusinesses);
+          setActiveTab('upgraded');
+        }
+      }
+    } catch (err) {
+      console.error('[Preview] Failed to trigger free preview:', err);
+    } finally {
+      setIsPreviewEnriching(false);
+    }
+  }, [isPremium]);
 
   // Handle search
   const handleSearch = async (niche: string, location: string) => {
@@ -574,6 +675,11 @@ export function AppProvider({ children }: AppProviderProps) {
       }
 
       saveToLibrary(data.businesses, niche, location);
+
+      // Trigger free preview for non-premium users
+      if (!isPremium && data.businesses.length > 0) {
+        triggerFreePreview(data.businesses, niche, location);
+      }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
@@ -987,6 +1093,17 @@ export function AppProvider({ children }: AppProviderProps) {
     setToastMessage,
     rateLimitCountdown,
     setRateLimitCountdown,
+
+    // Lead Status
+    updateLeadStatus,
+    updateLeadNotes,
+    statusFilter,
+    setStatusFilter,
+
+    // Preview
+    isPreviewEnriching,
+    isPreviewMode,
+    triggerFreePreview,
 
     // Functions
     handleSearch,

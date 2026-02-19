@@ -1,3 +1,5 @@
+export type LeadStatus = 'new' | 'contacted' | 'pitched' | 'won' | 'lost';
+
 export interface Business {
   name: string;
   placeId: string | null;
@@ -23,6 +25,8 @@ export interface EnrichedBusiness extends Business {
   websiteTech: string;
   seoOptimized: boolean;
   isEnriching?: false; // Fully enriched
+  leadStatus?: LeadStatus;
+  leadNotes?: string;
 }
 
 // Business that is currently being enriched - shows spinners
