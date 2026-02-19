@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
 import { calculateSeoNeedScore, getSeoNeedSummary } from '@/lib/signals';
-import { ALL_LEAD_STATUSES, LEAD_STATUS_CONFIG } from './UpgradedListTable';
+import { ALL_LEAD_STATUSES } from './UpgradedListTable';
 
 interface PipelineViewProps {
   businesses: TableBusiness[];
@@ -21,8 +21,52 @@ const STATUS_LABELS: Record<LeadStatus, string> = {
   lost: 'Lost',
 };
 
-// Status move dropdown
-function MoveToDropdown({
+const NEXT_STATUS: Partial<Record<LeadStatus, LeadStatus>> = {
+  new: 'contacted',
+  contacted: 'pitched',
+  pitched: 'won',
+};
+
+const PROGRESSION: LeadStatus[] = ['new', 'contacted', 'pitched', 'won'];
+
+// ── Stage flow bar ──────────────────────────────────────────────
+
+function StageFlowBar({ counts }: { counts: Record<LeadStatus, number> }) {
+  return (
+    <div className="flex items-center">
+      {PROGRESSION.map((status, i) => {
+        const count = counts[status];
+        const hasLeads = count > 0;
+        return (
+          <div key={status} className="flex items-center">
+            <div className={`px-3 py-1 text-xs rounded-md border ${
+              hasLeads
+                ? 'bg-violet-50 text-violet-700 font-medium border-violet-200'
+                : 'text-gray-400 border-transparent'
+            }`}>
+              {STATUS_LABELS[status]}{hasLeads ? ` (${count})` : ''}
+            </div>
+            {i < PROGRESSION.length - 1 && (
+              <svg className="w-3.5 h-3.5 text-gray-300 mx-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+              </svg>
+            )}
+          </div>
+        );
+      })}
+      {counts.lost > 0 && (
+        <>
+          <span className="text-gray-200 mx-2">|</span>
+          <span className="text-xs text-gray-500 font-medium">Lost ({counts.lost})</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Next-step action button ─────────────────────────────────────
+
+function NextStepAction({
   currentStatus,
   onChange,
 }: {
@@ -31,32 +75,73 @@ function MoveToDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const nextStatus = NEXT_STATUS[currentStatus];
 
   useEffect(() => {
     if (!open) return;
-    const handleClick = (e: MouseEvent) => {
+    const handle = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
   }, [open]);
 
-  const options = ALL_LEAD_STATUSES.filter(s => s !== currentStatus);
+  const otherStatuses = ALL_LEAD_STATUSES.filter(s => s !== currentStatus && s !== nextStatus);
+
+  // Won / Lost — no natural next step, just a dropdown
+  if (!nextStatus) {
+    return (
+      <div className="relative" ref={ref}>
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+        >
+          Move to
+          <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {open && (
+          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-30 py-1 min-w-[140px]">
+            {ALL_LEAD_STATUSES.filter(s => s !== currentStatus).map(s => (
+              <button
+                key={s}
+                onClick={() => { onChange(s); setOpen(false); }}
+                className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                {STATUS_LABELS[s]}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative flex items-center" ref={ref}>
+      {/* Primary: advance to next stage */}
+      <button
+        onClick={() => onChange(nextStatus)}
+        className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-l-md border border-violet-200 transition-colors"
+      >
+        {STATUS_LABELS[nextStatus]}
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+      {/* Dropdown for other options */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+        className="px-1.5 py-1.5 text-violet-500 bg-violet-50 hover:bg-violet-100 rounded-r-md border border-l-0 border-violet-200 transition-colors"
       >
-        <span>Move to</span>
-        <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 min-w-[140px]">
-          {options.map(s => (
+        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-30 py-1 min-w-[140px]">
+          {otherStatuses.map(s => (
             <button
               key={s}
               onClick={() => { onChange(s); setOpen(false); }}
@@ -71,53 +156,8 @@ function MoveToDropdown({
   );
 }
 
-// Inline notes editor
-function InlineNotes({
-  value,
-  onSave,
-}: {
-  value: string;
-  onSave: (notes: string) => void;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+// ── Lead row ────────────────────────────────────────────────────
 
-  const handleSave = () => {
-    if (draft !== value) onSave(draft);
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <div className="mt-2">
-        <textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onBlur={handleSave}
-          onKeyDown={(e) => { if (e.key === 'Escape') { setDraft(value); setEditing(false); } }}
-          placeholder="Add a note..."
-          className="w-full h-16 text-xs text-gray-700 border border-gray-200 rounded-md p-2 resize-none focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500"
-          autoFocus
-        />
-      </div>
-    );
-  }
-
-  if (value) {
-    return (
-      <p
-        className="mt-1.5 text-xs text-gray-400 italic truncate cursor-pointer hover:text-gray-600 transition-colors"
-        onClick={() => { setDraft(value); setEditing(true); }}
-      >
-        {value}
-      </p>
-    );
-  }
-
-  return null;
-}
-
-// Single lead row
 function LeadRow({
   business,
   onStatusChange,
@@ -131,94 +171,104 @@ function LeadRow({
   onOutreachClick?: () => void;
   onReportClick?: () => void;
 }) {
-  const [showNoteEditor, setShowNoteEditor] = useState(false);
+  const [editingNote, setEditingNote] = useState(false);
+  const [noteDraft, setNoteDraft] = useState(business.leadNotes || '');
   const score = calculateSeoNeedScore(business);
   const signals = getSeoNeedSummary(business);
   const topSignal = signals.groups[0]?.signals[0] || null;
   const status = business.leadStatus || 'new';
 
+  const saveNote = () => {
+    if (noteDraft !== (business.leadNotes || '')) onNotesChange(noteDraft);
+    setEditingNote(false);
+  };
+
   return (
-    <div className="group">
-      <div className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50/50 transition-colors">
-        {/* Business name + signal */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900 truncate">{business.name}</span>
-          </div>
+    <div className="group border-b border-gray-100 last:border-b-0">
+      <div className="flex items-center px-5 py-3 hover:bg-gray-50/60 transition-colors">
+        {/* Business info */}
+        <div className="flex-1 min-w-0 pr-6">
+          <div className="text-sm font-medium text-gray-900 truncate">{business.name}</div>
           {topSignal && (
-            <p className="text-xs text-gray-400 mt-0.5 truncate">{topSignal}</p>
+            <p className="text-xs text-gray-500 mt-0.5 truncate">{topSignal}</p>
           )}
-          <InlineNotes
-            value={business.leadNotes || ''}
-            onSave={onNotesChange}
-          />
         </div>
 
-        {/* Score */}
-        <div className="flex-shrink-0 w-16 text-right">
-          <span className="text-sm font-semibold text-gray-900">{score}</span>
-          <span className="text-xs text-gray-400">/100</span>
+        {/* Data columns — grouped tight */}
+        <div className="flex items-center flex-shrink-0">
+          <div className="w-14 text-right pr-4">
+            <span className="text-sm font-semibold text-gray-900">{score}</span>
+          </div>
+          <div className="w-24 text-right pr-4">
+            <span className="text-sm text-gray-700">{business.rating > 0 ? business.rating : '--'}</span>
+            <span className="text-xs text-gray-400 ml-0.5">({business.reviewCount})</span>
+          </div>
+          <div className="w-12 text-right pr-6">
+            <span className="text-xs text-gray-500">
+              {business.searchVisibility !== null ? `#${business.searchVisibility}` : '--'}
+            </span>
+          </div>
         </div>
 
-        {/* Rating + Reviews */}
-        <div className="flex-shrink-0 w-24 text-right hidden sm:block">
-          <span className="text-sm text-gray-700">
-            {business.rating > 0 ? `${business.rating}` : '--'}
-          </span>
-          <span className="text-xs text-gray-400 ml-1">
-            ({business.reviewCount})
-          </span>
-        </div>
-
-        {/* Rank */}
-        <div className="flex-shrink-0 w-16 text-right hidden md:block">
-          <span className="text-xs text-gray-500">
-            {business.searchVisibility !== null ? `#${business.searchVisibility}` : '--'}
-          </span>
-        </div>
-
-        {/* Actions — visible on hover */}
-        <div className="flex-shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {onOutreachClick && (
+        {/* Actions */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Secondary actions — appear on hover */}
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onOutreachClick && (
+              <button
+                onClick={onOutreachClick}
+                className="px-2 py-1 text-xs text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded transition-colors"
+              >
+                Outreach
+              </button>
+            )}
+            {onReportClick && (
+              <button
+                onClick={onReportClick}
+                className="px-2 py-1 text-xs text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+              >
+                Report
+              </button>
+            )}
             <button
-              onClick={onOutreachClick}
-              className="px-2 py-1 text-xs text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded transition-colors"
+              onClick={() => { setNoteDraft(business.leadNotes || ''); setEditingNote(true); }}
+              className={`px-2 py-1 text-xs rounded transition-colors ${
+                business.leadNotes
+                  ? 'text-violet-500 hover:text-violet-700 hover:bg-violet-50'
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+              }`}
             >
-              Outreach
+              Note
             </button>
-          )}
-          {onReportClick && (
-            <button
-              onClick={onReportClick}
-              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-            >
-              Report
-            </button>
-          )}
-          <button
-            onClick={() => setShowNoteEditor(prev => !prev)}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              business.leadNotes
-                ? 'text-violet-500 hover:text-violet-700 hover:bg-violet-50'
-                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            Note
-          </button>
-        </div>
+          </div>
 
-        {/* Move to dropdown */}
-        <div className="flex-shrink-0">
-          <MoveToDropdown currentStatus={status} onChange={onStatusChange} />
+          {/* Primary action — always visible */}
+          <NextStepAction currentStatus={status} onChange={onStatusChange} />
         </div>
       </div>
 
-      {/* Expanded note editor triggered from action button */}
-      {showNoteEditor && !business.leadNotes && (
-        <div className="px-4 pb-3">
-          <InlineNotes
-            value=""
-            onSave={(notes) => { onNotesChange(notes); setShowNoteEditor(false); }}
+      {/* Notes area */}
+      {business.leadNotes && !editingNote && (
+        <div
+          className="px-5 pb-2.5 -mt-1 cursor-pointer"
+          onClick={() => { setNoteDraft(business.leadNotes || ''); setEditingNote(true); }}
+        >
+          <p className="text-xs text-gray-400 italic truncate hover:text-gray-600 transition-colors pl-0.5">
+            {business.leadNotes}
+          </p>
+        </div>
+      )}
+
+      {editingNote && (
+        <div className="px-5 pb-3 -mt-1">
+          <textarea
+            value={noteDraft}
+            onChange={(e) => setNoteDraft(e.target.value)}
+            onBlur={saveNote}
+            onKeyDown={(e) => { if (e.key === 'Escape') { setNoteDraft(business.leadNotes || ''); setEditingNote(false); } }}
+            placeholder="Add a note..."
+            className="w-full max-w-md h-16 text-xs text-gray-700 border border-gray-200 rounded-md p-2 resize-none focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500"
+            autoFocus
           />
         </div>
       )}
@@ -226,7 +276,8 @@ function LeadRow({
   );
 }
 
-// Collapsible status section
+// ── Status section ──────────────────────────────────────────────
+
 function StatusSection({
   status,
   businesses,
@@ -234,7 +285,6 @@ function StatusSection({
   onNotesChange,
   onOutreachClick,
   onReportClick,
-  defaultOpen,
 }: {
   status: LeadStatus;
   businesses: EnrichedBusiness[];
@@ -242,38 +292,29 @@ function StatusSection({
   onNotesChange: (businessId: string, notes: string) => void;
   onOutreachClick?: (business: EnrichedBusiness) => void;
   onReportClick?: (business: EnrichedBusiness) => void;
-  defaultOpen: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(true);
 
   return (
-    <div className="border-b border-gray-100 last:border-b-0">
+    <div>
       {/* Section header */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50/50 transition-colors text-left"
+        className="w-full flex items-center gap-2.5 px-5 py-2.5 bg-gray-50 border-b border-gray-200 hover:bg-gray-100/60 transition-colors text-left"
       >
         <svg
-          className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${open ? 'rotate-90' : ''}`}
+          className={`w-3 h-3 text-gray-400 transition-transform flex-shrink-0 ${open ? 'rotate-90' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-sm font-semibold text-gray-900">{STATUS_LABELS[status]}</span>
-        <span className="text-xs text-gray-400">{businesses.length}</span>
+        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{STATUS_LABELS[status]}</span>
+        <span className="text-xs text-gray-400 font-medium">{businesses.length}</span>
       </button>
 
       {/* Rows */}
-      {open && businesses.length > 0 && (
-        <div className="border-t border-gray-100">
-          {/* Column labels */}
-          <div className="flex items-center gap-4 px-4 py-1.5 text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-            <div className="flex-1">Business</div>
-            <div className="w-16 text-right">Score</div>
-            <div className="w-24 text-right hidden sm:block">Rating</div>
-            <div className="w-16 text-right hidden md:block">Rank</div>
-            <div className="w-[200px]"></div>
-          </div>
+      {open && (
+        <div>
           {businesses.map(business => (
             <LeadRow
               key={business.placeId || business.name}
@@ -286,15 +327,11 @@ function StatusSection({
           ))}
         </div>
       )}
-
-      {open && businesses.length === 0 && (
-        <div className="px-4 py-6 text-center border-t border-gray-100">
-          <p className="text-xs text-gray-400">No leads in this stage</p>
-        </div>
-      )}
     </div>
   );
 }
+
+// ── Main component ──────────────────────────────────────────────
 
 export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutreachClick, onReportClick }: PipelineViewProps) {
   const enrichedBusinesses = useMemo(() =>
@@ -307,11 +344,19 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
       new: [], contacted: [], pitched: [], won: [], lost: [],
     };
     enrichedBusinesses.forEach(b => {
-      const status = b.leadStatus || 'new';
-      result[status].push(b);
+      result[b.leadStatus || 'new'].push(b);
     });
     return result;
   }, [enrichedBusinesses]);
+
+  const counts = useMemo(() => {
+    const c: Record<LeadStatus, number> = { new: 0, contacted: 0, pitched: 0, won: 0, lost: 0 };
+    ALL_LEAD_STATUSES.forEach(s => { c[s] = grouped[s].length; });
+    return c;
+  }, [grouped]);
+
+  // Only render sections that have leads
+  const populatedStatuses = ALL_LEAD_STATUSES.filter(s => grouped[s].length > 0);
 
   if (enrichedBusinesses.length === 0) {
     return (
@@ -329,27 +374,29 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+      {/* Header + stage flow */}
+      <div className="px-5 py-3.5 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           <h3 className="text-sm font-semibold text-gray-900">Pipeline</h3>
           <span className="text-xs text-gray-400">{enrichedBusinesses.length} leads</span>
         </div>
-        {/* Summary counts */}
-        <div className="flex items-center gap-4 text-xs text-gray-400">
-          {ALL_LEAD_STATUSES.map(s => (
-            grouped[s].length > 0 ? (
-              <span key={s}>
-                <span className="text-gray-500 font-medium">{grouped[s].length}</span> {STATUS_LABELS[s].toLowerCase()}
-              </span>
-            ) : null
-          ))}
-        </div>
+        <StageFlowBar counts={counts} />
       </div>
 
-      {/* Sections */}
+      {/* Column headers */}
+      <div className="flex items-center px-5 py-2 border-b border-gray-200 bg-white flex-shrink-0">
+        <div className="flex-1 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Business</div>
+        <div className="flex items-center flex-shrink-0">
+          <div className="w-14 text-right pr-4 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Score</div>
+          <div className="w-24 text-right pr-4 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Rating</div>
+          <div className="w-12 text-right pr-6 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Rank</div>
+        </div>
+        <div className="w-[220px] flex-shrink-0"></div>
+      </div>
+
+      {/* Sections — only populated stages */}
       <div className="flex-1 overflow-y-auto">
-        {ALL_LEAD_STATUSES.map(status => (
+        {populatedStatuses.map(status => (
           <StatusSection
             key={status}
             status={status}
@@ -358,7 +405,6 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
             onNotesChange={onNotesChange}
             onOutreachClick={onOutreachClick}
             onReportClick={onReportClick}
-            defaultOpen={grouped[status].length > 0}
           />
         ))}
       </div>
