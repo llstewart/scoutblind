@@ -10,6 +10,7 @@ import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/t
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
+import { PipelineView } from '@/components/PipelineView';
 
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
 
@@ -122,6 +123,17 @@ export function ResultsView() {
               NEW
             </span>
           </button>
+          {isPremium && tableBusinesses.length > 0 && (
+            <button
+              onClick={() => setActiveTab('pipeline')}
+              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'pipeline'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900'
+                }`}
+            >
+              <span>Pipeline</span>
+            </button>
+          )}
         </div>
 
         {/* Actions */}
@@ -151,7 +163,7 @@ export function ResultsView() {
                 exportGeneralListToCSV(businesses, searchParams?.niche, searchParams?.location);
               }
             }}
-            disabled={activeTab === 'market' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
+            disabled={activeTab === 'market' || activeTab === 'pipeline' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
             className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -264,10 +276,20 @@ export function ResultsView() {
         </div>
       )}
 
-      {/* Data Table / Market Dashboard */}
+      {/* Data Table / Market Dashboard / Pipeline */}
       {activeTab === 'market' ? (
         <div className="flex-1 min-h-0 border-t border-gray-200 p-4 overflow-y-auto">
           <MarketDashboard />
+        </div>
+      ) : activeTab === 'pipeline' ? (
+        <div className="flex-1 min-h-0 border-t border-gray-200 overflow-hidden">
+          <PipelineView
+            businesses={tableBusinesses}
+            onStatusChange={updateLeadStatus}
+            onNotesChange={updateLeadNotes}
+            onOutreachClick={setOutreachBusiness}
+            onReportClick={setReportBusiness}
+          />
         </div>
       ) : (
       <div className={`overflow-hidden border-t border-gray-200 ${activeTab === 'upgraded' && isPremium
@@ -367,6 +389,10 @@ export function ResultsView() {
         {activeTab === 'market' ? (
           <span>
             Market insights for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
+          </span>
+        ) : activeTab === 'pipeline' ? (
+          <span>
+            Pipeline for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
           </span>
         ) : activeTab === 'general' ? (
           <span>

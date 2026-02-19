@@ -6,7 +6,7 @@ import { useUser } from '@/hooks/useUser';
 import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
-type TabType = 'general' | 'upgraded' | 'market';
+type TabType = 'general' | 'upgraded' | 'market' | 'pipeline';
 
 const SESSION_STORAGE_KEY = 'packleads_session';
 const PERSISTENT_SESSION_ID_KEY = 'packleads_sid';

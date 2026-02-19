@@ -75,18 +75,18 @@ function HeaderTooltip({
   );
 }
 
-const LEAD_STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; bg: string; border: string }> = {
-  new:       { label: 'New',       color: 'text-gray-500',    bg: 'bg-gray-100',       border: 'border-gray-200' },
-  contacted: { label: 'Contacted', color: 'text-blue-600',    bg: 'bg-blue-50',        border: 'border-blue-200' },
-  pitched:   { label: 'Pitched',   color: 'text-amber-600',   bg: 'bg-amber-50',       border: 'border-amber-200' },
-  won:       { label: 'Won',       color: 'text-emerald-600', bg: 'bg-emerald-50',     border: 'border-emerald-200' },
-  lost:      { label: 'Lost',      color: 'text-red-600',     bg: 'bg-red-50',         border: 'border-red-200' },
+export const LEAD_STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; bg: string; border: string; dot: string }> = {
+  new:       { label: 'New',       color: 'text-gray-500',    bg: 'bg-gray-100',       border: 'border-gray-200',   dot: 'bg-gray-400' },
+  contacted: { label: 'Contacted', color: 'text-blue-600',    bg: 'bg-blue-50',        border: 'border-blue-200',   dot: 'bg-blue-500' },
+  pitched:   { label: 'Pitched',   color: 'text-amber-600',   bg: 'bg-amber-50',       border: 'border-amber-200',  dot: 'bg-amber-500' },
+  won:       { label: 'Won',       color: 'text-emerald-600', bg: 'bg-emerald-50',     border: 'border-emerald-200', dot: 'bg-emerald-500' },
+  lost:      { label: 'Lost',      color: 'text-red-600',     bg: 'bg-red-50',         border: 'border-red-200',    dot: 'bg-red-500' },
 };
 
-const ALL_LEAD_STATUSES: LeadStatus[] = ['new', 'contacted', 'pitched', 'won', 'lost'];
+export const ALL_LEAD_STATUSES: LeadStatus[] = ['new', 'contacted', 'pitched', 'won', 'lost'];
 
-// Status dropdown component
-function LeadStatusDropdown({ status, onChange }: { status: LeadStatus; onChange: (s: LeadStatus) => void }) {
+// Status dot popover — click the dot next to the name to change status
+function StatusDotPopover({ status, onChange }: { status: LeadStatus; onChange: (s: LeadStatus) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const config = LEAD_STATUS_CONFIG[status];
@@ -101,25 +101,33 @@ function LeadStatusDropdown({ status, onChange }: { status: LeadStatus; onChange
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative flex-shrink-0">
       <button
         onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
-        className={`px-2 py-0.5 text-[11px] font-medium rounded border ${config.bg} ${config.color} ${config.border} hover:opacity-80 transition-opacity`}
+        className="group/dot flex items-center gap-1.5 pr-1 rounded hover:bg-gray-100 transition-colors"
+        title={`Status: ${config.label}`}
       >
-        {config.label}
+        <span className={`w-2.5 h-2.5 rounded-full ${config.dot} ring-2 ring-white`} />
+        <span className={`text-[10px] font-medium ${config.color} opacity-0 group-hover/dot:opacity-100 transition-opacity`}>{config.label}</span>
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 w-32 bg-white rounded-lg shadow-xl border border-gray-200 z-50 py-1">
+        <div className="absolute left-0 top-full mt-1 w-36 bg-white rounded-lg shadow-xl border border-gray-200 z-50 py-1">
+          <div className="px-3 py-1.5 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Lead Status</div>
           {ALL_LEAD_STATUSES.map(s => {
             const c = LEAD_STATUS_CONFIG[s];
             return (
               <button
                 key={s}
                 onClick={(e) => { e.stopPropagation(); onChange(s); setOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 flex items-center gap-2 ${status === s ? 'bg-gray-50' : ''}`}
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center gap-2.5 ${status === s ? 'bg-gray-50' : ''}`}
               >
-                <span className={`w-2 h-2 rounded-full ${c.bg} border ${c.border}`} />
-                <span className={c.color}>{c.label}</span>
+                <span className={`w-2.5 h-2.5 rounded-full ${c.dot}`} />
+                <span className={`font-medium ${c.color}`}>{c.label}</span>
+                {status === s && (
+                  <svg className="w-3.5 h-3.5 text-violet-600 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
               </button>
             );
           })}
@@ -154,22 +162,24 @@ function NotesPopover({ notes, onChange }: { notes: string; onChange: (n: string
       <button
         onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
         className={`p-1 rounded hover:bg-gray-100 transition-colors ${notes ? 'text-violet-500' : 'text-gray-400'}`}
-        title="Notes"
+        title={notes ? 'Edit notes' : 'Add notes'}
       >
         <svg className="w-3.5 h-3.5" fill={notes ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
         </svg>
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-2" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute left-0 top-full mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-3" onClick={(e) => e.stopPropagation()}>
+          <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-2">Lead Notes</div>
           <textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onBlur={() => { if (value !== notes) onChange(value); }}
             placeholder="Add notes about this lead..."
-            className="w-full h-20 text-xs border border-gray-200 rounded p-2 resize-none focus:outline-none focus:ring-1 focus:ring-violet-500"
+            className="w-full h-24 text-xs border border-gray-200 rounded-lg p-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400"
             autoFocus
           />
+          <div className="text-[10px] text-gray-400 mt-1.5">Click outside to save</div>
         </div>
       )}
     </div>
@@ -236,6 +246,33 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   const [showTopShadow, setShowTopShadow] = useState(false);
   const [focusedRow, setFocusedRow] = useState<number | null>(null);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [checkedRows, setCheckedRows] = useState<Set<string>>(new Set());
+
+  const toggleRowCheck = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCheckedRows(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const clearChecked = () => setCheckedRows(new Set());
+  const toggleAllOnPage = () => {
+    const pageIds = currentBusinesses
+      .filter(b => !isPendingBusiness(b) && isEnrichedBusiness(b))
+      .map(b => b.placeId || b.name);
+    const allChecked = pageIds.every(id => checkedRows.has(id));
+    if (allChecked) {
+      setCheckedRows(prev => { const next = new Set(prev); pageIds.forEach(id => next.delete(id)); return next; });
+    } else {
+      setCheckedRows(prev => { const next = new Set(prev); pageIds.forEach(id => next.add(id)); return next; });
+    }
+  };
+  const handleBulkStatus = (status: LeadStatus) => {
+    if (!onStatusChange) return;
+    checkedRows.forEach(id => onStatusChange(id, status));
+    clearChecked();
+  };
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
@@ -734,6 +771,17 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
         <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left text-xs">
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
             <tr className="border-b border-gray-200">
+              {onStatusChange && (
+                <th className={`${headerPadding} w-8`}>
+                  <input
+                    type="checkbox"
+                    checked={currentBusinesses.filter(b => !isPendingBusiness(b) && isEnrichedBusiness(b)).length > 0 && currentBusinesses.filter(b => !isPendingBusiness(b) && isEnrichedBusiness(b)).every(b => checkedRows.has(b.placeId || b.name))}
+                    onChange={toggleAllOnPage}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-3.5 h-3.5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                  />
+                </th>
+              )}
               <th className={`text-left ${headerPadding} font-medium text-gray-700 w-12`}>
                 #
               </th>
@@ -917,16 +965,6 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
               <th className={`text-left ${headerPadding} font-medium text-gray-700`}>
                 Website Tech
               </th>
-              {onStatusChange && (
-                <th className={`${headerPadding} font-medium text-gray-700 w-24`}>
-                  Lead Status
-                </th>
-              )}
-              {(onOutreachClick || onReportClick) && (
-                <th className={`${headerPadding} font-medium text-gray-700 w-36`}>
-                  Actions
-                </th>
-              )}
             </tr>
           </thead>
           <tbody>
@@ -951,6 +989,19 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       isPending ? 'bg-violet-500/5' : 'hover:bg-gray-50'
                     }`}
                 >
+                  {onStatusChange && (
+                    <td className={`${cellPadding} w-8`} onClick={(e) => e.stopPropagation()}>
+                      {isEnriched ? (
+                        <input
+                          type="checkbox"
+                          checked={checkedRows.has(business.placeId || business.name)}
+                          onChange={() => {}}
+                          onClick={(e) => toggleRowCheck(business.placeId || business.name, e)}
+                          className="w-3.5 h-3.5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                        />
+                      ) : null}
+                    </td>
+                  )}
                   <td className={`${cellPadding} text-gray-400 tabular-nums`}>
                     {startIndex + index + 1}
                   </td>
@@ -1016,12 +1067,46 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       </div>
                     )}
                   </td>
-                  {/* General List columns */}
+                  {/* Business Name with status dot + actions */}
                   <td className={`${cellPadding} font-medium text-gray-800`}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
+                      {isEnriched && onStatusChange && (
+                        <StatusDotPopover
+                          status={(business as EnrichedBusiness).leadStatus || 'new'}
+                          onChange={(s) => onStatusChange(business.placeId || business.name, s)}
+                        />
+                      )}
                       <span className="truncate">{business.name}</span>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 flex items-center gap-0.5">
                         <CopyButton text={business.name} label="name" />
+                        {isEnriched && onNotesChange && (
+                          <NotesPopover
+                            notes={(business as EnrichedBusiness).leadNotes || ''}
+                            onChange={(n) => onNotesChange(business.placeId || business.name, n)}
+                          />
+                        )}
+                        {isEnriched && onOutreachClick && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onOutreachClick(business as EnrichedBusiness); }}
+                            className="p-1 rounded hover:bg-violet-50 text-gray-400 hover:text-violet-600 transition-colors"
+                            title="Outreach templates"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                        )}
+                        {isEnriched && onReportClick && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onReportClick(business as EnrichedBusiness); }}
+                            className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                            title="Generate report"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -1221,50 +1306,6 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                       </div>
                     )}
                   </td>
-                  {onStatusChange && (
-                    <td className={cellPadding}>
-                      {isEnriched ? (
-                        <div className="flex items-center gap-1">
-                          <LeadStatusDropdown
-                            status={(business as EnrichedBusiness).leadStatus || 'new'}
-                            onChange={(s) => onStatusChange(business.placeId || business.name, s)}
-                          />
-                          <NotesPopover
-                            notes={(business as EnrichedBusiness).leadNotes || ''}
-                            onChange={(n) => onNotesChange?.(business.placeId || business.name, n)}
-                          />
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">—</span>
-                      )}
-                    </td>
-                  )}
-                  {(onOutreachClick || onReportClick) && (
-                    <td className={cellPadding}>
-                      {isEnriched ? (
-                        <div className="flex items-center gap-1">
-                          {onOutreachClick && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); onOutreachClick(business as EnrichedBusiness); }}
-                              className="px-2 py-0.5 text-[11px] font-medium rounded bg-violet-50 text-violet-600 border border-violet-200 hover:bg-violet-100 transition-colors"
-                            >
-                              Outreach
-                            </button>
-                          )}
-                          {onReportClick && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); onReportClick(business as EnrichedBusiness); }}
-                              className="px-2 py-0.5 text-[11px] font-medium rounded bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 transition-colors"
-                            >
-                              Report
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">—</span>
-                      )}
-                    </td>
-                  )}
                 </tr>
               );
             })}
@@ -1331,6 +1372,34 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             >
               Next
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Action Bar */}
+      {checkedRows.size > 0 && onStatusChange && (
+        <div className="sticky bottom-0 left-0 right-0 z-30 bg-white border-t-2 border-violet-500 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-gray-900">{checkedRows.size} selected</span>
+              <button onClick={clearChecked} className="text-xs text-gray-500 hover:text-gray-900 underline">Clear</button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 mr-1">Set status:</span>
+              {ALL_LEAD_STATUSES.map(s => {
+                const c = LEAD_STATUS_CONFIG[s];
+                return (
+                  <button
+                    key={s}
+                    onClick={() => handleBulkStatus(s)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors hover:shadow-sm ${c.bg} ${c.color} ${c.border}`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${c.dot}`} />
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
