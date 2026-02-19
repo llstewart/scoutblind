@@ -28,9 +28,27 @@ export default function PricingPage() {
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center mb-2">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-sm text-gray-600 text-center mb-12">
-          One scan could pay for a year of Packleads.
+        <p className="text-sm text-gray-600 text-center mb-4">
+          One closed client pays for 3 years of Pro.
         </p>
+
+        {/* ROI Math Strip */}
+        <div className="flex items-center justify-center gap-6 md:gap-10 mb-12 py-4 px-6 rounded-xl bg-gray-50 border border-gray-200 max-w-lg mx-auto">
+          <div className="text-center">
+            <div className="text-lg font-bold text-gray-900">$0.58</div>
+            <div className="text-[10px] text-gray-500 uppercase tracking-wider">per scan</div>
+          </div>
+          <div className="w-px h-8 bg-gray-200" />
+          <div className="text-center">
+            <div className="text-lg font-bold text-gray-900">~25</div>
+            <div className="text-[10px] text-gray-500 uppercase tracking-wider">leads per scan</div>
+          </div>
+          <div className="w-px h-8 bg-gray-200" />
+          <div className="text-center">
+            <div className="text-lg font-bold text-violet-600">$0.02</div>
+            <div className="text-[10px] text-gray-500 uppercase tracking-wider">per lead</div>
+          </div>
+        </div>
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
@@ -137,9 +155,9 @@ export default function PricingPage() {
               href="/signup"
               className="inline-block px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
             >
-              Try it free
+              Start with 5 free scans
             </Link>
-            <p className="text-xs text-gray-500 mt-2">No credit card required. 5 free searches.</p>
+            <p className="text-xs text-gray-500 mt-2">No credit card required. ~125 businesses analyzed free.</p>
           </div>
         </div>
 

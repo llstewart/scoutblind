@@ -47,6 +47,11 @@ function DashboardContent() {
     setToastMessage,
   } = useAppContext();
 
+  // Detect brand-new users (created < 2 minutes ago) and pre-fill demo search
+  const isNewUser = user && (Date.now() - new Date(user.created_at).getTime() < 2 * 60 * 1000);
+  const demoNiche = isNewUser && !searchParams?.niche ? 'Plumbers' : undefined;
+  const demoLocation = isNewUser && !searchParams?.location ? 'Austin, TX' : undefined;
+
   // Handle checkout success/cancel from Stripe redirect
   useEffect(() => {
     const checkout = urlSearchParams.get('checkout');
@@ -111,13 +116,13 @@ function DashboardContent() {
     return null;
   }
 
-  // Build the search form component
+  // Build the search form component — pre-fill with demo data for new users
   const searchFormComponent = (
     <SearchForm
       onSearch={handleSearch}
       isLoading={isSearching}
-      initialNiche={isViewingSavedSearch ? undefined : searchParams?.niche}
-      initialLocation={isViewingSavedSearch ? undefined : searchParams?.location}
+      initialNiche={isViewingSavedSearch ? undefined : (searchParams?.niche || demoNiche)}
+      initialLocation={isViewingSavedSearch ? undefined : (searchParams?.location || demoLocation)}
       compact={false}
     />
   );

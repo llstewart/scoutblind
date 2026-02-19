@@ -361,12 +361,13 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
-      // Show onboarding for users who signed up less than 2 minutes ago (once per session)
+      // Welcome new users with a toast instead of a modal slideshow
       if (!onboardingCheckedRef.current) {
         onboardingCheckedRef.current = true;
         const createdAt = new Date(user.created_at).getTime();
         if (Date.now() - createdAt < 2 * 60 * 1000) {
-          setShowOnboardingModal(true);
+          setToastMessage('Welcome to Packleads! You have 5 free scans. Try your first search below.');
+          setTimeout(() => setToastMessage(null), 6000);
         }
       }
 

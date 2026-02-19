@@ -228,11 +228,11 @@ export function MarketingPage() {
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
-              The Agency Standard for Local Lead Generation.
+              Stop scrolling Google Maps at midnight.
             </h1>
 
             <p className="text-sm text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Stop scrolling maps. Instantly scan any city for businesses with unclaimed profiles, missing websites, and bad rankings. Export the data. Pitch the solution.
+              Scan an entire market in 60 seconds. Find every business with an unclaimed profile, missing website, or buried ranking — then export the list and pitch the fix.
             </p>
 
             <div className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2">
@@ -245,7 +245,7 @@ export function MarketingPage() {
             </div>
 
             <p className="text-xs text-gray-500 mt-4 text-center lg:text-left">
-              No credit card required. 50 leads on us.
+              No credit card required. 5 free scans — ~125 businesses analyzed.
             </p>
           </div>
 
@@ -422,10 +422,10 @@ export function MarketingPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
-            Hours of manual research, done in minutes.
+            What takes a VA 4 hours, Packleads does in 4 minutes.
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            Stop scrolling Google Maps one listing at a time. Packleads scans an entire market in one click.
+            One scan. One market. Every business with a weak profile, missing website, or buried ranking — scored and ready to pitch. For $0.58 per scan.
           </p>
 
           <div ref={stats.ref} className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
@@ -454,10 +454,10 @@ export function MarketingPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="max-w-xl mb-12">
             <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
-              This is one scan of one market.
+              This is one scan. One market. Look what you&apos;re missing.
             </h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Every scan surfaces opportunity breakdowns, claim gaps, and market health scores. Run it on your top niches and see what you&apos;ve been missing.
+              Every scan shows you which businesses are vulnerable — unclaimed profiles, zero review responses, no website. These are clients waiting to be closed.
             </p>
           </div>
 
@@ -692,11 +692,14 @@ export function MarketingPage() {
       {/* ── FINAL CTA ────────────────────────────────────────────────── */}
       <section className="py-20 md:py-28 border-t border-gray-200">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
-            Every day you prospect manually is a day someone else closes the deal.
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
+            There are unclaimed profiles in your market right now.
           </h2>
-          <p className="text-sm text-gray-600 mb-8">
-            5 free searches. No credit card required.
+          <p className="text-sm text-gray-600 mb-2">
+            Every day you spend scrolling Maps is a day someone else closes that client.
+          </p>
+          <p className="text-xs text-gray-500 mb-8">
+            5 free scans. No credit card. Each scan returns ~25 businesses — that&apos;s $0.02 per lead on Starter.
           </p>
           <Link
             href="/signup"
