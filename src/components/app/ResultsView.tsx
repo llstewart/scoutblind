@@ -41,6 +41,7 @@ export function ResultsView() {
     setStatusFilter,
     isPreviewMode,
     isPreviewEnriching,
+    triggerFreePreview,
   } = useAppContext();
 
   // Modal state for outreach templates and pitch report
@@ -190,17 +191,43 @@ export function ResultsView() {
                 </span>
                 <span className="sm:hidden">Get Intel</span>
               </button>
-            ) : (
-              <button
-                onClick={() => setShowBillingModal(true)}
-                className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 transition-all flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span className="hidden sm:inline">Unlock Lead Intel</span>
-                <span className="sm:hidden">Unlock</span>
-              </button>
+            ) : isPreviewMode ? null : (
+              <>
+                {selectedBusinesses.size > 0 && selectedBusinesses.size <= 3 ? (
+                  <button
+                    onClick={() => {
+                      if (!searchParams) return;
+                      const selected = Array.from(selectedBusinesses).map(i => businesses[i]).filter(Boolean);
+                      triggerFreePreview(selected, searchParams.niche, searchParams.location);
+                    }}
+                    disabled={isPreviewEnriching}
+                    className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span className="hidden sm:inline">
+                      {isPreviewEnriching ? 'Analyzing...' : `Get Free Intel (${selectedBusinesses.size}/3)`}
+                    </span>
+                    <span className="sm:hidden">
+                      {isPreviewEnriching ? '...' : `Intel (${selectedBusinesses.size}/3)`}
+                    </span>
+                  </button>
+                ) : (
+                  <span className="text-xs text-gray-400 hidden sm:inline">
+                    {selectedBusinesses.size > 3
+                      ? 'Select up to 3 businesses'
+                      : 'Select up to 3 for free analysis'}
+                  </span>
+                )}
+                <button
+                  onClick={() => setShowBillingModal(true)}
+                  className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
+                >
+                  <span className="hidden sm:inline">Upgrade</span>
+                  <span className="sm:hidden">Upgrade</span>
+                </button>
+              </>
             )
           )}
         </div>
@@ -323,6 +350,7 @@ export function ResultsView() {
               onSelectionChange={setSelectedBusinesses}
               isPremium={isPremium}
               onUpgradeClick={handleUpgradeClick}
+              maxSelection={isPremium ? undefined : 3}
             />
           )
         ) : !isPremium ? (

@@ -67,6 +67,7 @@ interface GeneralListTableProps {
   onSelectionChange?: (selected: Set<number>) => void;
   isPremium?: boolean;
   onUpgradeClick?: () => void;
+  maxSelection?: number;
 }
 
 // Deterministic fake values for premium teaser columns
@@ -153,7 +154,8 @@ export function GeneralListTable({
   selectedBusinesses = new Set(),
   onSelectionChange,
   isPremium,
-  onUpgradeClick
+  onUpgradeClick,
+  maxSelection,
 }: GeneralListTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCompact, setIsCompact] = useState(false);
@@ -303,6 +305,8 @@ export function GeneralListTable({
     if (newSelected.has(index)) {
       newSelected.delete(index);
     } else {
+      // Enforce max selection cap if set
+      if (maxSelection && newSelected.size >= maxSelection) return;
       newSelected.add(index);
     }
     onSelectionChange(newSelected);
@@ -317,18 +321,24 @@ export function GeneralListTable({
     if (allCurrentSelected) {
       currentPageIndices.forEach(i => newSelected.delete(i));
     } else {
-      currentPageIndices.forEach(i => newSelected.add(i));
+      currentPageIndices.forEach(i => {
+        if (maxSelection && newSelected.size >= maxSelection) return;
+        newSelected.add(i);
+      });
     }
     onSelectionChange(newSelected);
   };
 
   const handleSelectAllPages = () => {
     if (!onSelectionChange) return;
-    const allSelected = selectedBusinesses.size === businesses.length;
+    const allSelected = maxSelection
+      ? selectedBusinesses.size === maxSelection
+      : selectedBusinesses.size === businesses.length;
     if (allSelected) {
       onSelectionChange(new Set());
     } else {
-      onSelectionChange(new Set(businesses.map((_, i) => i)));
+      const indices = businesses.map((_, i) => i);
+      onSelectionChange(new Set(maxSelection ? indices.slice(0, maxSelection) : indices));
     }
   };
 

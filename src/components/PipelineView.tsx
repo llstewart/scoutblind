@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
 import { calculateSeoNeedScore, getSeoNeedSummary } from '@/lib/signals';
 import { ALL_LEAD_STATUSES } from './UpgradedListTable';
@@ -19,12 +19,6 @@ const STATUS_LABELS: Record<LeadStatus, string> = {
   pitched: 'Pitched',
   won: 'Won',
   lost: 'Lost',
-};
-
-const NEXT_STATUS: Partial<Record<LeadStatus, LeadStatus>> = {
-  new: 'contacted',
-  contacted: 'pitched',
-  pitched: 'won',
 };
 
 const PROGRESSION: LeadStatus[] = ['new', 'contacted', 'pitched', 'won'];
@@ -64,9 +58,9 @@ function StageFlowBar({ counts }: { counts: Record<LeadStatus, number> }) {
   );
 }
 
-// ── Next-step action button ─────────────────────────────────────
+// ── Status dropdown ─────────────────────────────────────────────
 
-function NextStepAction({
+function StatusDropdown({
   currentStatus,
   onChange,
 }: {
@@ -75,7 +69,6 @@ function NextStepAction({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const nextStatus = NEXT_STATUS[currentStatus];
 
   useEffect(() => {
     if (!open) return;
@@ -86,66 +79,24 @@ function NextStepAction({
     return () => document.removeEventListener('mousedown', handle);
   }, [open]);
 
-  const otherStatuses = ALL_LEAD_STATUSES.filter(s => s !== currentStatus && s !== nextStatus);
-
-  // Won / Lost — no natural next step, just a dropdown
-  if (!nextStatus) {
-    return (
-      <div className="relative" ref={ref}>
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-        >
-          Move to
-          <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {open && (
-          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-30 py-1 min-w-[140px]">
-            {ALL_LEAD_STATUSES.filter(s => s !== currentStatus).map(s => (
-              <button
-                key={s}
-                onClick={() => { onChange(s); setOpen(false); }}
-                className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                {STATUS_LABELS[s]}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
-    <div className="relative flex items-center" ref={ref}>
-      {/* Primary: advance to next stage */}
-      <button
-        onClick={() => onChange(nextStatus)}
-        className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-l-md border border-violet-200 transition-colors"
-      >
-        {STATUS_LABELS[nextStatus]}
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-      {/* Dropdown for other options */}
+    <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="px-1.5 py-1.5 text-violet-500 bg-violet-50 hover:bg-violet-100 rounded-r-md border border-l-0 border-violet-200 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-colors"
       >
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        Move to
+        <svg className={`w-3 h-3 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-30 py-1 min-w-[140px]">
-          {otherStatuses.map(s => (
+          {ALL_LEAD_STATUSES.filter(s => s !== currentStatus).map(s => (
             <button
               key={s}
               onClick={() => { onChange(s); setOpen(false); }}
-              className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
             >
               {STATUS_LABELS[s]}
             </button>
@@ -186,64 +137,60 @@ function LeadRow({
   return (
     <div className="group border-b border-gray-100 last:border-b-0">
       <div className="flex items-center px-5 py-3 hover:bg-gray-50/60 transition-colors">
-        {/* Business info */}
-        <div className="flex-1 min-w-0 pr-6">
+        {/* Business info — flex-1 */}
+        <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-gray-900 truncate">{business.name}</div>
           {topSignal && (
             <p className="text-xs text-gray-500 mt-0.5 truncate">{topSignal}</p>
           )}
         </div>
 
-        {/* Data columns — grouped tight */}
-        <div className="flex items-center flex-shrink-0">
-          <div className="w-14 text-right pr-4">
+        {/* Right panel — fixed width, shared with column headers */}
+        <div className="flex-shrink-0 flex items-center w-[480px]">
+          <div className="w-16 text-right">
             <span className="text-sm font-semibold text-gray-900">{score}</span>
           </div>
-          <div className="w-24 text-right pr-4">
+          <div className="w-28 text-right">
             <span className="text-sm text-gray-700">{business.rating > 0 ? business.rating : '--'}</span>
             <span className="text-xs text-gray-400 ml-0.5">({business.reviewCount})</span>
           </div>
-          <div className="w-12 text-right pr-6">
+          <div className="w-16 text-right">
             <span className="text-xs text-gray-500">
               {business.searchVisibility !== null ? `#${business.searchVisibility}` : '--'}
             </span>
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {/* Secondary actions — appear on hover */}
-          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            {onOutreachClick && (
+          {/* Actions — fixed right portion */}
+          <div className="flex-1 flex items-center justify-end gap-1">
+            {/* Hover actions */}
+            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              {onOutreachClick && (
+                <button
+                  onClick={onOutreachClick}
+                  className="px-2 py-1 text-xs text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded transition-colors"
+                >
+                  Outreach
+                </button>
+              )}
+              {onReportClick && (
+                <button
+                  onClick={onReportClick}
+                  className="px-2 py-1 text-xs text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                >
+                  Report
+                </button>
+              )}
               <button
-                onClick={onOutreachClick}
-                className="px-2 py-1 text-xs text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded transition-colors"
-              >
-                Outreach
-              </button>
-            )}
-            {onReportClick && (
-              <button
-                onClick={onReportClick}
+                onClick={() => { setNoteDraft(business.leadNotes || ''); setEditingNote(true); }}
                 className="px-2 py-1 text-xs text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
               >
-                Report
+                Note
               </button>
-            )}
-            <button
-              onClick={() => { setNoteDraft(business.leadNotes || ''); setEditingNote(true); }}
-              className={`px-2 py-1 text-xs rounded transition-colors ${
-                business.leadNotes
-                  ? 'text-violet-500 hover:text-violet-700 hover:bg-violet-50'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
-              }`}
-            >
-              Note
-            </button>
-          </div>
+            </div>
 
-          {/* Primary action — always visible */}
-          <NextStepAction currentStatus={status} onChange={onStatusChange} />
+            {/* Status dropdown — always visible */}
+            <StatusDropdown currentStatus={status} onChange={onStatusChange} />
+          </div>
         </div>
       </div>
 
@@ -297,7 +244,6 @@ function StatusSection({
 
   return (
     <div>
-      {/* Section header */}
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-2.5 px-5 py-2.5 bg-gray-50 border-b border-gray-200 hover:bg-gray-100/60 transition-colors text-left"
@@ -312,7 +258,6 @@ function StatusSection({
         <span className="text-xs text-gray-400 font-medium">{businesses.length}</span>
       </button>
 
-      {/* Rows */}
       {open && (
         <div>
           {businesses.map(business => (
@@ -355,7 +300,24 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
     return c;
   }, [grouped]);
 
-  // Only render sections that have leads
+  // Move notification
+  const [moveNotice, setMoveNotice] = useState<{ name: string; to: LeadStatus } | null>(null);
+  const moveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleStatusChange = useCallback((businessId: string, status: LeadStatus) => {
+    const biz = enrichedBusinesses.find(b => (b.placeId || b.name) === businessId);
+    onStatusChange(businessId, status);
+    if (biz) {
+      setMoveNotice({ name: biz.name, to: status });
+      if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
+      moveTimerRef.current = setTimeout(() => setMoveNotice(null), 2500);
+    }
+  }, [enrichedBusinesses, onStatusChange]);
+
+  useEffect(() => {
+    return () => { if (moveTimerRef.current) clearTimeout(moveTimerRef.current); };
+  }, []);
+
   const populatedStatuses = ALL_LEAD_STATUSES.filter(s => grouped[s].length > 0);
 
   if (enrichedBusinesses.length === 0) {
@@ -383,25 +345,37 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
         <StageFlowBar counts={counts} />
       </div>
 
-      {/* Column headers */}
+      {/* Column headers — same w-[480px] right panel as rows */}
       <div className="flex items-center px-5 py-2 border-b border-gray-200 bg-white flex-shrink-0">
         <div className="flex-1 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Business</div>
-        <div className="flex items-center flex-shrink-0">
-          <div className="w-14 text-right pr-4 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Score</div>
-          <div className="w-24 text-right pr-4 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Rating</div>
-          <div className="w-12 text-right pr-6 text-[10px] font-medium text-gray-400 uppercase tracking-wider">Rank</div>
+        <div className="flex-shrink-0 flex items-center w-[480px]">
+          <div className="w-16 text-right text-[10px] font-medium text-gray-400 uppercase tracking-wider">Score</div>
+          <div className="w-28 text-right text-[10px] font-medium text-gray-400 uppercase tracking-wider">Rating</div>
+          <div className="w-16 text-right text-[10px] font-medium text-gray-400 uppercase tracking-wider">Rank</div>
+          <div className="flex-1"></div>
         </div>
-        <div className="w-[220px] flex-shrink-0"></div>
       </div>
 
-      {/* Sections — only populated stages */}
+      {/* Move notification */}
+      {moveNotice && (
+        <div className="px-5 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2 text-xs text-gray-600 flex-shrink-0">
+          <svg className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span>
+            Moved <span className="font-medium text-gray-900">{moveNotice.name}</span> to <span className="font-medium text-gray-900">{STATUS_LABELS[moveNotice.to]}</span>
+          </span>
+        </div>
+      )}
+
+      {/* Sections */}
       <div className="flex-1 overflow-y-auto">
         {populatedStatuses.map(status => (
           <StatusSection
             key={status}
             status={status}
             businesses={grouped[status]}
-            onStatusChange={onStatusChange}
+            onStatusChange={handleStatusChange}
             onNotesChange={onNotesChange}
             onOutreachClick={onOutreachClick}
             onReportClick={onReportClick}

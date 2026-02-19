@@ -539,22 +539,17 @@ export function AppProvider({ children }: AppProviderProps) {
   // Computed: is preview mode (free user with enriched table businesses)
   const isPreviewMode = !isPremium && tableBusinesses.length > 0 && tableBusinesses.some(b => !isPendingBusiness(b) && isEnrichedBusiness(b));
 
-  // Trigger free preview enrichment for top 3 businesses
+  // Trigger free preview enrichment for user-selected businesses (max 3)
   const triggerFreePreview = useCallback(async (previewBusinesses: Business[], niche: string, location: string) => {
-    if (isPremium) return; // Paid users don't need preview
+    if (isPremium) return;
+    const capped = previewBusinesses.slice(0, 3);
+    if (capped.length === 0) return;
     setIsPreviewEnriching(true);
     try {
-      // Sort by basic opportunity score and pick top 3
-      const { calculateBasicOpportunityScore } = await import('@/lib/signals');
-      const sorted = [...previewBusinesses].sort((a, b) =>
-        calculateBasicOpportunityScore(b) - calculateBasicOpportunityScore(a)
-      );
-      const top3 = sorted.slice(0, 3);
-
       const response = await fetch('/api/analyze-preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businesses: top3, niche, location }),
+        body: JSON.stringify({ businesses: capped, niche, location }),
       });
 
       if (response.ok) {
@@ -675,11 +670,6 @@ export function AppProvider({ children }: AppProviderProps) {
       }
 
       saveToLibrary(data.businesses, niche, location);
-
-      // Trigger free preview for non-premium users
-      if (!isPremium && data.businesses.length > 0) {
-        triggerFreePreview(data.businesses, niche, location);
-      }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
