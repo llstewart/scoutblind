@@ -138,42 +138,39 @@ export function MarketingPage() {
       <MarketingHeader />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="relative flex-1 flex items-center px-4 py-20 md:py-28 lg:py-32 overflow-hidden">
-        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-[1fr,1.15fr] gap-12 lg:gap-16 items-center">
-          {/* Left: Copy */}
-          <div className="text-center lg:text-left order-1">
-            <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
-              Every weak Google listing in your market. One search.
-            </h1>
+      <section className="relative px-4 pt-20 md:pt-28 lg:pt-32 pb-12 md:pb-16 overflow-hidden">
+        {/* Copy — centered above screenshot */}
+        <div className="max-w-2xl mx-auto text-center mb-12 md:mb-16">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
+            Every weak Google listing in your market. One search.
+          </h1>
 
-            <p className="text-sm text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Scan an entire market in 60 seconds. Find every business with an unclaimed profile, missing website, or buried ranking — then export the list and pitch the fix.
-            </p>
+          <p className="text-sm md:text-base text-gray-600 mb-8 max-w-xl mx-auto leading-relaxed">
+            Scan an entire market in 60 seconds. Find every business with an unclaimed profile, missing website, or buried ranking — then export the list and pitch the fix.
+          </p>
 
-            <div className="max-w-md mx-auto lg:mx-0 flex flex-col gap-2">
-              <Link
-                href="/signup"
-                className="w-full px-6 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors text-center"
-              >
-                Start Your First Scan
-              </Link>
-            </div>
-
-            <p className="text-xs text-gray-500 mt-4 text-center lg:text-left">
-              No credit card required. 5 free scans — ~125 businesses analyzed.
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/signup"
+              className="px-8 py-3 text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+            >
+              Start Your First Scan
+            </Link>
+            <p className="text-xs text-gray-400">
+              No credit card required. 5 free scans.
             </p>
           </div>
+        </div>
 
-          {/* Right: Product Screenshot */}
-          <div className="relative order-2">
-            <div className="rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),0_12px_40px_rgba(0,0,0,0.1),0_40px_80px_-20px_rgba(0,0,0,0.08)] border border-gray-200/60">
-              <img
-                src="/hero-screenshot.png"
-                alt="Packleads Lead Intel — SEO signals, search visibility, and opportunity scores for every business in your market"
-                className="w-full h-auto block"
-                loading="eager"
-              />
-            </div>
+        {/* Product Screenshot — full width */}
+        <div className="max-w-7xl mx-auto">
+          <div className="rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),0_12px_40px_rgba(0,0,0,0.1),0_40px_80px_-20px_rgba(0,0,0,0.08)] border border-gray-200/60">
+            <img
+              src="/hero-screenshot.png"
+              alt="Packleads Lead Intel — SEO signals, search visibility, and opportunity scores for every business in your market"
+              className="w-full h-auto block"
+              loading="eager"
+            />
           </div>
         </div>
       </section>
