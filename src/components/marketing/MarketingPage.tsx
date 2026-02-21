@@ -228,7 +228,7 @@ export function MarketingPage() {
           {/* Left: Copy */}
           <div className="text-center lg:text-left order-1">
             <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-semibold text-gray-900 mb-4 tracking-tight leading-[1.1]">
-              Stop scrolling Google Maps at midnight.
+              Every weak Google listing in your market. One search.
             </h1>
 
             <p className="text-sm text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
