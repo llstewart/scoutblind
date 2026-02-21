@@ -7,6 +7,19 @@ import { classifyLocationType } from '@/utils/address';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createServiceSupabase } from '@supabase/supabase-js';
+
+const FREE_PREVIEW_LIFETIME_CAP = 1; // Max preview sessions ever (each = up to 3 businesses)
+
+function getServiceClient() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Supabase environment variables not set');
+  }
+  return createServiceSupabase(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
 interface AnalyzePreviewRequest {
   businesses: Business[];
@@ -52,6 +65,21 @@ export async function POST(request: NextRequest) {
   // Per-user rate limit
   const userRateLimitResponse = await checkUserRateLimit(user.id, 'preview' as any);
   if (userRateLimitResponse) return userRateLimitResponse;
+
+  // Lifetime cap: check how many preview sessions this user has ever used
+  const serviceClient = getServiceClient();
+  const { count: previewUses } = await serviceClient
+    .from('usage_logs')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('action', 'preview_analysis');
+
+  if ((previewUses ?? 0) >= FREE_PREVIEW_LIFETIME_CAP) {
+    return NextResponse.json({
+      error: 'You\'ve used your free preview. Upgrade for unlimited analysis.',
+      previewCapReached: true,
+    }, { status: 403 });
+  }
 
   try {
     const body: AnalyzePreviewRequest = await request.json();
@@ -127,7 +155,19 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Preview] Completed preview analysis for ${enrichedBusinesses.length} businesses`);
 
-    // NO credit deduction for preview
+    // Log this preview use for lifetime cap tracking (no credit deduction)
+    await serviceClient.from('usage_logs').insert({
+      user_id: user.id,
+      action: 'preview_analysis',
+      credits_used: 0,
+      metadata: {
+        niche,
+        location,
+        businessCount: enrichedBusinesses.length,
+        businessNames: enrichedBusinesses.map(b => b.name),
+      },
+    });
+
     return NextResponse.json({
       enrichedBusinesses,
       isPreview: true,

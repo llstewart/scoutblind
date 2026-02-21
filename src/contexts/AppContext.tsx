@@ -560,7 +560,8 @@ export function AppProvider({ children }: AppProviderProps) {
           setTableBusinesses(data.enrichedBusinesses);
           setActiveTab('upgraded');
         }
-      } else if (response.status === 429) {
+      } else if (response.status === 403 || response.status === 429) {
+        // 403 = lifetime cap reached, 429 = rate limit hit — both mean no more previews
         setPreviewExhausted(true);
       }
     } catch (err) {
