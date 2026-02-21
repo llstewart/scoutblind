@@ -128,6 +128,7 @@ interface AppContextValue {
   // Preview
   isPreviewEnriching: boolean;
   isPreviewMode: boolean;
+  previewExhausted: boolean;
   triggerFreePreview: (businesses: Business[], niche: string, location: string) => Promise<void>;
 
   // Functions
@@ -202,6 +203,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   // Preview state
   const [isPreviewEnriching, setIsPreviewEnriching] = useState(false);
+  const [previewExhausted, setPreviewExhausted] = useState(false);
 
   // User is considered premium only if they have a paid subscription (not free tier)
   const isPremium = !!user && !!subscription && subscription.tier !== 'free';
@@ -558,6 +560,8 @@ export function AppProvider({ children }: AppProviderProps) {
           setTableBusinesses(data.enrichedBusinesses);
           setActiveTab('upgraded');
         }
+      } else if (response.status === 429) {
+        setPreviewExhausted(true);
       }
     } catch (err) {
       console.error('[Preview] Failed to trigger free preview:', err);
@@ -1093,6 +1097,7 @@ export function AppProvider({ children }: AppProviderProps) {
     // Preview
     isPreviewEnriching,
     isPreviewMode,
+    previewExhausted,
     triggerFreePreview,
 
     // Functions

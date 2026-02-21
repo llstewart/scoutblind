@@ -6,6 +6,7 @@ interface PremiumGateProps {
   onUpgradeClick: () => void;
   niche?: string;
   location?: string;
+  exhausted?: boolean;
 }
 
 // Mock data to show users what they'd get - more rows for better preview
@@ -73,7 +74,7 @@ const MOCK_BUSINESSES = [
   },
 ];
 
-export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProps) {
+export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: PremiumGateProps) {
   return (
     <div className="relative min-h-[600px]">
       {/* Preview table - blurred */}
@@ -146,14 +147,24 @@ export function PremiumGate({ onUpgradeClick, niche, location }: PremiumGateProp
 
               {/* Title */}
               <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
-                Unlock SEO Signals Pro
+                {exhausted ? 'Free Intel Used Up' : 'Unlock SEO Signals Pro'}
               </h3>
 
               {/* Description */}
               <p className="text-gray-500 text-center mb-6 leading-relaxed">
-                Subscribe to a paid plan to analyze{' '}
-                <span className="text-gray-900 font-medium">{niche || 'businesses'}</span> in{' '}
-                <span className="text-gray-900 font-medium">{location || 'your area'}</span>.
+                {exhausted ? (
+                  <>
+                    You&apos;ve used your free lead intel preview. Upgrade to analyze all{' '}
+                    <span className="text-gray-900 font-medium">{niche || 'businesses'}</span> in{' '}
+                    <span className="text-gray-900 font-medium">{location || 'your area'}</span> with unlimited analysis.
+                  </>
+                ) : (
+                  <>
+                    Subscribe to a paid plan to analyze{' '}
+                    <span className="text-gray-900 font-medium">{niche || 'businesses'}</span> in{' '}
+                    <span className="text-gray-900 font-medium">{location || 'your area'}</span>.
+                  </>
+                )}
               </p>
 
               {/* Divider */}
