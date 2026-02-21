@@ -8,7 +8,6 @@ import {
   PieChart, Pie, Cell, Legend,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from 'recharts';
-import { SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS, type SignalCategory } from '@/lib/signals';
 import { MarketingHeader } from './MarketingHeader';
 import { MarketingFooter } from './MarketingFooter';
 
@@ -28,90 +27,6 @@ const faqItems = [
   {
     q: 'Can I export my data?',
     a: 'Yes. Every search result can be exported as a CSV file with all prospect data and signal scores, ready for your outreach workflow.',
-  },
-];
-
-// ─── Mock table data ────────────────────────────────────────────────
-interface MockSignal {
-  category: SignalCategory;
-  text: string;
-}
-
-interface MockBusiness {
-  name: string;
-  score: number;
-  rating: number;
-  reviewCount: number;
-  searchRank: string;
-  claimed: boolean;
-  signals: MockSignal[];
-}
-
-const MOCK_BUSINESSES: MockBusiness[] = [
-  {
-    name: 'Lone Star Plumbing Co',
-    score: 15,
-    rating: 2.9,
-    reviewCount: 4,
-    searchRank: 'Not ranked',
-    claimed: false,
-    signals: [
-      { category: 'gbp', text: 'Unclaimed profile' },
-      { category: 'web', text: 'No website' },
-      { category: 'rank', text: 'Not in local pack' },
-      { category: 'rep', text: '2.9★ — 4 reviews' },
-    ],
-  },
-  {
-    name: 'Austin Family Dental',
-    score: 32,
-    rating: 3.4,
-    reviewCount: 8,
-    searchRank: '#14',
-    claimed: true,
-    signals: [
-      { category: 'gbp', text: '12% reply rate (6 mo)' },
-      { category: 'rank', text: 'Buried at #14' },
-      { category: 'rep', text: '8 reviews (avg is 47)' },
-    ],
-  },
-  {
-    name: 'Garcia & Sons Law Firm',
-    score: 28,
-    rating: 3.2,
-    reviewCount: 23,
-    searchRank: 'Not ranked',
-    claimed: true,
-    signals: [
-      { category: 'web', text: 'No website linked' },
-      { category: 'rank', text: 'Not in local pack' },
-      { category: 'rep', text: '3.2★ avg (market 4.1)' },
-    ],
-  },
-  {
-    name: 'Summit Mechanical HVAC',
-    score: 44,
-    rating: 4.0,
-    reviewCount: 11,
-    searchRank: '#8',
-    claimed: true,
-    signals: [
-      { category: 'gbp', text: '0% reply rate (12 mo)' },
-      { category: 'web', text: 'No analytics detected' },
-      { category: 'rep', text: '11 reviews total' },
-    ],
-  },
-  {
-    name: 'Prestige Auto Detail',
-    score: 74,
-    rating: 4.7,
-    reviewCount: 112,
-    searchRank: '#2',
-    claimed: true,
-    signals: [
-      { category: 'gbp', text: 'Active — replies in 24h' },
-      { category: 'rank', text: 'Top 3 in local pack' },
-    ],
   },
 ];
 
@@ -249,171 +164,16 @@ export function MarketingPage() {
             </p>
           </div>
 
-          {/* Right: Product Preview — App Frame */}
+          {/* Right: Product Screenshot */}
           <div className="relative order-2">
-                <div className="rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.08),0_30px_60px_-10px_rgba(0,0,0,0.06)] border border-gray-200/80">
-                  {/* App shell: sidebar + main */}
-                  <div className="flex bg-white">
-                    {/* Thin sidebar */}
-                    <div className="hidden lg:flex flex-col items-center w-11 bg-gray-50 border-r border-gray-200 py-3 gap-3 shrink-0">
-                      <img src="/icon.svg" alt="" className="w-5 h-5" />
-                      <div className="w-5 h-5 rounded bg-violet-500/10 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                      </div>
-                      <div className="w-5 h-5 rounded bg-gray-200/60 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div className="w-5 h-5 rounded bg-gray-200/60 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Main content area */}
-                    <div className="flex-1 min-w-0">
-                      {/* Toolbar */}
-                      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100 bg-white">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 rounded-md border border-gray-200 text-[10px] text-gray-600">
-                            <svg className="w-2.5 h-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            Plumbers in Austin, TX
-                          </div>
-                          <span className="px-1.5 py-0.5 text-[9px] font-medium bg-violet-500/10 text-violet-500 rounded">25 results</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button className="flex items-center gap-1 px-2 py-1 text-[10px] text-gray-500 bg-gray-50 border border-gray-200 rounded-md">
-                            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                            </svg>
-                            Export CSV
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Tab bar */}
-                      <div className="flex items-center gap-0 px-3 border-b border-gray-100 bg-white">
-                        <span className="px-3 py-1.5 text-[10px] font-medium text-gray-400 border-b border-transparent">All Results</span>
-                        <span className="px-3 py-1.5 text-[10px] font-medium text-violet-600 border-b-2 border-violet-500">Lead Intel</span>
-                        <span className="px-3 py-1.5 text-[10px] font-medium text-gray-400 border-b border-transparent">Market</span>
-                      </div>
-
-                      {/* Desktop table */}
-                      <div className="hidden lg:block">
-                        <table className="w-full text-[11px]">
-                          <thead>
-                            <tr className="border-b border-gray-100 bg-gray-50/50">
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-7">#</th>
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Business</th>
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-10">Rating</th>
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-12">Reviews</th>
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider w-16">Status</th>
-                              <th className="text-left py-1.5 px-2.5 text-[9px] font-semibold text-gray-400 uppercase tracking-wider">Signals</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {MOCK_BUSINESSES.map((biz, i) => (
-                              <tr key={i} className={`border-b border-gray-50 ${i === 0 ? 'bg-violet-500/[0.02]' : ''}`}>
-                                <td className="py-2 px-2.5 text-gray-300 font-medium">{i + 1}</td>
-                                <td className="py-2 px-2.5 whitespace-nowrap">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-gray-800 font-medium text-[11px]">{biz.name}</span>
-                                    <span className={`text-[9px] font-bold px-1 py-px rounded ${
-                                      biz.score >= 60 ? 'bg-emerald-500/10 text-emerald-500' :
-                                      biz.score >= 35 ? 'bg-amber-500/10 text-amber-500' :
-                                      'bg-rose-500/10 text-rose-500'
-                                    }`}>
-                                      {biz.score}
-                                    </span>
-                                  </div>
-                                </td>
-                                <td className="py-2 px-2.5 text-gray-600">{biz.rating}</td>
-                                <td className="py-2 px-2.5 text-gray-600">{biz.reviewCount}</td>
-                                <td className="py-2 px-2.5">
-                                  <span className={`inline-flex items-center px-1.5 py-px text-[9px] font-medium rounded ${
-                                    biz.claimed
-                                      ? 'bg-emerald-500/10 text-emerald-600'
-                                      : 'bg-rose-500/10 text-rose-500'
-                                  }`}>
-                                    {biz.claimed ? 'Claimed' : 'Unclaimed'}
-                                  </span>
-                                </td>
-                                <td className="py-2 px-2.5">
-                                  <div className="flex flex-wrap gap-0.5">
-                                    {biz.signals.slice(0, 2).map((signal, j) => {
-                                      const colors = SIGNAL_CATEGORY_COLORS[signal.category];
-                                      return (
-                                        <span key={j} className={`inline-flex items-center gap-0.5 px-1.5 py-px text-[9px] rounded ${colors.bg}`}>
-                                          <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
-                                          <span className={colors.text}>{signal.text}</span>
-                                        </span>
-                                      );
-                                    })}
-                                    {biz.signals.length > 2 && (
-                                      <span className="text-[9px] text-violet-400 px-1 py-px cursor-pointer hover:text-violet-600">+{biz.signals.length - 2} more</span>
-                                    )}
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-
-                      {/* Mobile cards */}
-                      <div className="block lg:hidden divide-y divide-gray-100">
-                        {MOCK_BUSINESSES.slice(0, 3).map((biz, i) => (
-                          <div key={i} className="px-3 py-2.5">
-                            <div className="flex items-center justify-between mb-1.5">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-400 font-medium">{i + 1}.</span>
-                                <span className="text-sm font-medium text-gray-900">{biz.name}</span>
-                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                                  biz.claimed
-                                    ? 'bg-emerald-500/10 text-emerald-500'
-                                    : 'bg-rose-500/10 text-rose-500'
-                                }`}>
-                                  {biz.claimed ? 'Claimed' : 'Unclaimed'}
-                                </span>
-                              </div>
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                                biz.score >= 70 ? 'bg-rose-500/10 text-rose-500' :
-                                biz.score >= 40 ? 'bg-amber-500/10 text-amber-500' :
-                                'bg-emerald-500/10 text-emerald-500'
-                              }`}>
-                                {biz.score}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-3 text-[10px] text-gray-500 mb-1.5">
-                              <span>{biz.rating} stars</span>
-                              <span>{biz.reviewCount} reviews</span>
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {biz.signals.slice(0, 2).map((signal, j) => {
-                                const colors = SIGNAL_CATEGORY_COLORS[signal.category];
-                                return (
-                                  <span key={j} className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded ${colors.bg}`}>
-                                    <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[signal.category]}</span>
-                                    <span className={colors.text}>{signal.text}</span>
-                                  </span>
-                                );
-                              })}
-                              {biz.signals.length > 2 && (
-                                <span className="text-[10px] text-gray-500 px-1 py-0.5">+{biz.signals.length - 2} more</span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),0_12px_40px_rgba(0,0,0,0.1),0_40px_80px_-20px_rgba(0,0,0,0.08)] border border-gray-200/60">
+              <img
+                src="/hero-screenshot.png"
+                alt="Packleads Lead Intel — SEO signals, search visibility, and opportunity scores for every business in your market"
+                className="w-full h-auto block"
+                loading="eager"
+              />
+            </div>
           </div>
         </div>
       </section>
