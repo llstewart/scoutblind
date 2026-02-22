@@ -8,6 +8,7 @@ import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createServiceSupabase } from '@supabase/supabase-js';
+import { upsertLeadFireAndForget } from '@/lib/leads';
 
 const FREE_PREVIEW_LIFETIME_CAP = 1; // Max preview sessions ever (each = up to 3 businesses)
 
@@ -154,6 +155,11 @@ export async function POST(request: NextRequest) {
     );
 
     console.log(`[Preview] Completed preview analysis for ${enrichedBusinesses.length} businesses`);
+
+    // Upsert each enriched business into leads table
+    for (const eb of enrichedBusinesses) {
+      upsertLeadFireAndForget(user.id, eb, niche, location);
+    }
 
     // Log this preview use for lifetime cap tracking (no credit deduction)
     await serviceClient.from('usage_logs').insert({

@@ -36,7 +36,27 @@
       "WebFetch(domain:github.com)",
       "Bash(tee:*)",
       "WebFetch(domain:app.outscraper.cloud)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch(domain:www.trustpilot.com)",
+      "WebFetch(domain:www.capterra.com)",
+      "WebFetch(domain:www.reddit.com)",
+      "WebFetch(domain:coldreach.ai)",
+      "WebFetch(domain:www.coldlytics.com)",
+      "WebFetch(domain:www.toksta.com)",
+      "WebFetch(domain:ideas.gohighlevel.com)",
+      "WebFetch(domain:www.saleshandy.com)",
+      "WebFetch(domain:worqstrap.com)",
+      "WebFetch(domain:www.trustradius.com)",
+      "WebFetch(domain:igleads.io)",
+      "WebFetch(domain:community.outscraper.com)",
+      "WebFetch(domain:autoposting.ai)",
+      "WebFetch(domain:supplygem.com)",
+      "WebFetch(domain:profilespider.com)",
+      "WebFetch(domain:findfahim.com)",
+      "WebFetch(domain:www.salesforge.ai)",
+      "WebFetch(domain:www.leadsforge.ai)",
+      "WebFetch(domain:millo.co)",
+      "WebFetch(domain:appsumo.com)"
     ]
   }
 }

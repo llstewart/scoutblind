@@ -125,6 +125,12 @@ interface AppContextValue {
   statusFilter: LeadStatus | null;
   setStatusFilter: (filter: LeadStatus | null) => void;
 
+  // Leads DB
+  allLeads: EnrichedBusiness[];
+  isLoadingLeads: boolean;
+  fetchAllLeads: () => Promise<void>;
+  updateLeadDirect: (leadId: string, updates: { status?: LeadStatus; notes?: string }) => Promise<void>;
+
   // Preview
   isPreviewEnriching: boolean;
   isPreviewMode: boolean;
@@ -200,6 +206,12 @@ export function AppProvider({ children }: AppProviderProps) {
 
   // Lead status
   const [statusFilter, setStatusFilter] = useState<LeadStatus | null>(null);
+
+  // Leads DB state
+  const [allLeads, setAllLeads] = useState<EnrichedBusiness[]>([]);
+  const [isLoadingLeads, setIsLoadingLeads] = useState(false);
+  const [hasLeadsLoaded, setHasLeadsLoaded] = useState(false);
+  const backfillAttemptedRef = useRef(false);
 
   // Preview state
   const [isPreviewEnriching, setIsPreviewEnriching] = useState(false);
@@ -571,6 +583,78 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [isPremium]);
 
+  // Fetch all leads from persistent DB
+  const fetchAllLeads = useCallback(async () => {
+    if (!user || !isPremium) return;
+    setIsLoadingLeads(true);
+    try {
+      const response = await fetch('/api/leads');
+      if (response.ok) {
+        const data = await response.json();
+        setAllLeads(data.leads || []);
+        setHasLeadsLoaded(true);
+
+        // Auto-backfill: if no leads but user has saved searches, migrate once
+        if ((data.leads || []).length === 0 && savedSearchesList.length > 0 && !backfillAttemptedRef.current) {
+          backfillAttemptedRef.current = true;
+          try {
+            const backfillRes = await fetch('/api/leads/backfill', { method: 'POST' });
+            if (backfillRes.ok) {
+              const backfillData = await backfillRes.json();
+              if (backfillData.migrated > 0) {
+                // Re-fetch leads after backfill
+                const refreshRes = await fetch('/api/leads');
+                if (refreshRes.ok) {
+                  const refreshData = await refreshRes.json();
+                  setAllLeads(refreshData.leads || []);
+                }
+              }
+            }
+          } catch (err) {
+            console.error('[Leads] Backfill failed:', err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[Leads] Failed to fetch:', err);
+    } finally {
+      setIsLoadingLeads(false);
+    }
+  }, [user, isPremium, savedSearchesList.length]);
+
+  // Update a lead directly in the persistent DB
+  const updateLeadDirect = useCallback(async (leadId: string, updates: { status?: LeadStatus; notes?: string }) => {
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId, ...updates }),
+      });
+
+      if (response.ok) {
+        setAllLeads(prev => prev.map(lead => {
+          if (lead.leadId === leadId) {
+            return {
+              ...lead,
+              ...(updates.status !== undefined ? { leadStatus: updates.status } : {}),
+              ...(updates.notes !== undefined ? { leadNotes: updates.notes } : {}),
+            };
+          }
+          return lead;
+        }));
+      }
+    } catch (err) {
+      console.error('[Leads] Failed to update lead:', err);
+    }
+  }, []);
+
+  // Fetch leads when pipeline tab is opened
+  useEffect(() => {
+    if (activeTab === 'pipeline' && isPremium && !hasLeadsLoaded) {
+      fetchAllLeads();
+    }
+  }, [activeTab, isPremium, hasLeadsLoaded, fetchAllLeads]);
+
   // Handle search
   const handleSearch = async (niche: string, location: string) => {
     const normalizedNiche = niche.toLowerCase().trim();
@@ -766,6 +850,9 @@ export function AppProvider({ children }: AppProviderProps) {
     setSearchParams(null);
     setSavedSearchesList([]);
     setSavedAnalysesCount(0);
+    setAllLeads([]);
+    setHasLeadsLoaded(false);
+    backfillAttemptedRef.current = false;
     router.replace('/');
   };
 
@@ -1094,6 +1181,12 @@ export function AppProvider({ children }: AppProviderProps) {
     updateLeadNotes,
     statusFilter,
     setStatusFilter,
+
+    // Leads DB
+    allLeads,
+    isLoadingLeads,
+    fetchAllLeads,
+    updateLeadDirect,
 
     // Preview
     isPreviewEnriching,

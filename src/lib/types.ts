@@ -27,6 +27,7 @@ export interface EnrichedBusiness extends Business {
   isEnriching?: false; // Fully enriched
   leadStatus?: LeadStatus;
   leadNotes?: string;
+  leadId?: string; // UUID from leads table (set when loaded from /api/leads)
 }
 
 // Business that is currently being enriched - shows spinners

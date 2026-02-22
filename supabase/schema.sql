@@ -345,3 +345,140 @@ INSERT INTO public.subscription_tiers (tier, name, monthly_credits, price_monthl
 -- Public read access for tiers
 ALTER TABLE public.subscription_tiers ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view tiers" ON public.subscription_tiers FOR SELECT USING (true);
+
+-- ============================================
+-- LEADS TABLE
+-- Persistent CRM for enriched businesses
+-- ============================================
+CREATE TABLE public.leads (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  canonical_id TEXT NOT NULL,
+  place_id TEXT,
+  name TEXT NOT NULL,
+  address TEXT NOT NULL,
+  phone TEXT,
+  website TEXT,
+  rating NUMERIC(2,1),
+  review_count INTEGER DEFAULT 0,
+  category TEXT,
+  claimed BOOLEAN DEFAULT false,
+
+  -- Enriched fields
+  owner_name TEXT,
+  owner_phone TEXT,
+  last_review_date TIMESTAMPTZ,
+  last_owner_activity TIMESTAMPTZ,
+  days_dormant INTEGER,
+  search_visibility INTEGER,
+  response_rate NUMERIC(5,2) DEFAULT 0,
+  location_type TEXT,
+  website_tech TEXT,
+  seo_optimized BOOLEAN DEFAULT false,
+
+  -- CRM fields
+  lead_status TEXT DEFAULT 'new',
+  lead_notes TEXT,
+
+  -- Provenance
+  source_niche TEXT,
+  source_location TEXT,
+
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+
+  UNIQUE(user_id, canonical_id)
+);
+
+-- RLS
+ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own leads" ON public.leads
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update own leads" ON public.leads
+  FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own leads" ON public.leads
+  FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Service role can manage leads" ON public.leads
+  FOR ALL USING (auth.role() = 'service_role');
+
+-- Indexes
+CREATE INDEX idx_leads_user_id ON public.leads(user_id);
+CREATE INDEX idx_leads_user_status ON public.leads(user_id, lead_status);
+CREATE INDEX idx_leads_canonical ON public.leads(user_id, canonical_id);
+
+-- Auto-update timestamp
+CREATE TRIGGER update_leads_updated_at
+  BEFORE UPDATE ON public.leads
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+-- Upsert RPC (service role only)
+CREATE OR REPLACE FUNCTION public.upsert_lead(
+  p_user_id UUID,
+  p_canonical_id TEXT,
+  p_place_id TEXT,
+  p_name TEXT,
+  p_address TEXT,
+  p_phone TEXT,
+  p_website TEXT,
+  p_rating NUMERIC,
+  p_review_count INTEGER,
+  p_category TEXT,
+  p_claimed BOOLEAN,
+  p_owner_name TEXT,
+  p_owner_phone TEXT,
+  p_last_review_date TIMESTAMPTZ,
+  p_last_owner_activity TIMESTAMPTZ,
+  p_days_dormant INTEGER,
+  p_search_visibility INTEGER,
+  p_response_rate NUMERIC,
+  p_location_type TEXT,
+  p_website_tech TEXT,
+  p_seo_optimized BOOLEAN,
+  p_source_niche TEXT,
+  p_source_location TEXT
+) RETURNS UUID AS $$
+DECLARE
+  v_id UUID;
+BEGIN
+  INSERT INTO public.leads (
+    user_id, canonical_id, place_id, name, address, phone, website,
+    rating, review_count, category, claimed,
+    owner_name, owner_phone, last_review_date, last_owner_activity,
+    days_dormant, search_visibility, response_rate, location_type,
+    website_tech, seo_optimized, source_niche, source_location
+  ) VALUES (
+    p_user_id, p_canonical_id, p_place_id, p_name, p_address, p_phone, p_website,
+    p_rating, p_review_count, p_category, p_claimed,
+    p_owner_name, p_owner_phone, p_last_review_date, p_last_owner_activity,
+    p_days_dormant, p_search_visibility, p_response_rate, p_location_type,
+    p_website_tech, p_seo_optimized, p_source_niche, p_source_location
+  )
+  ON CONFLICT (user_id, canonical_id)
+  DO UPDATE SET
+    place_id = COALESCE(EXCLUDED.place_id, leads.place_id),
+    name = EXCLUDED.name,
+    address = EXCLUDED.address,
+    phone = COALESCE(EXCLUDED.phone, leads.phone),
+    website = COALESCE(EXCLUDED.website, leads.website),
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    category = EXCLUDED.category,
+    claimed = EXCLUDED.claimed,
+    owner_name = COALESCE(EXCLUDED.owner_name, leads.owner_name),
+    owner_phone = COALESCE(EXCLUDED.owner_phone, leads.owner_phone),
+    last_review_date = EXCLUDED.last_review_date,
+    last_owner_activity = EXCLUDED.last_owner_activity,
+    days_dormant = EXCLUDED.days_dormant,
+    search_visibility = EXCLUDED.search_visibility,
+    response_rate = EXCLUDED.response_rate,
+    location_type = EXCLUDED.location_type,
+    website_tech = EXCLUDED.website_tech,
+    seo_optimized = EXCLUDED.seo_optimized,
+    source_niche = EXCLUDED.source_niche,
+    source_location = EXCLUDED.source_location
+  RETURNING id INTO v_id;
+
+  RETURN v_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

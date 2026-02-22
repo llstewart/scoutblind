@@ -9,6 +9,7 @@ import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { deductCredits, refundCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
+import { upsertLeadFireAndForget } from '@/lib/leads';
 
 // Configuration
 const FIRST_PAGE_SIZE = 20; // Prioritize first page for fast initial load
@@ -37,7 +38,10 @@ async function processBatch(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder,
   completedCount: { value: number },
-  totalBusinesses: number
+  totalBusinesses: number,
+  userId: string,
+  niche: string,
+  location: string
 ): Promise<void> {
   const batchPromises = businesses.map(async (business: Business, batchIndex: number) => {
     const globalIndex = startIndex + batchIndex;
@@ -120,6 +124,7 @@ async function processBatch(
         progress: { completed: completedCount.value, total: totalBusinesses }
       })}\n\n`)
     );
+    upsertLeadFireAndForget(userId, result.business, niche, location);
   }
 }
 
@@ -309,7 +314,10 @@ export async function POST(request: NextRequest) {
             controller,
             encoder,
             completedCount,
-            totalBusinesses
+            totalBusinesses,
+            user.id,
+            body.niche,
+            body.location
           );
 
           if (i + BATCH_SIZE < firstPageBusinesses.length) {
@@ -372,7 +380,10 @@ export async function POST(request: NextRequest) {
               controller,
               encoder,
               completedCount,
-              totalBusinesses
+              totalBusinesses,
+              user.id,
+              body.niche,
+              body.location
             );
 
             if (i + BATCH_SIZE < remainingBusinesses.length) {

@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
+import { EnrichedBusiness, LeadStatus } from '@/lib/types';
 import { calculateSeoNeedScore, getSeoNeedSummary } from '@/lib/signals';
 import { ALL_LEAD_STATUSES } from './UpgradedListTable';
+import { useAppContext } from '@/contexts/AppContext';
 
 interface PipelineViewProps {
-  businesses: TableBusiness[];
-  onStatusChange: (businessId: string, status: LeadStatus) => void;
-  onNotesChange: (businessId: string, notes: string) => void;
   onOutreachClick?: (business: EnrichedBusiness) => void;
   onReportClick?: (business: EnrichedBusiness) => void;
 }
@@ -235,8 +233,8 @@ function StatusSection({
 }: {
   status: LeadStatus;
   businesses: EnrichedBusiness[];
-  onStatusChange: (businessId: string, status: LeadStatus) => void;
-  onNotesChange: (businessId: string, notes: string) => void;
+  onStatusChange: (leadId: string, status: LeadStatus) => void;
+  onNotesChange: (leadId: string, notes: string) => void;
   onOutreachClick?: (business: EnrichedBusiness) => void;
   onReportClick?: (business: EnrichedBusiness) => void;
 }) {
@@ -260,16 +258,19 @@ function StatusSection({
 
       {open && (
         <div>
-          {businesses.map(business => (
-            <LeadRow
-              key={business.placeId || business.name}
-              business={business}
-              onStatusChange={(s) => onStatusChange(business.placeId || business.name, s)}
-              onNotesChange={(n) => onNotesChange(business.placeId || business.name, n)}
-              onOutreachClick={onOutreachClick ? () => onOutreachClick(business) : undefined}
-              onReportClick={onReportClick ? () => onReportClick(business) : undefined}
-            />
-          ))}
+          {businesses.map(business => {
+            const key = business.leadId || business.placeId || business.name;
+            return (
+              <LeadRow
+                key={key}
+                business={business}
+                onStatusChange={(s) => onStatusChange(key, s)}
+                onNotesChange={(n) => onNotesChange(key, n)}
+                onOutreachClick={onOutreachClick ? () => onOutreachClick(business) : undefined}
+                onReportClick={onReportClick ? () => onReportClick(business) : undefined}
+              />
+            );
+          })}
         </div>
       )}
     </div>
@@ -278,21 +279,18 @@ function StatusSection({
 
 // ── Main component ──────────────────────────────────────────────
 
-export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutreachClick, onReportClick }: PipelineViewProps) {
-  const enrichedBusinesses = useMemo(() =>
-    businesses.filter((b): b is EnrichedBusiness => !isPendingBusiness(b) && isEnrichedBusiness(b)),
-    [businesses]
-  );
+export function PipelineView({ onOutreachClick, onReportClick }: PipelineViewProps) {
+  const { allLeads, isLoadingLeads, updateLeadDirect } = useAppContext();
 
   const grouped = useMemo(() => {
     const result: Record<LeadStatus, EnrichedBusiness[]> = {
       new: [], contacted: [], pitched: [], won: [], lost: [],
     };
-    enrichedBusinesses.forEach(b => {
+    allLeads.forEach(b => {
       result[b.leadStatus || 'new'].push(b);
     });
     return result;
-  }, [enrichedBusinesses]);
+  }, [allLeads]);
 
   const counts = useMemo(() => {
     const c: Record<LeadStatus, number> = { new: 0, contacted: 0, pitched: 0, won: 0, lost: 0 };
@@ -304,15 +302,19 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
   const [moveNotice, setMoveNotice] = useState<{ name: string; to: LeadStatus } | null>(null);
   const moveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleStatusChange = useCallback((businessId: string, status: LeadStatus) => {
-    const biz = enrichedBusinesses.find(b => (b.placeId || b.name) === businessId);
-    onStatusChange(businessId, status);
+  const handleStatusChange = useCallback((leadId: string, status: LeadStatus) => {
+    const biz = allLeads.find(b => (b.leadId || b.placeId || b.name) === leadId);
+    updateLeadDirect(leadId, { status });
     if (biz) {
       setMoveNotice({ name: biz.name, to: status });
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
       moveTimerRef.current = setTimeout(() => setMoveNotice(null), 2500);
     }
-  }, [enrichedBusinesses, onStatusChange]);
+  }, [allLeads, updateLeadDirect]);
+
+  const handleNotesChange = useCallback((leadId: string, notes: string) => {
+    updateLeadDirect(leadId, { notes });
+  }, [updateLeadDirect]);
 
   useEffect(() => {
     return () => { if (moveTimerRef.current) clearTimeout(moveTimerRef.current); };
@@ -320,7 +322,16 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
 
   const populatedStatuses = ALL_LEAD_STATUSES.filter(s => grouped[s].length > 0);
 
-  if (enrichedBusinesses.length === 0) {
+  if (isLoadingLeads) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-6 h-6 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mb-4" />
+        <p className="text-xs text-gray-500">Loading your leads...</p>
+      </div>
+    );
+  }
+
+  if (allLeads.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <svg className="w-10 h-10 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -340,7 +351,7 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
       <div className="px-5 py-3.5 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           <h3 className="text-sm font-semibold text-gray-900">Pipeline</h3>
-          <span className="text-xs text-gray-400">{enrichedBusinesses.length} leads</span>
+          <span className="text-xs text-gray-400">{allLeads.length} leads</span>
         </div>
         <StageFlowBar counts={counts} />
       </div>
@@ -376,7 +387,7 @@ export function PipelineView({ businesses, onStatusChange, onNotesChange, onOutr
             status={status}
             businesses={grouped[status]}
             onStatusChange={handleStatusChange}
-            onNotesChange={onNotesChange}
+            onNotesChange={handleNotesChange}
             onOutreachClick={onOutreachClick}
             onReportClick={onReportClick}
           />

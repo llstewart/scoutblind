@@ -10,6 +10,7 @@ import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { deductCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
+import { upsertLeadFireAndForget } from '@/lib/leads';
 
 interface AnalyzeSelectedRequest {
   businesses: Business[];
@@ -296,6 +297,7 @@ export async function POST(request: NextRequest) {
               success: true,
               progress: { completed: completedCount, total: totalBusinesses }
             })}\n\n`));
+            upsertLeadFireAndForget(user.id, enrichedBusiness, niche, location);
           }
 
           if (i + BATCH_SIZE < businesses.length) {

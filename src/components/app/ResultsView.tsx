@@ -43,6 +43,7 @@ export function ResultsView() {
     isPreviewEnriching,
     previewExhausted,
     triggerFreePreview,
+    allLeads,
   } = useAppContext();
 
   // Modal state for outreach templates and pitch report
@@ -129,7 +130,7 @@ export function ResultsView() {
               NEW
             </span>
           </button>
-          {isPremium && tableBusinesses.length > 0 && (
+          {isPremium && (
             <button
               onClick={() => setActiveTab('pipeline')}
               className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'pipeline'
@@ -138,6 +139,9 @@ export function ResultsView() {
                 }`}
             >
               <span>Pipeline</span>
+              {allLeads.length > 0 && (
+                <span className="text-gray-400">({allLeads.length})</span>
+              )}
             </button>
           )}
         </div>
@@ -327,9 +331,6 @@ export function ResultsView() {
       ) : activeTab === 'pipeline' ? (
         <div className="flex-1 min-h-0 border-t border-gray-200 overflow-hidden">
           <PipelineView
-            businesses={tableBusinesses}
-            onStatusChange={updateLeadStatus}
-            onNotesChange={updateLeadNotes}
             onOutreachClick={setOutreachBusiness}
             onReportClick={setReportBusiness}
           />
