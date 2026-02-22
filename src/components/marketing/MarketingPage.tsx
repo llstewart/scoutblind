@@ -146,7 +146,7 @@ export function MarketingPage() {
           </h1>
 
           <p className="text-sm md:text-base text-gray-600 mb-8 max-w-xl mx-auto leading-relaxed">
-            Scan an entire market in 60 seconds. Find every business with an unclaimed profile, missing website, or buried ranking — then export the list and pitch the fix.
+            Packleads scans your entire market and scores hidden signals most agencies miss — review response rates, owner dormancy, search visibility gaps — so you know exactly which businesses need help and how badly.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -179,10 +179,10 @@ export function MarketingPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
-            What takes a VA 4 hours, Packleads does in 4 minutes.
+            Stop guessing which businesses to pitch.
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            One scan. One market. Every business with a weak profile, missing website, or buried ranking — scored and ready to pitch. For $0.58 per scan.
+            Enter a niche and location. Packleads pulls every business in that market, analyzes 10+ ranking signals per profile, and scores each one by how urgently they need your services — so you pitch the right businesses first.
           </p>
 
           <div ref={stats.ref} className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
