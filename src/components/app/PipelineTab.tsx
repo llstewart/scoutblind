@@ -93,12 +93,14 @@ function RowActions({
   onOutreach,
   onReport,
   onNotesSave,
+  onDelete,
 }: {
   lead: EnrichedBusiness;
   notes: string;
   onOutreach: () => void;
   onReport: () => void;
   onNotesSave: (n: string) => void;
+  onDelete: () => void;
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [draft, setDraft] = useState(notes);
@@ -150,6 +152,15 @@ function RowActions({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
       </button>
+      <button
+        onClick={onDelete}
+        className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+        title="Delete lead"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -159,25 +170,43 @@ function RowActions({
 function MobileLeadCard({
   lead,
   score,
+  selected,
+  selectionMode,
   onStatusChange,
   onOutreach,
   onReport,
   onNotesSave,
+  onDelete,
+  onToggleSelect,
 }: {
   lead: EnrichedBusiness;
   score: number;
+  selected: boolean;
+  selectionMode: boolean;
   onStatusChange: (s: LeadStatus) => void;
   onOutreach: () => void;
   onReport: () => void;
   onNotesSave: (n: string) => void;
+  onDelete: () => void;
+  onToggleSelect: () => void;
 }) {
   const status = lead.leadStatus || 'new';
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+    <div className={`bg-white rounded-xl border p-4 space-y-3 transition-colors ${selected ? 'border-violet-300 bg-violet-50/30' : 'border-gray-200'}`}>
       {/* Top row: status + score */}
       <div className="flex items-center justify-between">
-        <StatusPill status={status} onChange={onStatusChange} />
+        <div className="flex items-center gap-2">
+          {selectionMode && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onToggleSelect}
+              className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500/30"
+            />
+          )}
+          <StatusPill status={status} onChange={onStatusChange} />
+        </div>
         <ScoreRing score={score} />
       </div>
 
@@ -244,7 +273,7 @@ function MobileLeadCard({
 
       {/* Actions */}
       <div className="flex items-center gap-2 pt-1 border-t border-gray-100">
-        <RowActions lead={lead} notes={lead.leadNotes || ''} onOutreach={onOutreach} onReport={onReport} onNotesSave={onNotesSave} />
+        <RowActions lead={lead} notes={lead.leadNotes || ''} onOutreach={onOutreach} onReport={onReport} onNotesSave={onNotesSave} onDelete={onDelete} />
       </div>
     </div>
   );
@@ -255,7 +284,7 @@ function MobileLeadCard({
 // ══════════════════════════════════════════════════════════════
 
 export function PipelineTab() {
-  const { allLeads, isLoadingLeads, updateLeadDirect, searchParams: contextSearchParams } = useAppContext();
+  const { allLeads, isLoadingLeads, leadsError, fetchAllLeads, updateLeadDirect, deleteLeadsDirect, searchParams: contextSearchParams } = useAppContext();
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all');
@@ -269,20 +298,30 @@ export function PipelineTab() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Selection
+  const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   // Modals
   const [outreachBusiness, setOutreachBusiness] = useState<EnrichedBusiness | null>(null);
   const [reportBusiness, setReportBusiness] = useState<EnrichedBusiness | null>(null);
 
-  // Move notification
-  const [moveNotice, setMoveNotice] = useState<{ name: string; to: LeadStatus } | null>(null);
-  const moveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Notification
+  const [notice, setNotice] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Scroll tracking for table shadow
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
 
+  const showNotice = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setNotice({ message, type });
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = setTimeout(() => setNotice(null), 2500);
+  }, []);
+
   useEffect(() => {
-    return () => { if (moveTimerRef.current) clearTimeout(moveTimerRef.current); };
+    return () => { if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current); };
   }, []);
 
   useEffect(() => { setCurrentPage(1); }, [statusFilter, sourceFilter, searchQuery, sortKey, sortDir]);
@@ -358,20 +397,69 @@ export function PipelineTab() {
   const activeLeads = statusCounts.new + statusCounts.contacted + statusCounts.pitched;
   const wonRate = allLeads.length > 0 ? Math.round((statusCounts.won / allLeads.length) * 100) : 0;
 
+  // ── Selection helpers ────────────────────────────────────────
+
+  const selectionMode = selectedLeads.size > 0;
+
+  const toggleSelect = useCallback((leadId: string) => {
+    setSelectedLeads(prev => {
+      const next = new Set(prev);
+      if (next.has(leadId)) next.delete(leadId); else next.add(leadId);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    const pageIds = paginatedLeads.map(({ lead }) => lead.leadId).filter(Boolean) as string[];
+    const allSelected = pageIds.every(id => selectedLeads.has(id));
+    if (allSelected) {
+      setSelectedLeads(prev => {
+        const next = new Set(prev);
+        pageIds.forEach(id => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedLeads(prev => {
+        const next = new Set(prev);
+        pageIds.forEach(id => next.add(id));
+        return next;
+      });
+    }
+  }, [paginatedLeads, selectedLeads]);
+
   // ── Handlers ─────────────────────────────────────────────────
 
   const handleStatusChange = useCallback((lead: EnrichedBusiness, newStatus: LeadStatus) => {
     if (!lead.leadId) return;
     updateLeadDirect(lead.leadId, { status: newStatus });
-    setMoveNotice({ name: lead.name, to: newStatus });
-    if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
-    moveTimerRef.current = setTimeout(() => setMoveNotice(null), 2500);
-  }, [updateLeadDirect]);
+    showNotice(`Moved ${lead.name} to ${LEAD_STATUS_CONFIG[newStatus].label}`);
+  }, [updateLeadDirect, showNotice]);
 
   const handleNotesChange = useCallback((lead: EnrichedBusiness, notes: string) => {
     if (!lead.leadId) return;
     updateLeadDirect(lead.leadId, { notes });
   }, [updateLeadDirect]);
+
+  const handleDeleteSingle = useCallback(async (lead: EnrichedBusiness) => {
+    if (!lead.leadId) return;
+    const ok = await deleteLeadsDirect([lead.leadId]);
+    if (ok) {
+      selectedLeads.delete(lead.leadId);
+      setSelectedLeads(new Set(selectedLeads));
+      showNotice(`Deleted ${lead.name}`);
+    }
+  }, [deleteLeadsDirect, selectedLeads, showNotice]);
+
+  const handleBulkDelete = useCallback(async () => {
+    const ids = Array.from(selectedLeads);
+    if (ids.length === 0) return;
+    const ok = await deleteLeadsDirect(ids);
+    if (ok) {
+      setSelectedLeads(new Set());
+      setShowDeleteConfirm(false);
+      showNotice(`Deleted ${ids.length} lead${ids.length > 1 ? 's' : ''}`);
+    }
+  }, [deleteLeadsDirect, selectedLeads, showNotice]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -423,6 +511,30 @@ export function PipelineTab() {
               <div className="h-4 w-14 bg-gray-50 rounded animate-pulse" />
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Error ──────────────────────────────────────────────────
+
+  if (leadsError && !isLoadingLeads) {
+    return (
+      <div className="p-4 md:p-6">
+        <div className="flex flex-col items-center justify-center py-28 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center mb-6">
+            <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to load pipeline</h3>
+          <p className="text-sm text-gray-500 max-w-md leading-relaxed mb-6">{leadsError}</p>
+          <button
+            onClick={fetchAllLeads}
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -572,13 +684,77 @@ export function PipelineTab() {
         </div>
       </div>
 
-      {/* ── Move notification ──────────────────────────────────── */}
-      {moveNotice && (
-        <div className="px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-sm text-emerald-700 animate-in slide-in-from-top-2 fade-in duration-200">
-          <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      {/* ── Bulk actions bar ──────────────────────────────────── */}
+      {selectionMode && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-violet-50 border border-violet-200 rounded-xl">
+          <span className="text-sm font-semibold text-violet-700">{selectedLeads.size} selected</span>
+          <div className="flex-1" />
+          <button
+            onClick={() => setSelectedLeads(new Set())}
+            className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
+          >
+            Clear
+          </button>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
+        </div>
+      )}
+
+      {/* ── Delete confirmation ───────────────────────────────── */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Delete {selectedLeads.size} lead{selectedLeads.size > 1 ? 's' : ''}?</h3>
+                <p className="text-sm text-gray-500 mt-0.5">This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Notification ──────────────────────────────────────── */}
+      {notice && (
+        <div className={`px-4 py-2.5 rounded-xl flex items-center gap-2.5 text-sm ${
+          notice.type === 'success'
+            ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+            : 'bg-red-50 border border-red-200 text-red-700'
+        }`}>
+          <svg className={`w-4 h-4 flex-shrink-0 ${notice.type === 'success' ? 'text-emerald-500' : 'text-red-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {notice.type === 'success'
+              ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            }
           </svg>
-          Moved <span className="font-semibold">{moveNotice.name}</span> to <span className="font-semibold">{LEAD_STATUS_CONFIG[moveNotice.to].label}</span>
+          {notice.message}
         </div>
       )}
 
@@ -615,7 +791,15 @@ export function PipelineTab() {
               <table className="w-full min-w-full">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-gray-50/95 backdrop-blur-sm border-b border-gray-200">
-                    <th className="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-2.5 w-28">
+                    <th className="pl-5 pr-1 py-2.5 w-10">
+                      <input
+                        type="checkbox"
+                        checked={paginatedLeads.length > 0 && paginatedLeads.every(({ lead }) => lead.leadId && selectedLeads.has(lead.leadId))}
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500/30"
+                      />
+                    </th>
+                    <th className="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-2.5 w-28">
                       Status
                     </th>
                     <th
@@ -660,10 +844,20 @@ export function PipelineTab() {
                     return (
                       <tr
                         key={lead.leadId || lead.placeId || lead.name}
-                        className="group hover:bg-violet-50/30 transition-colors"
+                        className={`group transition-colors ${selectedLeads.has(lead.leadId || '') ? 'bg-violet-50/50' : 'hover:bg-violet-50/30'}`}
                       >
+                        {/* Checkbox */}
+                        <td className="pl-5 pr-1 py-3 align-middle w-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedLeads.has(lead.leadId || '')}
+                            onChange={() => lead.leadId && toggleSelect(lead.leadId)}
+                            className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500/30"
+                          />
+                        </td>
+
                         {/* Status */}
-                        <td className="px-5 py-3 align-middle">
+                        <td className="px-3 py-3 align-middle">
                           <StatusPill status={status} onChange={(s) => handleStatusChange(lead, s)} />
                         </td>
 
@@ -771,6 +965,7 @@ export function PipelineTab() {
                               onOutreach={() => setOutreachBusiness(lead)}
                               onReport={() => setReportBusiness(lead)}
                               onNotesSave={(n) => handleNotesChange(lead, n)}
+                              onDelete={() => handleDeleteSingle(lead)}
                             />
                           </div>
                         </td>
@@ -789,10 +984,14 @@ export function PipelineTab() {
                 key={lead.leadId || lead.placeId || lead.name}
                 lead={lead}
                 score={score}
+                selected={selectedLeads.has(lead.leadId || '')}
+                selectionMode={selectionMode}
                 onStatusChange={(s) => handleStatusChange(lead, s)}
                 onOutreach={() => setOutreachBusiness(lead)}
                 onReport={() => setReportBusiness(lead)}
                 onNotesSave={(n) => handleNotesChange(lead, n)}
+                onDelete={() => handleDeleteSingle(lead)}
+                onToggleSelect={() => lead.leadId && toggleSelect(lead.leadId)}
               />
             ))}
           </div>

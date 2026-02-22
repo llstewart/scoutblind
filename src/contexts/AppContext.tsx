@@ -128,8 +128,10 @@ interface AppContextValue {
   // Leads DB
   allLeads: EnrichedBusiness[];
   isLoadingLeads: boolean;
+  leadsError: string | null;
   fetchAllLeads: () => Promise<void>;
   updateLeadDirect: (leadId: string, updates: { status?: LeadStatus; notes?: string }) => Promise<void>;
+  deleteLeadsDirect: (leadIds: string[]) => Promise<boolean>;
 
   // Preview
   isPreviewEnriching: boolean;
@@ -210,6 +212,7 @@ export function AppProvider({ children }: AppProviderProps) {
   // Leads DB state
   const [allLeads, setAllLeads] = useState<EnrichedBusiness[]>([]);
   const [isLoadingLeads, setIsLoadingLeads] = useState(false);
+  const [leadsError, setLeadsError] = useState<string | null>(null);
   const [hasLeadsLoaded, setHasLeadsLoaded] = useState(false);
   const backfillAttemptedRef = useRef(false);
 
@@ -442,6 +445,7 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isPremium, fetchSavedCount, fetchSavedSearchesList]);
 
+
   // Clear analyzed data for free tier users (but preserve preview data)
   useEffect(() => {
     if (!isAuthLoading && (!subscription || subscription.tier === 'free')) {
@@ -592,6 +596,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const fetchAllLeads = useCallback(async () => {
     if (!user || !isPremium) return;
     setIsLoadingLeads(true);
+    setLeadsError(null);
     try {
       const response = await fetch('/api/leads');
       if (response.ok) {
@@ -619,16 +624,32 @@ export function AppProvider({ children }: AppProviderProps) {
             console.error('[Leads] Backfill failed:', err);
           }
         }
+      } else {
+        setLeadsError('Failed to load leads. Please try again.');
       }
     } catch (err) {
       console.error('[Leads] Failed to fetch:', err);
+      setLeadsError('Could not connect to server. Check your connection and try again.');
     } finally {
       setIsLoadingLeads(false);
     }
   }, [user, isPremium, savedSearchesList.length]);
 
-  // Update a lead directly in the persistent DB
+  // Update a lead directly in the persistent DB (optimistic)
   const updateLeadDirect = useCallback(async (leadId: string, updates: { status?: LeadStatus; notes?: string }) => {
+    // Optimistic: update UI immediately
+    const previousLeads = allLeads;
+    setAllLeads(prev => prev.map(lead => {
+      if (lead.leadId === leadId) {
+        return {
+          ...lead,
+          ...(updates.status !== undefined ? { leadStatus: updates.status } : {}),
+          ...(updates.notes !== undefined ? { leadNotes: updates.notes } : {}),
+        };
+      }
+      return lead;
+    }));
+
     try {
       const response = await fetch('/api/leads', {
         method: 'PATCH',
@@ -636,23 +657,71 @@ export function AppProvider({ children }: AppProviderProps) {
         body: JSON.stringify({ leadId, ...updates }),
       });
 
-      if (response.ok) {
-        setAllLeads(prev => prev.map(lead => {
-          if (lead.leadId === leadId) {
-            return {
-              ...lead,
-              ...(updates.status !== undefined ? { leadStatus: updates.status } : {}),
-              ...(updates.notes !== undefined ? { leadNotes: updates.notes } : {}),
-            };
-          }
-          return lead;
-        }));
+      if (!response.ok) {
+        // Rollback on failure
+        setAllLeads(previousLeads);
+        setToastMessage('Failed to update lead. Change reverted.');
       }
     } catch (err) {
       console.error('[Leads] Failed to update lead:', err);
+      setAllLeads(previousLeads);
+      setToastMessage('Failed to update lead. Change reverted.');
     }
-  }, []);
+  }, [allLeads]);
 
+  // Delete leads from persistent DB (optimistic)
+  const deleteLeadsDirect = useCallback(async (leadIds: string[]): Promise<boolean> => {
+    if (leadIds.length === 0) return false;
+
+    // Optimistic: remove from UI immediately
+    const previousLeads = allLeads;
+    setAllLeads(prev => prev.filter(lead => !leadIds.includes(lead.leadId || '')));
+
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadIds }),
+      });
+
+      if (!response.ok) {
+        setAllLeads(previousLeads);
+        setToastMessage('Failed to delete leads. Changes reverted.');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('[Leads] Failed to delete leads:', err);
+      setAllLeads(previousLeads);
+      setToastMessage('Failed to delete leads. Changes reverted.');
+      return false;
+    }
+  }, [allLeads]);
+
+  // Multi-tab sync: re-fetch stale data when tab becomes visible again
+  useEffect(() => {
+    if (!user || !isPremium) return;
+    let hiddenAt = 0;
+    const STALE_THRESHOLD = 30_000; // 30 seconds
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAt = Date.now();
+      } else if (document.visibilityState === 'visible' && hiddenAt > 0) {
+        const elapsed = Date.now() - hiddenAt;
+        if (elapsed >= STALE_THRESHOLD) {
+          fetchSavedSearchesList();
+          if (hasLeadsLoaded) {
+            fetchAllLeads();
+          }
+        }
+        hiddenAt = 0;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [user, isPremium, hasLeadsLoaded, fetchSavedSearchesList, fetchAllLeads]);
 
   // Handle search
   const handleSearch = async (niche: string, location: string) => {
@@ -1184,8 +1253,10 @@ export function AppProvider({ children }: AppProviderProps) {
     // Leads DB
     allLeads,
     isLoadingLeads,
+    leadsError,
     fetchAllLeads,
     updateLeadDirect,
+    deleteLeadsDirect,
 
     // Preview
     isPreviewEnriching,

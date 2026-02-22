@@ -98,6 +98,41 @@ export async function GET() {
 }
 
 /**
+ * DELETE /api/leads - Delete one or more leads
+ */
+export async function DELETE(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { leadIds } = body as { leadIds: string[] };
+
+  if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
+    return NextResponse.json({ error: 'leadIds array is required' }, { status: 400 });
+  }
+
+  if (leadIds.length > 100) {
+    return NextResponse.json({ error: 'Maximum 100 leads per delete request' }, { status: 400 });
+  }
+
+  const { error } = await supabase
+    .from('leads')
+    .delete()
+    .in('id', leadIds);
+
+  if (error) {
+    console.error('[Leads API] DELETE error:', error);
+    return NextResponse.json({ error: 'Failed to delete leads' }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, deleted: leadIds.length });
+}
+
+/**
  * PATCH /api/leads - Update CRM fields for a single lead
  */
 export async function PATCH(request: NextRequest) {

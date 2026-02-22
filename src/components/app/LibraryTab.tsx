@@ -80,7 +80,8 @@ export function LibraryTab({
 }: LibraryTabProps) {
   const [searchFilter, setSearchFilter] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<'bulk' | 'all' | null>(null);
 
   // Filter and group searches
   const filteredSearches = useMemo(() => {
@@ -200,18 +201,15 @@ export function LibraryTab({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {onClearAll && searches.length > 0 && (
-            <button
-              onClick={() => setShowClearConfirm(true)}
-              className="px-2 py-1 text-[10px] font-medium text-gray-400 hover:text-red-400 transition-colors"
-            >
-              Clear all
-            </button>
-          )}
           {onDeleteSearch && (
             <button
-              onClick={() => setIsEditing(!isEditing)}
-              className={`px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+              onClick={() => {
+                if (isEditing) {
+                  setSelectedIds(new Set());
+                }
+                setIsEditing(!isEditing);
+              }}
+              className={`px-2.5 py-1 text-[10px] font-semibold rounded transition-colors ${
                 isEditing
                   ? 'bg-violet-500/10 text-violet-400'
                   : 'text-gray-500 hover:text-gray-900'
@@ -222,6 +220,46 @@ export function LibraryTab({
           )}
         </div>
       </div>
+
+      {/* Bulk actions bar */}
+      {isEditing && (
+        <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl">
+          <button
+            onClick={() => {
+              if (selectedIds.size === filteredSearches.length) {
+                setSelectedIds(new Set());
+              } else {
+                setSelectedIds(new Set(filteredSearches.map(s => s.id)));
+              }
+            }}
+            className="text-[11px] font-semibold text-violet-600 hover:text-violet-500 transition-colors"
+          >
+            {selectedIds.size === filteredSearches.length ? 'Deselect all' : 'Select all'}
+          </button>
+          <div className="flex-1" />
+          {selectedIds.size > 0 && (
+            <span className="text-[11px] font-semibold text-gray-500">{selectedIds.size} selected</span>
+          )}
+          <button
+            onClick={() => selectedIds.size > 0 ? setShowDeleteConfirm('bulk') : null}
+            disabled={selectedIds.size === 0}
+            className="px-2.5 py-1 text-[11px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
+          {onClearAll && searches.length > 1 && (
+            <button
+              onClick={() => setShowDeleteConfirm('all')}
+              className="px-2.5 py-1 text-[11px] font-semibold text-red-400 hover:text-red-500 transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Search filter */}
       <div className="mb-4">
@@ -262,18 +300,24 @@ export function LibraryTab({
               {periodSearches.map((search) => (
                 <div
                   key={search.id}
-                  className="flex items-center gap-2 px-2.5 py-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg transition-colors group ${
+                    selectedIds.has(search.id) ? 'bg-violet-50 border border-violet-200' : 'bg-gray-50 hover:bg-gray-100'
+                  }`}
                 >
-                  {/* Delete button (edit mode) */}
-                  {isEditing && onDeleteSearch && (
-                    <button
-                      onClick={() => onDeleteSearch(search.id)}
-                      className="p-0.5 text-gray-400 hover:text-red-400 transition-colors"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                  {/* Checkbox (edit mode) */}
+                  {isEditing && (
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(search.id)}
+                      onChange={() => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(search.id)) next.delete(search.id); else next.add(search.id);
+                          return next;
+                        });
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500/30 flex-shrink-0"
+                    />
                   )}
 
                   {/* Status indicator */}
@@ -344,10 +388,10 @@ export function LibraryTab({
           </div>
         ))}
       </div>
-      {/* Clear All Confirmation Modal */}
-      {showClearConfirm && (
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowClearConfirm(false)} />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
           <div className="relative bg-white rounded-2xl p-6 shadow-2xl shadow-black/10 w-full max-w-sm border border-gray-200">
             <div className="flex justify-center mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10">
@@ -356,25 +400,40 @@ export function LibraryTab({
                 </svg>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">Clear all research?</h3>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+              {showDeleteConfirm === 'all'
+                ? 'Clear all research?'
+                : `Delete ${selectedIds.size} ${selectedIds.size === 1 ? 'market' : 'markets'}?`
+              }
+            </h3>
             <p className="text-sm text-gray-500 text-center mb-6">
-              This will permanently delete all {searches.length} saved {searches.length === 1 ? 'market' : 'markets'} and their analysis data. This cannot be undone.
+              {showDeleteConfirm === 'all'
+                ? `This will permanently delete all ${searches.length} saved ${searches.length === 1 ? 'market' : 'markets'} and their analysis data. This cannot be undone.`
+                : `This will permanently delete the selected ${selectedIds.size === 1 ? 'market' : 'markets'} and their analysis data. This cannot be undone.`
+              }
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => setShowClearConfirm(false)}
+                onClick={() => setShowDeleteConfirm(null)}
                 className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  setShowClearConfirm(false);
-                  onClearAll?.();
+                  if (showDeleteConfirm === 'all') {
+                    onClearAll?.();
+                  } else {
+                    // Delete selected one by one
+                    selectedIds.forEach(id => onDeleteSearch?.(id));
+                    setSelectedIds(new Set());
+                  }
+                  setShowDeleteConfirm(null);
+                  setIsEditing(false);
                 }}
                 className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors"
               >
-                Clear All
+                Delete
               </button>
             </div>
           </div>

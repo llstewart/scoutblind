@@ -164,8 +164,16 @@ function DashboardContent() {
       {/* Error display */}
       {error && !hasResults && (
         <div className="max-w-2xl mx-auto px-4">
-          <div className="p-4 bg-red-500/10 rounded-lg text-red-400 text-sm">
-            {error}
+          <div className="p-4 bg-red-500/10 rounded-lg flex items-center justify-between gap-3">
+            <span className="text-red-400 text-sm">{error}</span>
+            {searchParams && (
+              <button
+                onClick={() => handleSearch(searchParams.niche, searchParams.location)}
+                className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+            )}
           </div>
         </div>
       )}

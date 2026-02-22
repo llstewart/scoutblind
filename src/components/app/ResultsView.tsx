@@ -30,6 +30,8 @@ export function ResultsView() {
     wasAnalysisInterrupted,
     setWasAnalysisInterrupted,
     error,
+    setError,
+    handleSearch,
     handleAnalyze,
     handleNewSearch,
     handleUpgradeClick,
@@ -68,8 +70,24 @@ export function ResultsView() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-red-500/10 rounded-lg text-red-400 text-sm mx-4">
-          {error}
+        <div className="p-3 bg-red-500/10 rounded-lg flex items-center justify-between gap-3 mx-4">
+          <span className="text-red-400 text-sm">{error}</span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setError(null)}
+              className="text-xs text-gray-500 hover:text-gray-900 px-2 py-1"
+            >
+              Dismiss
+            </button>
+            {searchParams && (
+              <button
+                onClick={() => handleSearch(searchParams.niche, searchParams.location)}
+                className="px-3 py-1 text-xs font-semibold text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-colors"
+              >
+                Retry Search
+              </button>
+            )}
+          </div>
         </div>
       )}
 
