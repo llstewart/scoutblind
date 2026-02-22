@@ -56,6 +56,8 @@ function leadRowToEnrichedBusiness(row: LeadRow): EnrichedBusiness {
     seoOptimized: row.seo_optimized,
     leadStatus: (row.lead_status as any) || 'new',
     leadNotes: row.lead_notes || undefined,
+    sourceNiche: row.source_niche || undefined,
+    sourceLocation: row.source_location || undefined,
   };
 }
 

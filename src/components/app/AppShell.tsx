@@ -78,6 +78,7 @@ export function AppShell({
         activeTab={activeTab}
         onTabChange={setActiveTab}
         libraryCount={libraryCount}
+        tier={tier}
       />
     </div>
   );

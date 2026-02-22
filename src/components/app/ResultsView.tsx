@@ -10,7 +10,6 @@ import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/t
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
-import { PipelineView } from '@/components/PipelineView';
 
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
 
@@ -43,7 +42,6 @@ export function ResultsView() {
     isPreviewEnriching,
     previewExhausted,
     triggerFreePreview,
-    allLeads,
   } = useAppContext();
 
   // Modal state for outreach templates and pitch report
@@ -130,20 +128,6 @@ export function ResultsView() {
               NEW
             </span>
           </button>
-          {isPremium && (
-            <button
-              onClick={() => setActiveTab('pipeline')}
-              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'pipeline'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-900'
-                }`}
-            >
-              <span>Pipeline</span>
-              {allLeads.length > 0 && (
-                <span className="text-gray-400">({allLeads.length})</span>
-              )}
-            </button>
-          )}
         </div>
 
         {/* Actions */}
@@ -173,7 +157,7 @@ export function ResultsView() {
                 exportGeneralListToCSV(businesses, searchParams?.niche, searchParams?.location);
               }
             }}
-            disabled={activeTab === 'market' || activeTab === 'pipeline' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
+            disabled={activeTab === 'market' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
             className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -328,13 +312,6 @@ export function ResultsView() {
         <div className="flex-1 min-h-0 border-t border-gray-200 p-4 overflow-y-auto">
           <MarketDashboard />
         </div>
-      ) : activeTab === 'pipeline' ? (
-        <div className="flex-1 min-h-0 border-t border-gray-200 overflow-hidden">
-          <PipelineView
-            onOutreachClick={setOutreachBusiness}
-            onReportClick={setReportBusiness}
-          />
-        </div>
       ) : (
       <div className={`overflow-hidden border-t border-gray-200 ${activeTab === 'upgraded' && isPremium
         ? 'ring-1 ring-violet-500/20'
@@ -435,10 +412,6 @@ export function ResultsView() {
         {activeTab === 'market' ? (
           <span>
             Market insights for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
-          </span>
-        ) : activeTab === 'pipeline' ? (
-          <span>
-            Pipeline for &quot;{searchParams?.niche}&quot; in {searchParams?.location}
           </span>
         ) : activeTab === 'general' ? (
           <span>

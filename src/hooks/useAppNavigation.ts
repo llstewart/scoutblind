@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-export type AppTab = 'search' | 'library' | 'account';
+export type AppTab = 'search' | 'library' | 'pipeline' | 'account';
 
 interface UseAppNavigationReturn {
   activeTab: AppTab;
@@ -20,6 +20,7 @@ export function useAppNavigation(): UseAppNavigationReturn {
   // Derive active tab from pathname
   const getActiveTab = (): AppTab => {
     if (pathname === '/library') return 'library';
+    if (pathname === '/pipeline') return 'pipeline';
     if (pathname === '/account') return 'account';
     if (pathname === '/dashboard') return 'search';
     return 'search';
@@ -32,6 +33,9 @@ export function useAppNavigation(): UseAppNavigationReturn {
     switch (tab) {
       case 'library':
         router.push('/library');
+        break;
+      case 'pipeline':
+        router.push('/pipeline');
         break;
       case 'account':
         router.push('/account');

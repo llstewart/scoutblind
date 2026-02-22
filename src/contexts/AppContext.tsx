@@ -6,7 +6,7 @@ import { useUser } from '@/hooks/useUser';
 import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
-type TabType = 'general' | 'upgraded' | 'market' | 'pipeline';
+type TabType = 'general' | 'upgraded' | 'market';
 
 const SESSION_STORAGE_KEY = 'packleads_session';
 const PERSISTENT_SESSION_ID_KEY = 'packleads_sid';
@@ -410,7 +410,12 @@ export function AppProvider({ children }: AppProviderProps) {
           setBusinesses(state.businesses || []);
           setTableBusinesses(state.tableBusinesses || []);
           setSearchParams(state.searchParams);
-          setActiveTab(state.activeTab || 'general');
+          const restoredTab = (state.activeTab || 'general') as string;
+          setActiveTab(
+            restoredTab === 'general' || restoredTab === 'upgraded' || restoredTab === 'market'
+              ? restoredTab
+              : 'general'
+          );
           if (state.wasAnalyzing && state.tableBusinesses && state.tableBusinesses.length > 0) {
             setWasAnalysisInterrupted(true);
           }
@@ -648,12 +653,6 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, []);
 
-  // Fetch leads when pipeline tab is opened
-  useEffect(() => {
-    if (activeTab === 'pipeline' && isPremium && !hasLeadsLoaded) {
-      fetchAllLeads();
-    }
-  }, [activeTab, isPremium, hasLeadsLoaded, fetchAllLeads]);
 
   // Handle search
   const handleSearch = async (niche: string, location: string) => {
