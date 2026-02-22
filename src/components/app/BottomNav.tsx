@@ -87,7 +87,7 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
               </div>
 
               {/* Label */}
-              <span className={`text-[10px] font-medium mt-1 ${isActive ? 'text-violet-600' : 'text-gray-400'}`}>
+              <span className={`text-[10px] font-semibold mt-1 ${isActive ? 'text-violet-600' : 'text-gray-400'}`}>
                 {tab.label}
               </span>
             </button>

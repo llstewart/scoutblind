@@ -82,7 +82,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
         <div className="flex bg-gray-100">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold transition-colors ${
               activeTab === 'profile'
                 ? 'text-gray-900 border-b-2 border-violet-500'
                 : 'text-gray-500 hover:text-gray-900'
@@ -93,7 +93,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
           </button>
           <button
             onClick={() => setActiveTab('danger')}
-            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold transition-colors ${
               activeTab === 'danger'
                 ? 'text-red-400 border-b-2 border-red-500'
                 : 'text-gray-500 hover:text-red-400'

@@ -156,7 +156,7 @@ export function LibraryTab({
     return (
       <TabContent>
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Library</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
           <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
         </div>
         <div className="flex items-center justify-center py-16">
@@ -171,7 +171,7 @@ export function LibraryTab({
     return (
       <TabContent>
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Library</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
           <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
         </div>
         <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -194,7 +194,7 @@ export function LibraryTab({
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Library</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
           <p className="text-xs text-gray-500 mt-0.5">
             {searches.length} {searches.length === 1 ? 'market' : 'markets'} researched
           </p>
@@ -363,7 +363,7 @@ export function LibraryTab({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowClearConfirm(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -372,7 +372,7 @@ export function LibraryTab({
                   setShowClearConfirm(false);
                   onClearAll?.();
                 }}
-                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors"
               >
                 Clear All
               </button>

@@ -201,7 +201,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
 
           {/* Text */}
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-bold text-gray-900">{slide.title}</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-gray-900">{slide.title}</h2>
             <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">{slide.description}</p>
           </div>
         </div>
@@ -235,7 +235,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
 
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors shadow-lg shadow-violet-600/20"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-violet-600/20"
             >
               {isLastSlide ? 'Get started' : 'Next'}
               {!isLastSlide && <ChevronRight className="w-4 h-4" />}

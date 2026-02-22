@@ -138,7 +138,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
         {/* Header */}
         <div className="sticky top-0 bg-white p-4 sm:p-6 flex items-start sm:items-center justify-between z-10 gap-4">
           <div className="min-w-0">
-            <h2 id="billing-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900">Upgrade Your Plan</h2>
+            <h2 id="billing-modal-title" className="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900">Upgrade Your Plan</h2>
             <p className="text-gray-500 mt-1 text-sm sm:text-base">
               <span className="hidden sm:inline">Current: </span>
               {SUBSCRIPTION_TIERS[currentTier as keyof typeof SUBSCRIPTION_TIERS]?.name || 'Free'}
@@ -162,7 +162,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
           <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
             <button
               onClick={() => setActiveTab('plans')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
                 activeTab === 'plans'
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-500 hover:text-gray-900'
@@ -172,7 +172,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
             </button>
             <button
               onClick={() => setActiveTab('credits')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
                 activeTab === 'credits'
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-500 hover:text-gray-900'
@@ -247,10 +247,10 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
                         <h3 className="text-lg font-semibold text-gray-900">{tier.name}</h3>
                         <div className="mt-2">
                           {price === 0 ? (
-                            <span className="text-3xl font-bold text-gray-900">Free</span>
+                            <span className="text-3xl font-extrabold text-gray-900">Free</span>
                           ) : (
                             <>
-                              <span className="text-3xl font-bold text-gray-900">${monthlyPrice}</span>
+                              <span className="text-3xl font-extrabold text-gray-900">${monthlyPrice}</span>
                               <span className="text-gray-500">/mo</span>
                               {billingInterval === 'year' && (
                                 <div className="text-xs text-gray-500 mt-1">
@@ -278,7 +278,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
                       <button
                         onClick={() => handleSubscribe(key)}
                         disabled={isCurrentTier || key === 'free' || loading === key}
-                        className={`w-full py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
+                        className={`w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
                           isCurrentTier
                             ? 'bg-green-500/20 text-green-400 cursor-default'
                             : key === 'free'
@@ -346,13 +346,13 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
                       </div>
 
                       <div className="text-center mb-4">
-                        <span className="text-3xl font-bold text-gray-900">${pack.price}</span>
+                        <span className="text-3xl font-extrabold text-gray-900">${pack.price}</span>
                       </div>
 
                       <button
                         onClick={() => handleBuyCredits(key)}
                         disabled={loading === key}
-                        className="w-full py-2.5 px-4 rounded-lg font-medium text-sm bg-gray-200 hover:bg-gray-300 text-gray-900 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm bg-gray-200 hover:bg-gray-300 text-gray-900 transition-colors flex items-center justify-center gap-2"
                       >
                         {loading === key ? (
                           <Loader2 className="w-4 h-4 animate-spin" />

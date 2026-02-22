@@ -52,7 +52,7 @@ export function Sidebar({
       {/* Logo / Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
-          <span className="text-lg font-bold text-gray-900">
+          <span className="text-lg font-bold tracking-tight text-gray-900">
             Packleads<span className="text-violet-500">.</span>
           </span>
         )}
@@ -86,7 +86,7 @@ export function Sidebar({
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          {!isCollapsed && <span className="font-medium">Search</span>}
+          {!isCollapsed && <span className="font-semibold">Search</span>}
         </button>
 
         {/* Library Tab */}
@@ -104,7 +104,7 @@ export function Sidebar({
             </svg>
             {!isCollapsed && (
               <>
-                <span className="font-medium flex-1 text-left">Library</span>
+                <span className="font-semibold flex-1 text-left">Library</span>
                 {recentSearches.length > 0 && (
                   <span className="text-xs text-gray-500">{recentSearches.length}</span>
                 )}
@@ -156,7 +156,7 @@ export function Sidebar({
             <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
-            {!isCollapsed && <span className="font-medium">Pipeline</span>}
+            {!isCollapsed && <span className="font-semibold">Pipeline</span>}
           </button>
         )}
 
@@ -175,7 +175,7 @@ export function Sidebar({
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          {!isCollapsed && <span className="font-medium">Account</span>}
+          {!isCollapsed && <span className="font-semibold">Account</span>}
         </button>
       </nav>
 

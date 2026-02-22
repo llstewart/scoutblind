@@ -79,7 +79,7 @@ export function ResultsView() {
         <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl shadow-sm overflow-x-auto">
           <button
             onClick={() => setActiveTab('general')}
-            className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${activeTab === 'general'
+            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-md transition-all whitespace-nowrap ${activeTab === 'general'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
@@ -89,7 +89,7 @@ export function ResultsView() {
           </button>
           <button
             onClick={() => setActiveTab('upgraded')}
-            className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
+            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
@@ -118,7 +118,7 @@ export function ResultsView() {
           </button>
           <button
             onClick={() => setActiveTab('market')}
-            className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
+            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
@@ -136,7 +136,7 @@ export function ResultsView() {
           {!isViewingSavedSearch && (
             <button
               onClick={handleNewSearch}
-              className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
+              className="px-3 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -158,7 +158,7 @@ export function ResultsView() {
               }
             }}
             disabled={activeTab === 'market' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
-            className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-3 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -172,7 +172,7 @@ export function ResultsView() {
               <button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing}
-                className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
+                className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -187,7 +187,7 @@ export function ResultsView() {
             ) : isPreviewMode ? null : previewExhausted ? (
               <button
                 onClick={() => setShowBillingModal(true)}
-                className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2"
+                className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -205,7 +205,7 @@ export function ResultsView() {
                       triggerFreePreview(selected, searchParams.niche, searchParams.location);
                     }}
                     disabled={isPreviewEnriching}
-                    className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
+                    className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -226,7 +226,7 @@ export function ResultsView() {
                 )}
                 <button
                   onClick={() => setShowBillingModal(true)}
-                  className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
+                  className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
                 >
                   <span className="hidden sm:inline">Upgrade</span>
                   <span className="sm:hidden">Upgrade</span>
@@ -257,7 +257,7 @@ export function ResultsView() {
             </button>
             <button
               onClick={handleAnalyze}
-              className="text-xs font-medium text-amber-400 hover:text-amber-300 px-3 py-1 rounded hover:bg-amber-500/10"
+              className="text-xs font-semibold text-amber-400 hover:text-amber-300 px-3 py-1 rounded hover:bg-amber-500/10"
             >
               Continue Analysis
             </button>
@@ -332,7 +332,7 @@ export function ResultsView() {
               </p>
               <button
                 onClick={handleNewSearch}
-                className="px-4 py-2 text-xs font-medium text-violet-400 hover:text-violet-300 transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors"
               >
                 Start New Search
               </button>

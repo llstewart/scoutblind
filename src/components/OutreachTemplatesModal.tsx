@@ -130,7 +130,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
             <button
               key={t.id}
               onClick={() => handleTabChange(i)}
-              className={`px-3 py-2 text-xs font-medium rounded-t-lg border border-b-0 transition-colors ${
+              className={`px-3 py-2 text-xs font-semibold rounded-t-lg border border-b-0 transition-colors ${
                 i === activeIndex
                   ? 'bg-white text-gray-900 border-gray-200'
                   : 'bg-gray-50 text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-100'
@@ -228,7 +228,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
           </div>
           <button
             onClick={copyAll}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors"
           >
             {copiedField === 'all' ? (
               <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Copied to clipboard</>
