@@ -1,9 +1,11 @@
 'use client';
 
 import { ReactNode, Suspense } from 'react';
+import { LucideIcon } from 'lucide-react';
 import { useAppNavigation, AppTab } from '@/hooks/useAppNavigation';
 import { BottomNav } from './BottomNav';
 import { Sidebar } from './Sidebar';
+import { BrandedSpinner } from '@/components/ui/BrandedSpinner';
 
 interface SavedSearch {
   id: string;
@@ -67,7 +69,7 @@ export function AppShell({
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-64">
-                <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+                <BrandedSpinner size="md" />
               </div>
             }
           >
@@ -109,16 +111,30 @@ export function TabHeader({
   title,
   subtitle,
   actions,
+  icon: Icon,
+  badge,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  icon?: LucideIcon;
+  badge?: ReactNode;
 }) {
   return (
     <div className="flex items-start justify-between mb-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{title}</h1>
-        {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+      <div className="flex items-center gap-3">
+        {Icon && (
+          <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+            <Icon size={20} className="text-violet-500" />
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{title}</h1>
+            {badge}
+          </div>
+          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        </div>
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>

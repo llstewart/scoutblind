@@ -18,7 +18,7 @@ const statusStyles: Record<StatusType, string> = {
 export function StatusTag({ status, children, className = '' }: StatusTagProps) {
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${statusStyles[status]} ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]} ${className}`}
     >
       {children}
     </span>

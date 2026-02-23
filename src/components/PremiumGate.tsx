@@ -1,5 +1,6 @@
 'use client';
 
+import { Lock, Check, Sparkles } from 'lucide-react';
 import { StatusTag } from './StatusTag';
 
 interface PremiumGateProps {
@@ -78,7 +79,7 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
   return (
     <div className="relative min-h-[600px]">
       {/* Preview table - blurred */}
-      <div className="overflow-hidden rounded-lg">
+      <div className="overflow-hidden rounded-xl">
         <div className="overflow-x-auto blur-[3px] pointer-events-none select-none opacity-60">
           <table className="w-full border-collapse text-left">
             <thead>
@@ -139,9 +140,7 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
               {/* Lock icon */}
               <div className="flex justify-center mb-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-500/10">
-                  <svg className="w-8 h-8 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+                  <Lock size={32} className="text-violet-400" />
                 </div>
               </div>
 
@@ -172,54 +171,21 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
 
               {/* Feature list - 2 columns */}
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-8">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
+                {[
+                  'Search visibility check',
+                  'Review response analysis',
+                  'Owner activity tracking',
+                  'Website & SEO analysis',
+                  'Opportunity scoring',
+                  'Actionable lead signals',
+                ].map((feature) => (
+                  <div key={feature} className="flex items-center gap-2.5">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <Check size={12} className="text-emerald-400" strokeWidth={3} />
+                    </div>
+                    <span className="text-sm text-gray-700">{feature}</span>
                   </div>
-                  <span className="text-sm text-gray-700">Search visibility check</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm text-gray-700">Review response analysis</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm text-gray-700">Owner activity tracking</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm text-gray-700">Website & SEO analysis</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm text-gray-700">Opportunity scoring</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm text-gray-700">Actionable lead signals</span>
-                </div>
+                ))}
               </div>
 
               {/* CTA Button */}
@@ -227,9 +193,7 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
                 onClick={onUpgradeClick}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
+                <Sparkles size={20} />
                 View Subscription Plans
               </button>
 

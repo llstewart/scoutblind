@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useMemo, ReactNode } from 'react';
-import { TabContent } from './AppShell';
+import { ArrowLeft, Search, Trash2, ChevronRight, Check, BarChart3, BookOpen } from 'lucide-react';
+import { TabContent, TabHeader } from './AppShell';
+import { Badge } from '@/components/ui/Badge';
+import { BrandedSpinner } from '@/components/ui/BrandedSpinner';
 import ScoreRing from '@/components/ui/ScoreRing';
 
 interface SavedSearch {
@@ -108,9 +111,7 @@ export function LibraryTab({
                 onClick={onBackToList}
                 className="p-1.5 -ml-1.5 text-gray-500 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <ArrowLeft size={20} />
               </button>
 
               {/* Search info */}
@@ -124,12 +125,7 @@ export function LibraryTab({
               </div>
 
               {/* GBP Signal badge */}
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-violet-500/10 rounded-md">
-                <svg className="w-3.5 h-3.5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <span className="text-[10px] font-medium text-violet-400 uppercase tracking-wide">GBP Signals</span>
-              </div>
+              <Badge variant="brand" size="sm">GBP Signals</Badge>
             </div>
           </div>
         </div>
@@ -139,8 +135,8 @@ export function LibraryTab({
           {isLoadingResults ? (
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
-                <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-gray-500">Loading GBP analysis data...</p>
+                <BrandedSpinner size="md" />
+                <p className="text-sm text-gray-500 mt-3">Loading GBP analysis data...</p>
               </div>
             </div>
           ) : (
@@ -157,12 +153,9 @@ export function LibraryTab({
   if (isLoading) {
     return (
       <TabContent>
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
-          <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
-        </div>
+        <TabHeader icon={BookOpen} title="Library" subtitle="Your GBP prospect research" />
         <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+          <BrandedSpinner size="md" />
         </div>
       </TabContent>
     );
@@ -172,10 +165,7 @@ export function LibraryTab({
   if (searches.length === 0) {
     return (
       <TabContent className="surface-library min-h-full">
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
-          <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
-        </div>
+        <TabHeader icon={BookOpen} title="Library" subtitle="Your GBP prospect research" />
         <div className="flex flex-col items-center justify-center py-16 text-center relative">
           {/* Animated gradient orb */}
           <div className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-amber-100/40 to-yellow-100/20 blur-3xl -z-10 animate-pulse" />
@@ -203,9 +193,7 @@ export function LibraryTab({
             href="/dashboard"
             className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search size={16} />
             Start a search
           </a>
         </div>
@@ -216,15 +204,12 @@ export function LibraryTab({
   return (
     <TabContent className="surface-library min-h-full">
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {searches.length} {searches.length === 1 ? 'market' : 'markets'} researched
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {onDeleteSearch && (
+      <TabHeader
+        icon={BookOpen}
+        title="Library"
+        subtitle={`${searches.length} ${searches.length === 1 ? 'market' : 'markets'} researched`}
+        actions={
+          onDeleteSearch ? (
             <button
               onClick={() => {
                 if (isEditing) {
@@ -232,7 +217,7 @@ export function LibraryTab({
                 }
                 setIsEditing(!isEditing);
               }}
-              className={`px-2.5 py-1 text-[10px] font-semibold rounded transition-colors ${
+              className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-colors ${
                 isEditing
                   ? 'bg-violet-500/10 text-violet-400'
                   : 'text-gray-500 hover:text-gray-900'
@@ -240,9 +225,9 @@ export function LibraryTab({
             >
               {isEditing ? 'Done' : 'Edit'}
             </button>
-          )}
-        </div>
-      </div>
+          ) : undefined
+        }
+      />
 
       {/* Bulk actions bar */}
       {isEditing && (
@@ -268,9 +253,7 @@ export function LibraryTab({
             disabled={selectedIds.size === 0}
             className="px-2.5 py-1 text-[11px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Trash2 size={12} />
             Delete
           </button>
           {onClearAll && searches.length > 1 && (
@@ -287,14 +270,10 @@ export function LibraryTab({
       {/* Search filter */}
       <div className="mb-4">
         <div className="relative">
-          <svg
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search
+            size={14}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+          />
           <input
             type="text"
             value={searchFilter}
@@ -316,7 +295,7 @@ export function LibraryTab({
       <div className="space-y-4">
         {Object.entries(groupedSearches).map(([period, periodSearches]) => (
           <div key={period}>
-            <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1.5 px-1">
+            <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5 px-1">
               {period}
             </h3>
             <div className="space-y-1">
@@ -360,20 +339,20 @@ export function LibraryTab({
                         <p className="text-sm font-medium text-gray-800 truncate">
                           {search.niche}
                         </p>
-                        <p className="text-[10px] text-gray-500 truncate">
+                        <p className="text-[11px] text-gray-500 truncate">
                           {search.location}
                         </p>
                       </div>
 
                       {/* Stats */}
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-[10px] text-gray-500">
+                        <span className="text-[11px] text-gray-500">
                           {search.totalCount} found
                         </span>
                         {search.analyzedCount > 0 && (
                           <>
-                            <span className="text-[10px] text-gray-300">·</span>
-                            <span className="text-[10px] text-violet-400 font-medium">
+                            <span className="text-[11px] text-gray-300">·</span>
+                            <span className="text-[11px] text-violet-400 font-medium">
                               {search.analyzedCount} analyzed
                             </span>
                           </>
@@ -381,14 +360,7 @@ export function LibraryTab({
 
                         {/* Chevron */}
                         {!isEditing && (
-                          <svg
-                            className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          <ChevronRight size={16} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
                         )}
                       </div>
                     </div>
@@ -403,12 +375,10 @@ export function LibraryTab({
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
-          <div className="relative bg-white rounded-2xl p-6 elevation-3 w-full max-w-sm">
+          <div className="relative bg-white rounded-xl p-6 elevation-3 w-full max-w-sm">
             <div className="flex justify-center mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10">
-                <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <Trash2 size={24} className="text-red-400" />
               </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
@@ -426,7 +396,7 @@ export function LibraryTab({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -442,7 +412,7 @@ export function LibraryTab({
                   setShowDeleteConfirm(null);
                   setIsEditing(false);
                 }}
-                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-500 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors"
               >
                 Delete
               </button>

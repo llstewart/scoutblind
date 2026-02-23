@@ -10,6 +10,8 @@ import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/t
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
+import { Search, Plus, Download, Sparkles, Zap, Lock, AlertTriangle, Check, Info, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
 
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
 
@@ -51,18 +53,16 @@ export function ResultsView() {
   const [reportBusiness, setReportBusiness] = useState<EnrichedBusiness | null>(null);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl gap-4 elevation-1">
+    <div className="flex flex-col h-full bg-white rounded-xl gap-4 elevation-1">
       {/* Search Context Header */}
       {searchParams && !isViewingSavedSearch && (
         <div className="flex items-center gap-2 text-sm text-gray-500 px-4 pt-4">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search size={16} />
           <span>
             Results for <span className="text-gray-900 font-medium">{searchParams.niche}</span> in <span className="text-gray-900 font-medium">{searchParams.location}</span>
           </span>
           {isCached && (
-            <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">Cached</span>
+            <Badge variant="neutral">Cached</Badge>
           )}
         </div>
       )}
@@ -96,7 +96,7 @@ export function ResultsView() {
         <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl shadow-sm overflow-x-auto">
           <button
             onClick={() => setActiveTab('general')}
-            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-md transition-all whitespace-nowrap ${activeTab === 'general'
+            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap ${activeTab === 'general'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
@@ -106,28 +106,20 @@ export function ResultsView() {
           </button>
           <button
             onClick={() => setActiveTab('upgraded')}
-            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
+            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
           >
             <span>Lead Intel</span>
             {isPremium ? (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400">
-                PRO
-              </span>
+              <Badge variant="success" size="sm">PRO</Badge>
             ) : isPreviewMode ? (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-500">
-                PREVIEW
-              </span>
+              <Badge variant="warning" size="sm">PREVIEW</Badge>
             ) : previewExhausted ? (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-gray-500/20 text-gray-400">
-                USED
-              </span>
+              <Badge variant="neutral" size="sm">USED</Badge>
             ) : (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-violet-500/20 text-violet-400">
-                UPGRADE
-              </span>
+              <Badge variant="brand" size="sm">UPGRADE</Badge>
             )}
             {tableBusinesses.length > 0 && (
               <span className="text-gray-400">({tableBusinesses.length})</span>
@@ -135,15 +127,13 @@ export function ResultsView() {
           </button>
           <button
             onClick={() => setActiveTab('market')}
-            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-md transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
+            className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
           >
             <span>Market</span>
-            <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400">
-              NEW
-            </span>
+            <Badge variant="success" size="sm">NEW</Badge>
           </button>
         </div>
 
@@ -155,9 +145,7 @@ export function ResultsView() {
               onClick={handleNewSearch}
               className="px-3 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search size={16} />
               <span className="hidden sm:inline">New Search</span>
             </button>
           )}
@@ -177,9 +165,7 @@ export function ResultsView() {
             disabled={activeTab === 'market' || (activeTab === 'upgraded' && tableBusinesses.length > 0 && tableBusinesses.every(b => isPendingBusiness(b)))}
             className="px-3 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all flex items-center gap-2 disabled:opacity-50"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+            <Download size={16} />
             <span className="hidden sm:inline">Export</span>
           </button>
 
@@ -191,9 +177,7 @@ export function ResultsView() {
                 disabled={isAnalyzing}
                 className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+                <Sparkles size={16} />
                 <span className="hidden sm:inline">
                   {selectedBusinesses.size > 0
                     ? `Get Intel on ${selectedBusinesses.size}`
@@ -206,9 +190,7 @@ export function ResultsView() {
                 onClick={() => setShowBillingModal(true)}
                 className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+                <Lock size={16} />
                 <span className="hidden sm:inline">Free intel used &mdash; Upgrade</span>
                 <span className="sm:hidden">Upgrade</span>
               </button>
@@ -224,9 +206,7 @@ export function ResultsView() {
                     disabled={isPreviewEnriching}
                     className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
+                    <Sparkles size={16} />
                     <span className="hidden sm:inline">
                       {isPreviewEnriching ? 'Analyzing...' : `Get Free Intel (${selectedBusinesses.size}/3)`}
                     </span>
@@ -258,9 +238,7 @@ export function ResultsView() {
       {wasAnalysisInterrupted && !isAnalyzing && tableBusinesses.length > 0 && (
         <div className="p-3 rounded-lg bg-amber-500/10 flex items-center justify-between mx-4">
           <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+            <AlertTriangle size={20} className="text-amber-400" />
             <span className="text-sm text-amber-400">
               Analysis was interrupted. {tableBusinesses.filter(b => !isPendingBusiness(b)).length} of {businesses.length} businesses analyzed.
             </span>
@@ -339,9 +317,7 @@ export function ResultsView() {
             // Viewing saved search - no general list available
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
+                <Info size={24} className="text-gray-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-700 mb-1">Viewing Saved Search</h3>
               <p className="text-xs text-gray-500 max-w-xs mb-4">
@@ -370,9 +346,7 @@ export function ResultsView() {
               {/* Conversion Banner */}
               <div className="px-4 py-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-violet-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+                  <Zap size={20} className="text-violet-500" />
                   <span className="text-sm text-gray-700">
                     You&apos;re seeing <strong className="text-violet-600">3 of {businesses.length}</strong> enriched results.{' '}
                     <button onClick={handleUpgradeClick} className="text-violet-600 font-semibold hover:underline">
@@ -383,10 +357,7 @@ export function ResultsView() {
               </div>
               {isPreviewEnriching && (
                 <div className="px-4 py-2 bg-violet-50 border-b border-violet-100 flex items-center gap-2 text-xs text-violet-600">
-                  <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
+                  <Loader2 size={12} className="animate-spin" />
                   Enriching preview results...
                 </div>
               )}

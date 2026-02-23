@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { Download, X } from 'lucide-react';
 import { EnrichedBusiness } from '@/lib/types';
 import { generatePitchReportData } from '@/lib/pitch-report';
 import { SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
@@ -93,18 +94,14 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
                 onClick={handlePrint}
                 className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+                <Download size={14} />
                 Save as PDF
               </button>
               <button
                 onClick={onClose}
                 className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X size={20} className="text-gray-400" />
               </button>
             </div>
           </div>
@@ -114,13 +111,13 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
             <div className="p-8 space-y-8">
               {/* Header Section */}
               <section className="text-center pb-6 border-b border-gray-100">
-                <p className="text-[10px] font-medium text-gray-400 uppercase tracking-[0.2em] mb-3">Digital Presence Audit</p>
+                <p className="text-[11px] font-medium text-gray-400 uppercase tracking-[0.2em] mb-3">Digital Presence Audit</p>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{report.businessName}</h1>
                 <p className="text-sm text-gray-500">{report.address}</p>
                 {report.category && (
                   <p className="text-xs text-gray-400 mt-1">{report.category}</p>
                 )}
-                <p className="text-[10px] text-gray-400 mt-3">
+                <p className="text-[11px] text-gray-400 mt-3">
                   Prepared {report.generatedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               </section>
@@ -179,7 +176,7 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
                   <div className="space-y-2.5 mt-3">
                     {report.keyFindings.map((finding, i) => (
                       <div key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-[10px] font-bold mt-0.5">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-[11px] font-bold mt-0.5">
                           {i + 1}
                         </span>
                         <span className="leading-relaxed">{finding}</span>
@@ -200,7 +197,7 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
                         return (
                           <span
                             key={`${g.category}-${i}`}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md ${colors.bg} border ${colors.border}`}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg ${colors.bg} border ${colors.border}`}
                           >
                             <span className={`font-semibold ${colors.text}`}>{SIGNAL_CATEGORY_LABELS[g.category]}</span>
                             <span className={colors.text}>{signal}</span>
@@ -251,7 +248,7 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
 
               {/* Footer */}
               <section className="pt-6 border-t border-gray-100 text-center space-y-2">
-                <p className="text-[10px] text-gray-400 uppercase tracking-wider">
+                <p className="text-[11px] text-gray-400 uppercase tracking-wider">
                   Digital Presence Audit &mdash; {report.generatedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
                 <p className="text-xs text-gray-500 max-w-lg mx-auto leading-relaxed">
@@ -275,9 +272,9 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 function QuickStat({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
     <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-100">
-      <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="text-lg font-bold text-gray-900">{value}</div>
-      <div className="text-[10px] text-gray-500 mt-0.5">{sub}</div>
+      <div className="text-[11px] text-gray-500 mt-0.5">{sub}</div>
     </div>
   );
 }
@@ -299,7 +296,7 @@ function MetricCard({ label, value, status }: { label: string; value: string; st
     <div className={`p-3 rounded-lg border ${statusStyles[status]}`}>
       <div className="flex items-center gap-1.5 mb-1">
         <span className={`w-1.5 h-1.5 rounded-full ${dotStyles[status]}`} />
-        <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">{label}</span>
+        <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">{label}</span>
       </div>
       <div className="text-sm font-semibold text-gray-900">{value}</div>
     </div>

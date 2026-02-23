@@ -109,7 +109,7 @@ function AnalyzeVisual() {
         <div className="space-y-1.5">
           {signals.map((s) => (
             <div key={s.label} className="flex items-center gap-2">
-              <span className="text-[10px] text-gray-500 w-8 font-medium">{s.label}</span>
+              <span className="text-[11px] text-gray-500 w-8 font-medium">{s.label}</span>
               <div className="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden">
                 <div
                   className={`h-full rounded-full ${s.fill} transition-all`}

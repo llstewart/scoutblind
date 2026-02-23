@@ -1,5 +1,7 @@
 'use client';
 
+import { BrandedSpinner } from '@/components/ui/BrandedSpinner';
+
 interface LoadingStateProps {
   message?: string;
   progress?: number;
@@ -8,9 +10,7 @@ interface LoadingStateProps {
 export function LoadingState({ message = 'Loading...', progress }: LoadingStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12">
-      <div className="relative">
-        <div className="w-12 h-12 border-4 border-muted rounded-full animate-spin border-t-primary" />
-      </div>
+      <BrandedSpinner size="lg" />
       <p className="mt-4 text-sm text-muted-foreground">{message}</p>
       {progress !== undefined && (
         <div className="w-64 mt-4">
@@ -28,15 +28,5 @@ export function LoadingState({ message = 'Loading...', progress }: LoadingStateP
 }
 
 export function LoadingSpinner({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg', className?: string }) {
-  const sizeClasses = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-8 h-8 border-3',
-    lg: 'w-12 h-12 border-4',
-  };
-
-  return (
-    <div
-      className={`${sizeClasses[size]} border-white/20 rounded-full animate-spin border-t-current ${className}`}
-    />
-  );
+  return <BrandedSpinner size={size} className={className} />;
 }

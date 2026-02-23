@@ -4,7 +4,7 @@ export default function DashboardLoading() {
       {/* Sidebar skeleton (desktop) */}
       <div className="hidden md:flex flex-col w-60 h-screen bg-gray-950 border-r border-gray-800">
         <div className="p-4 border-b border-gray-800">
-          <div className="h-6 w-28 bg-gray-800 rounded animate-pulse" />
+          <div className="h-6 w-28 bg-gray-800 rounded-lg animate-pulse" />
         </div>
         <div className="flex-1 p-2 space-y-1">
           {[...Array(4)].map((_, i) => (
@@ -18,13 +18,13 @@ export default function DashboardLoading() {
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto text-center px-4 space-y-6">
             {/* Title skeleton */}
-            <div className="h-7 w-48 bg-gray-100 rounded mx-auto animate-pulse" />
-            <div className="h-4 w-72 bg-gray-50 rounded mx-auto animate-pulse" />
+            <div className="h-7 w-48 bg-gray-100 rounded-lg mx-auto animate-pulse" />
+            <div className="h-4 w-72 bg-gray-50 rounded-lg mx-auto animate-pulse" />
 
             {/* Search form skeleton */}
             <div className="space-y-3 mt-8">
-              <div className="h-12 bg-white border border-gray-200 rounded-xl animate-pulse" />
-              <div className="h-12 bg-white border border-gray-200 rounded-xl animate-pulse" />
+              <div className="h-12 bg-white rounded-xl elevation-1 animate-pulse" />
+              <div className="h-12 bg-white rounded-xl elevation-1 animate-pulse" />
               <div className="h-12 w-32 bg-violet-100 rounded-xl mx-auto animate-pulse" />
             </div>
           </div>

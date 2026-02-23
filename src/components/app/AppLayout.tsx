@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { X } from 'lucide-react';
 import { useAppContext } from '@/contexts/AppContext';
 import { AppShell } from './AppShell';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -123,9 +124,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setToastMessage(null)}
                 className="text-gray-400 hover:text-gray-600 ml-2"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X size={16} />
               </button>
             )}
           </div>

@@ -56,7 +56,8 @@
       "WebFetch(domain:www.salesforge.ai)",
       "WebFetch(domain:www.leadsforge.ai)",
       "WebFetch(domain:millo.co)",
-      "WebFetch(domain:appsumo.com)"
+      "WebFetch(domain:appsumo.com)",
+      "Bash(cd:*)"
     ]
   }
 }

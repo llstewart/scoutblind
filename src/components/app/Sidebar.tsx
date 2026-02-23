@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Search, BookOpen, LayoutList, UserCircle, ChevronsLeft, ChevronsRight, Coins } from 'lucide-react';
 import { AppTab } from '@/hooks/useAppNavigation';
 import { useAppContext } from '@/contexts/AppContext';
 
@@ -63,14 +64,11 @@ export function Sidebar({
           className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded-lg transition-colors"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <svg
-            className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-          </svg>
+          {isCollapsed ? (
+            <ChevronsRight size={16} className="transition-transform" />
+          ) : (
+            <ChevronsLeft size={16} className="transition-transform" />
+          )}
         </button>
       </div>
 
@@ -78,7 +76,7 @@ export function Sidebar({
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {/* Section label */}
         {!isCollapsed && (
-          <p className="text-[10px] uppercase tracking-wider text-gray-600 px-3 mb-1 mt-1">Navigate</p>
+          <p className="text-[11px] uppercase tracking-wider text-gray-600 px-3 mb-1 mt-1">Navigate</p>
         )}
 
         {/* Search Tab */}
@@ -93,9 +91,7 @@ export function Sidebar({
           {activeTab === 'search' && (
             <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
           )}
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search size={20} className="flex-shrink-0" />
           {!isCollapsed && <span className="font-semibold">Search</span>}
         </button>
 
@@ -112,14 +108,12 @@ export function Sidebar({
             {activeTab === 'library' && (
               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
             )}
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
+            <BookOpen size={20} className="flex-shrink-0" />
             {!isCollapsed && (
               <>
                 <span className="font-semibold flex-1 text-left">Library</span>
                 {recentSearches.length > 0 && (
-                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
+                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[11px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
                     {recentSearches.length}
                   </span>
                 )}
@@ -134,7 +128,7 @@ export function Sidebar({
                 <button
                   key={search.id}
                   onClick={() => onSearchSelect?.(search.id)}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-300 rounded transition-colors truncate"
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-300 rounded-lg transition-colors truncate"
                 >
                   <span
                     className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
@@ -171,14 +165,12 @@ export function Sidebar({
             {activeTab === 'pipeline' && (
               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
             )}
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
+            <LayoutList size={20} className="flex-shrink-0" />
             {!isCollapsed && (
               <>
                 <span className="font-semibold flex-1 text-left">Pipeline</span>
                 {pipelineCount != null && pipelineCount > 0 && (
-                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
+                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[11px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
                     {pipelineCount}
                   </span>
                 )}
@@ -191,7 +183,7 @@ export function Sidebar({
         <div className="my-3 border-t border-gray-800" />
 
         {!isCollapsed && (
-          <p className="text-[10px] uppercase tracking-wider text-gray-600 px-3 mb-1">Settings</p>
+          <p className="text-[11px] uppercase tracking-wider text-gray-600 px-3 mb-1">Settings</p>
         )}
 
         {/* Account Tab */}
@@ -206,9 +198,7 @@ export function Sidebar({
           {activeTab === 'account' && (
             <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
           )}
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+          <UserCircle size={20} className="flex-shrink-0" />
           {!isCollapsed && <span className="font-semibold">Account</span>}
         </button>
       </nav>
@@ -222,12 +212,10 @@ export function Sidebar({
             className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Coins size={16} className="text-violet-400" />
               <span className="text-sm font-medium text-gray-300">{credits}</span>
             </div>
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tierColors[tier] || tierColors.free}`}>
+            <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full ${tierColors[tier] || tierColors.free}`}>
               {tier.toUpperCase()}
             </span>
           </button>
@@ -247,9 +235,9 @@ export function Sidebar({
 
           {/* Footer links */}
           <div className="flex items-center gap-3 px-2 pt-1">
-            <Link href="/contact" className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Help</Link>
-            <Link href="/privacy" className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Terms</Link>
+            <Link href="/contact" className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors">Help</Link>
+            <Link href="/privacy" className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors">Terms</Link>
           </div>
         </div>
       )}

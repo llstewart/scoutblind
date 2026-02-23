@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { X, Clock, MapPin, Trash2 } from 'lucide-react';
 import { isEnrichedBusiness } from '@/lib/types';
 
 interface SavedSearch {
@@ -140,9 +141,7 @@ export function SavedAnalysesPanel({
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X size={20} className="text-gray-500" />
             </button>
           </div>
         </div>
@@ -165,9 +164,7 @@ export function SavedAnalysesPanel({
             // Empty state
             <div className="flex flex-col items-center justify-center h-full text-center px-6">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <Clock size={32} className="text-gray-400" />
               </div>
               <h3 className="text-gray-700 font-medium mb-1">No saved analyses</h3>
               <p className="text-gray-500 text-sm">
@@ -198,15 +195,13 @@ export function SavedAnalysesPanel({
                         <div className="flex items-center gap-2">
                           <span className="text-gray-900 font-medium truncate">{search.niche}</span>
                           {isActive && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-500/20 text-violet-400 rounded">
+                            <span className="px-1.5 py-0.5 text-[11px] font-medium bg-violet-500/20 text-violet-400 rounded">
                               Current
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-1.5 mt-1 text-sm text-gray-500">
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
+                          <MapPin size={14} />
                           <span className="truncate">{search.location}</span>
                         </div>
                       </div>
@@ -250,9 +245,7 @@ export function SavedAnalysesPanel({
                 onClick={() => setShowClearConfirm(true)}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <Trash2 size={16} />
                 Clear History
               </button>
             )}

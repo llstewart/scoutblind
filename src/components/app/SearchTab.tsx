@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { Search, ChevronRight } from 'lucide-react';
 import { TabContent } from './AppShell';
 
 interface RecentSearch {
@@ -61,22 +62,20 @@ export function SearchTab({
               onClick={onLookupClick}
               className="text-xs text-gray-500 hover:text-violet-400 transition-colors flex items-center gap-1.5 mx-auto mb-8"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search size={14} />
               Or look up a specific business
             </button>
           )}
 
           {/* Credit info */}
-          <p className="text-[10px] text-gray-400 mb-8">
+          <p className="text-[11px] text-gray-400 mb-8">
             1 credit per search · 1 credit per GBP analysis · <span className="text-violet-400">{credits} credits remaining</span>
           </p>
 
           {/* Recent Searches */}
           {recentSearches.length > 0 && !isSearching && (
             <div className="border-t border-gray-200 pt-6">
-              <h2 className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-3">Recent</h2>
+              <h2 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-3">Recent</h2>
               <div className="space-y-1.5">
                 {recentSearches.slice(0, 3).map((search) => (
                   <button
@@ -94,23 +93,16 @@ export function SearchTab({
                         <p className="text-sm font-medium text-gray-700 truncate">
                           {search.niche}
                         </p>
-                        <p className="text-[10px] text-gray-400 truncate">
+                        <p className="text-[11px] text-gray-400 truncate">
                           {search.location}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[10px] text-gray-400">
+                      <span className="text-[11px] text-gray-400">
                         {search.analyzedCount > 0 ? `${search.analyzedCount} analyzed` : `${search.totalCount} found`}
                       </span>
-                      <svg
-                        className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 transition-colors"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                      <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
                     </div>
                   </button>
                 ))}
@@ -121,19 +113,19 @@ export function SearchTab({
           {/* Empty state for new users */}
           {recentSearches.length === 0 && !isSearching && (
             <div className="border-t border-gray-200 pt-6">
-              <div className="flex items-center justify-center gap-6 text-[10px] text-gray-400">
+              <div className="flex items-center justify-center gap-6 text-[11px] text-gray-400">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[10px] font-medium">1</div>
+                  <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[11px] font-medium">1</div>
                   <span>Search niche</span>
                 </div>
                 <div className="w-6 h-px bg-gray-200" />
                 <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[10px] font-medium">2</div>
+                  <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[11px] font-medium">2</div>
                   <span>Scan GBP profiles</span>
                 </div>
                 <div className="w-6 h-px bg-gray-200" />
                 <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[10px] font-medium">3</div>
+                  <div className="w-5 h-5 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 text-[11px] font-medium">3</div>
                   <span>Find weak signals</span>
                 </div>
               </div>

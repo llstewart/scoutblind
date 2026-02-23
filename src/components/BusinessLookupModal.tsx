@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Search, X, Loader2, Sparkles, Lock, Phone, Globe, Check, Download } from 'lucide-react';
 import { Business, EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
 import { calculateSeoNeedScore, getSeoNeedSummary, SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
@@ -247,14 +248,12 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-xl elevation-3 overflow-hidden">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl elevation-3 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+            <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
+              <Search size={20} className="text-violet-400" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Business Lookup</h2>
@@ -265,9 +264,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
             onClick={handleClose}
             className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={20} />
           </button>
         </div>
 
@@ -327,17 +324,12 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               >
                 {state === 'searching' ? (
                   <>
-                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
+                    <Loader2 size={16} className="animate-spin" />
                     Searching...
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <Search size={16} />
                     Find Business
                   </>
                 )}
@@ -407,17 +399,12 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   >
                     {state === 'analyzing' ? (
                       <>
-                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
+                        <Loader2 size={16} className="animate-spin" />
                         Analyzing...
                       </>
                     ) : (
                       <>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
+                        <Sparkles size={16} />
                         Get Lead Intel
                       </>
                     )}
@@ -427,9 +414,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                     onClick={onUpgradeClick}
                     className="flex-1 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+                    <Lock size={16} />
                     Unlock Lead Intel
                   </button>
                 )}
@@ -449,7 +434,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   </div>
                   <div className={`px-3 py-2 rounded-lg border text-center ${getScoreColor(seoScore)}`}>
                     <div className="text-2xl font-bold">{seoScore}</div>
-                    <div className="text-[10px] uppercase tracking-wider opacity-80">{getScoreLabel(seoScore)}</div>
+                    <div className="text-[11px] uppercase tracking-wider opacity-80">{getScoreLabel(seoScore)}</div>
                   </div>
                 </div>
 
@@ -462,14 +447,14 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                         const colors = SIGNAL_CATEGORY_COLORS[group.category];
                         return (
                           <div key={group.category}>
-                            <span className={`inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded mb-1 ${colors.bg} ${colors.text}`}>
+                            <span className={`inline-block px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-lg mb-1 ${colors.bg} ${colors.text}`}>
                               {SIGNAL_CATEGORY_LABELS[group.category]}
                             </span>
                             <div className="flex flex-wrap gap-1 ml-1">
                               {group.signals.map((signal, i) => (
                                 <span
                                   key={i}
-                                  className={`px-2 py-1 text-xs rounded ${colors.bg} ${colors.text}`}
+                                  className={`px-2 py-1 text-xs rounded-lg ${colors.bg} ${colors.text}`}
                                 >
                                   {signal}
                                 </span>
@@ -530,9 +515,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                           href={`tel:${enrichedBusiness.phone}`}
                           className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
                         >
-                          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                          </svg>
+                          <Phone size={16} className="text-gray-400" />
                           {enrichedBusiness.phone}
                         </a>
                       )}
@@ -543,9 +526,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                          </svg>
+                          <Globe size={16} />
                           {enrichedBusiness.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                         </a>
                       )}
@@ -573,24 +554,17 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                   >
                     {isSaved ? (
                       <>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check size={16} />
                         Saved
                       </>
                     ) : isSaving ? (
                       <>
-                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
+                        <Loader2 size={16} className="animate-spin" />
                         Saving...
                       </>
                     ) : (
                       <>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
+                        <Download size={16} />
                         Save to History
                       </>
                     )}

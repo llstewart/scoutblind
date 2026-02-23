@@ -1,5 +1,6 @@
 'use client';
 
+import { Search, BookOpen, LayoutList, UserCircle } from 'lucide-react';
 import { AppTab } from '@/hooks/useAppNavigation';
 
 interface BottomNavProps {
@@ -16,38 +17,22 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
     {
       id: 'search',
       label: 'Search',
-      icon: (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
+      icon: <Search size={24} />,
     },
     {
       id: 'library',
       label: 'Library',
-      icon: (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
-      ),
+      icon: <BookOpen size={24} />,
     },
     ...(isPremium ? [{
       id: 'pipeline' as AppTab,
       label: 'Pipeline',
-      icon: (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      ),
+      icon: <LayoutList size={24} />,
     }] : []),
     {
       id: 'account',
       label: 'Account',
-      icon: (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
+      icon: <UserCircle size={24} />,
     },
   ];
 
@@ -80,14 +65,14 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
 
                 {/* Badge for library count */}
                 {tab.id === 'library' && libraryCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold bg-violet-500 text-white rounded-full">
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 flex items-center justify-center text-[11px] font-bold bg-violet-500 text-white rounded-full">
                     {libraryCount > 99 ? '99+' : libraryCount}
                   </span>
                 )}
               </div>
 
               {/* Label */}
-              <span className={`text-[10px] font-semibold mt-1 ${isActive ? 'text-violet-600' : 'text-gray-400'}`}>
+              <span className={`text-[11px] font-semibold mt-1 ${isActive ? 'text-violet-600' : 'text-gray-400'}`}>
                 {tab.label}
               </span>
             </button>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { X, Check, Copy, Pencil, Star } from 'lucide-react';
 import { EnrichedBusiness } from '@/lib/types';
 import { generateOutreachTemplates, OutreachTemplate } from '@/lib/outreach-templates';
 import { calculateSeoNeedScore, getSeoNeedSummary, SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
@@ -64,12 +65,10 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
         <div className="relative w-full max-w-md bg-white rounded-xl elevation-3 mx-4 p-8 text-center">
           <button onClick={onClose} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            <X size={20} />
           </button>
           <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <Check size={28} className="text-emerald-500" />
           </div>
           <h3 className="text-base font-semibold text-gray-900 mb-2">Strong Online Presence</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
@@ -95,7 +94,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
               </p>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <X size={20} />
             </button>
           </div>
 
@@ -103,7 +102,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
           <div className="mt-3 flex items-center gap-4 text-xs">
             <div className="flex items-center gap-3 text-gray-500">
               <span className="flex items-center gap-1">
-                <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <Star size={12} className="text-amber-400" fill="currentColor" />
                 {business.rating}
               </span>
               <span>{business.reviewCount} reviews</span>
@@ -116,7 +115,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
             </div>
             <div className="flex items-center gap-1 ml-auto">
               {signals.groups.slice(0, 3).flatMap(g => g.signals.slice(0, 1).map((s, i) => (
-                <span key={`${g.category}-${i}`} className={`px-1.5 py-0.5 text-[10px] rounded ${SIGNAL_CATEGORY_COLORS[g.category].bg} ${SIGNAL_CATEGORY_COLORS[g.category].text}`}>
+                <span key={`${g.category}-${i}`} className={`px-1.5 py-0.5 text-[11px] rounded ${SIGNAL_CATEGORY_COLORS[g.category].bg} ${SIGNAL_CATEGORY_COLORS[g.category].text}`}>
                   {SIGNAL_CATEGORY_LABELS[g.category]}: {s}
                 </span>
               )))}
@@ -137,7 +136,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
               }`}
             >
               <div>{t.title}</div>
-              <div className={`text-[10px] mt-0.5 ${i === activeIndex ? 'text-violet-600' : 'text-gray-400'}`}>{t.trigger}</div>
+              <div className={`text-[11px] mt-0.5 ${i === activeIndex ? 'text-violet-600' : 'text-gray-400'}`}>{t.trigger}</div>
             </button>
           ))}
         </div>
@@ -149,15 +148,15 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
               {/* Subject line */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Subject Line</span>
+                  <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Subject Line</span>
                   <button
                     onClick={() => copyToClipboard(currentSubject, 'subject')}
-                    className="text-[10px] font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 transition-colors"
+                    className="text-[11px] font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 transition-colors"
                   >
                     {copiedField === 'subject' ? (
-                      <><svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Copied</>
+                      <><Check size={12} className="text-emerald-500" />Copied</>
                     ) : (
-                      <><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copy subject</>
+                      <><Copy size={12} />Copy subject</>
                     )}
                   </button>
                 </div>
@@ -178,15 +177,15 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
               {/* Email body */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Email Body</span>
+                  <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Email Body</span>
                   <button
                     onClick={() => copyToClipboard(currentBody, 'body')}
-                    className="text-[10px] font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 transition-colors"
+                    className="text-[11px] font-medium text-gray-500 hover:text-gray-800 flex items-center gap-1 transition-colors"
                   >
                     {copiedField === 'body' ? (
-                      <><svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Copied</>
+                      <><Check size={12} className="text-emerald-500" />Copied</>
                     ) : (
-                      <><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copy body</>
+                      <><Copy size={12} />Copy body</>
                     )}
                   </button>
                 </div>
@@ -221,7 +220,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
                 onClick={startEditing}
                 className="text-xs text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1.5 transition-colors"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                <Pencil size={14} />
                 Customize before copying
               </button>
             )}
@@ -231,9 +230,9 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
             className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors"
           >
             {copiedField === 'all' ? (
-              <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Copied to clipboard</>
+              <><Check size={16} />Copied to clipboard</>
             ) : (
-              <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copy full email</>
+              <><Copy size={16} />Copy full email</>
             )}
           </button>
         </div>
