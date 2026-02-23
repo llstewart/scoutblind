@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Download, X } from 'lucide-react';
+import { Download } from 'lucide-react';
+import { Modal } from './ui/Modal';
 import { EnrichedBusiness } from '@/lib/types';
 import { generatePitchReportData } from '@/lib/pitch-report';
 import { SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
@@ -48,6 +49,25 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
   const circumference = 2 * Math.PI * 40;
   const scoreOffset = circumference - (report.seoNeedScore / 100) * circumference;
 
+  const headerContent = (
+    <div className="flex items-center justify-between w-full pitch-report-actions">
+      <div className="flex items-center gap-3">
+        <h2 className="text-sm font-semibold text-gray-900">Digital Presence Audit</h2>
+        <span className="text-xs text-gray-400">|</span>
+        <span className="text-xs text-gray-500">{report.businessName}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={handlePrint}
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors"
+        >
+          <Download size={14} />
+          Save as PDF
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <>
       {/* Print-specific styles */}
@@ -55,8 +75,9 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
         @media print {
           body > *:not(.pitch-report-overlay) { display: none !important; }
           .pitch-report-overlay { position: static !important; }
-          .pitch-report-overlay > .pitch-report-backdrop { display: none !important; }
-          .pitch-report-overlay > .pitch-report-container {
+          .pitch-report-overlay > div { position: static !important; }
+          .pitch-report-overlay [class*="bg-black"] { display: none !important; }
+          .pitch-report-overlay [class*="bg-white"] {
             position: static !important;
             max-height: none !important;
             max-width: none !important;
@@ -76,38 +97,10 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
         }
       `}</style>
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center pitch-report-overlay">
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm pitch-report-backdrop" onClick={onClose} />
-
-        {/* Modal */}
-        <div className="relative w-full max-w-3xl max-h-[90vh] bg-white rounded-xl elevation-3 overflow-hidden flex flex-col mx-4 pitch-report-container">
-          {/* Action bar */}
-          <div className="px-6 py-3 border-b border-gray-200 flex items-center justify-between flex-shrink-0 pitch-report-actions bg-white">
-            <div className="flex items-center gap-3">
-              <h2 className="text-sm font-semibold text-gray-900">Digital Presence Audit</h2>
-              <span className="text-xs text-gray-400">|</span>
-              <span className="text-xs text-gray-500">{report.businessName}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrint}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors"
-              >
-                <Download size={14} />
-                Save as PDF
-              </button>
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <X size={20} className="text-gray-400" />
-              </button>
-            </div>
-          </div>
-
+      <div className="pitch-report-overlay">
+        <Modal open onClose={onClose} size="xl" customHeader={headerContent} className="pitch-report-container">
           {/* Report Content */}
-          <div className="flex-1 overflow-y-auto pitch-report-content" id="pitch-report-content">
+          <div className="pitch-report-content" id="pitch-report-content">
             <div className="p-8 space-y-8">
               {/* Header Section */}
               <section className="text-center pb-6 border-b border-gray-100">
@@ -257,7 +250,7 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
               </section>
             </div>
           </div>
-        </div>
+        </Modal>
       </div>
     </>
   );
