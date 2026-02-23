@@ -59,9 +59,8 @@ export function AccountTab({
       </div>
 
       {/* Profile Card */}
-      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6 elevation-1 overflow-hidden">
-        <div className="flex items-center gap-4 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-50/50 to-transparent -m-6 p-6 pointer-events-none" />
+      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6 elevation-1">
+        <div className="flex items-center gap-4">
           {userAvatar ? (
             <img
               src={userAvatar}

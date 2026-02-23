@@ -322,8 +322,8 @@ export function LibraryTab({
               {periodSearches.map((search) => (
                 <div
                   key={search.id}
-                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg transition-colors group border ${
-                    selectedIds.has(search.id) ? 'bg-violet-50 border-violet-200' : 'bg-gray-50 border-transparent hover:bg-gray-100 hover:border-amber-200'
+                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg transition-colors group ${
+                    selectedIds.has(search.id) ? 'bg-violet-50 border border-violet-200' : 'bg-gray-50 hover:bg-gray-100'
                   }`}
                 >
                   {/* Checkbox (edit mode) */}

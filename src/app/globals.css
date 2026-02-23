@@ -139,19 +139,10 @@ th {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Section surface tints */
-.surface-pipeline {
-  background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 50%, #f9fafb 100%);
-}
-
-.surface-library {
-  background: linear-gradient(135deg, #fefce8 0%, #fffbeb 30%, #f9fafb 100%);
-}
-
-.surface-search {
-  background: #f9fafb;
-}
-
+/* Surface tints — all neutral, differentiation via depth not color */
+.surface-pipeline,
+.surface-library,
+.surface-search,
 .surface-account {
   background: #f9fafb;
 }

@@ -570,19 +570,19 @@ export function PipelineTab() {
 
       {/* ── KPI strip ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Leads</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{allLeads.length}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Active</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{activeLeads}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Won</p>
           <p className="text-2xl font-extrabold text-emerald-600 mt-1">{statusCounts.won}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Win Rate</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{wonRate}<span className="text-base font-semibold text-gray-400">%</span></p>
         </div>
