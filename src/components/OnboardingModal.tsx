@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { X, ChevronRight } from 'lucide-react';
+import { Modal } from './ui/Modal';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -168,81 +169,70 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     setCurrentSlide(index);
   }, []);
 
-  if (!isOpen) return null;
-
   const slide = SLIDES[currentSlide];
   const Visual = VISUALS[slide.visual];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleSkip} role="presentation" />
-
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Welcome to Packleads"
-        className="relative bg-white border border-gray-200 rounded-2xl elevation-3 w-full max-w-lg m-4 overflow-hidden"
+    <Modal open={isOpen} onClose={handleSkip} size="md" hideClose>
+      {/* Close button */}
+      <button
+        onClick={handleSkip}
+        className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+        aria-label="Close onboarding"
       >
-        {/* Close button */}
-        <button
-          onClick={handleSkip}
-          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-          aria-label="Close onboarding"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <X className="w-4 h-4" />
+      </button>
 
-        {/* Content area */}
-        <div className="px-8 pt-10 pb-8">
-          {/* Visual */}
-          <div className="mb-6">
-            <Visual />
-          </div>
-
-          {/* Text */}
-          <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold tracking-tight text-gray-900">{slide.title}</h2>
-            <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">{slide.description}</p>
-          </div>
+      {/* Content area */}
+      <div className="px-2 pt-4 pb-8">
+        {/* Visual */}
+        <div className="mb-6">
+          <Visual />
         </div>
 
-        {/* Bottom controls */}
-        <div className="px-8 pb-8">
-          {/* Dot indicators */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            {SLIDES.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handleDotClick(index)}
-                className={`rounded-full transition-all duration-300 ${
-                  index === currentSlide
-                    ? 'w-6 h-2 bg-violet-500'
-                    : 'w-2 h-2 bg-gray-200 hover:bg-gray-300'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-
-          {/* Buttons */}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              onClick={handleSkip}
-              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Skip
-            </button>
-
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-violet-600/20"
-            >
-              {isLastSlide ? 'Get started' : 'Next'}
-              {!isLastSlide && <ChevronRight className="w-4 h-4" />}
-            </button>
-          </div>
+        {/* Text */}
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-semibold tracking-tight text-gray-900">{slide.title}</h2>
+          <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">{slide.description}</p>
         </div>
       </div>
-    </div>
+
+      {/* Bottom controls */}
+      <div className="px-2 pb-2">
+        {/* Dot indicators */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          {SLIDES.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handleDotClick(index)}
+              className={`rounded-full transition-all duration-300 ${
+                index === currentSlide
+                  ? 'w-6 h-2 bg-violet-500'
+                  : 'w-2 h-2 bg-gray-200 hover:bg-gray-300'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Buttons */}
+        <div className="flex items-center justify-between gap-3">
+          <button
+            onClick={handleSkip}
+            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            Skip
+          </button>
+
+          <button
+            onClick={handleNext}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-violet-600/20"
+          >
+            {isLastSlide ? 'Get started' : 'Next'}
+            {!isLastSlide && <ChevronRight className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 }
