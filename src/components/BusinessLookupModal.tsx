@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, X, Loader2, Sparkles, Lock, Phone, Globe, Check, Download } from 'lucide-react';
+import { Search, Loader2, Sparkles, Lock, Phone, Globe, Check, Download } from 'lucide-react';
+import { Modal } from './ui/Modal';
 import { Business, EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
 import { calculateSeoNeedScore, getSeoNeedSummary, SIGNAL_CATEGORY_COLORS, SIGNAL_CATEGORY_LABELS } from '@/lib/signals';
@@ -222,8 +223,6 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
     setIsSaved(false);
   };
 
-  if (!isOpen) return null;
-
   const seoScore = enrichedBusiness ? calculateSeoNeedScore(enrichedBusiness) : 0;
   const categorizedSignals = enrichedBusiness ? getSeoNeedSummary(enrichedBusiness) : { groups: [], totalCount: 0 };
 
@@ -239,37 +238,21 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
     return 'Low Opportunity';
   };
 
+  const headerContent = (
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
+        <Search size={20} className="text-violet-400" />
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900">Business Lookup</h2>
+        <p className="text-sm text-gray-500">Search for a specific business</p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={handleClose}
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-2xl elevation-3 overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
-              <Search size={20} className="text-violet-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Business Lookup</h2>
-              <p className="text-sm text-gray-500">Search for a specific business</p>
-            </div>
-          </div>
-          <button
-            onClick={handleClose}
-            className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
+    <Modal open={isOpen} onClose={handleClose} size="md" customHeader={headerContent}>
+      <div className="pb-6">
           {/* Search Form - always visible */}
           {(state === 'idle' || state === 'searching' || state === 'not-found' || state === 'error') && (
             <div className="space-y-4">
@@ -320,7 +303,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               <button
                 onClick={handleSearch}
                 disabled={!businessName.trim() || !location.trim() || state === 'searching'}
-                className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 active:scale-[0.97]"
               >
                 {state === 'searching' ? (
                   <>
@@ -573,8 +556,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
               </div>
             </div>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }
