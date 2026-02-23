@@ -27,7 +27,7 @@ export function MobileDisclaimer() {
 
     return (
         <div className="fixed inset-x-0 bottom-0 z-40 p-4 md:hidden pointer-events-none flex justify-center pb-8 animate-in slide-in-from-bottom-5 fade-in duration-500">
-            <div className="bg-white backdrop-blur-md border border-violet-500/30 shadow-2xl rounded-xl p-4 max-w-sm w-full pointer-events-auto relative overflow-hidden">
+            <div className="bg-white dark:bg-card backdrop-blur-md border border-violet-500/30 shadow-2xl rounded-xl p-4 max-w-sm w-full pointer-events-auto relative overflow-hidden">
                 {/* Decorative gradient blob */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/10 rounded-full blur-2xl -mr-10 -mt-10" />
 

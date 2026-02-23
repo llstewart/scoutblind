@@ -40,7 +40,7 @@ const GRID_STROKE = '#e5e7eb';
 
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+    <div className="bg-white dark:bg-card border border-gray-200 rounded-xl p-5 shadow-sm">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
         {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}

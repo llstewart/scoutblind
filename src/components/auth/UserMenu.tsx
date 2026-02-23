@@ -107,7 +107,7 @@ export function UserMenu({ user, credits, tier, onOpenBilling, onOpenSettings }:
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/10 z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/10 z-50 overflow-hidden">
           {/* User Info */}
           <div className="px-4 py-3">
             <div className="flex items-center gap-3">

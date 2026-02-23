@@ -136,7 +136,7 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
 
           {/* Content card */}
           <div className="relative z-10 w-full max-w-xl mx-auto px-6">
-            <div className="bg-white backdrop-blur-sm rounded-2xl p-8 shadow-2xl shadow-black/10">
+            <div className="bg-white dark:bg-card backdrop-blur-sm rounded-2xl p-8 shadow-2xl shadow-black/10">
               {/* Lock icon */}
               <div className="flex justify-center mb-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-500/10">
@@ -191,7 +191,7 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
               {/* CTA Button */}
               <button
                 onClick={onUpgradeClick}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20 active:scale-[0.97]"
               >
                 <Sparkles size={20} />
                 View Subscription Plans

@@ -7,6 +7,7 @@ import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness,
 import { StatusTag } from './StatusTag';
 import { CellSpinner } from './CellSpinner';
 import ScoreRing from '@/components/ui/ScoreRing';
+import { InlineScoreBar } from '@/components/ui/InlineScoreBar';
 import { formatDate } from '@/utils/date';
 import {
   getDormancyStatus,
@@ -64,7 +65,7 @@ function HeaderTooltip({
       </div>
       {isVisible && typeof window !== 'undefined' && createPortal(
         <div
-          className="fixed w-72 p-3 bg-white rounded-lg shadow-2xl shadow-black/10 z-[9999] animate-in fade-in duration-150"
+          className="fixed w-72 p-3 bg-white dark:bg-popover rounded-lg shadow-2xl shadow-black/10 z-[9999] animate-in fade-in duration-150"
           style={{ top: position.top, left: position.left }}
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
@@ -102,11 +103,11 @@ function StatusDotPopover({ status, onChange }: { status: LeadStatus; onChange: 
         className="group/dot flex items-center gap-1.5 pr-1 rounded-lg hover:bg-gray-100 transition-colors"
         title={`Status: ${config.label}`}
       >
-        <span className={`w-2.5 h-2.5 rounded-full ${config.dot} ring-2 ring-white`} />
+        <span className={`w-2.5 h-2.5 rounded-full ${config.dot} ring-2 ring-white dark:ring-card`} />
         <span className={`text-[11px] font-medium ${config.color} opacity-0 group-hover/dot:opacity-100 transition-opacity`}>{config.label}</span>
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 w-36 bg-white rounded-lg shadow-xl border border-gray-200 z-50 py-1">
+        <div className="absolute left-0 top-full mt-1 w-36 bg-white dark:bg-popover rounded-lg shadow-xl border border-gray-200 z-50 py-1">
           <div className="px-3 py-1.5 text-[11px] font-medium text-gray-400 uppercase tracking-wider">Lead Status</div>
           {ALL_LEAD_STATUSES.map(s => {
             const c = LEAD_STATUS_CONFIG[s];
@@ -160,7 +161,7 @@ function NotesPopover({ notes, onChange }: { notes: string; onChange: (n: string
         <MessageSquare size={14} fill={notes ? 'currentColor' : 'none'} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-3" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute left-0 top-full mt-1 w-72 bg-white dark:bg-popover rounded-lg shadow-xl border border-gray-200 z-50 p-3" onClick={(e) => e.stopPropagation()}>
           <div className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-2">Lead Notes</div>
           <textarea
             value={value}
@@ -605,7 +606,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95 dark:bg-card/95">
         <span className="text-xs text-gray-500">
           {businesses.length.toLocaleString()} analyzed
         </span>
@@ -629,7 +630,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
       )}
 
       {/* Filter Controls */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95 dark:bg-card/95">
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500">
             {enrichedBusinesses.length}/{businesses.length} enriched
@@ -657,7 +658,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
             <ChevronDown size={12} className={`transition-transform ${sortDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
           {sortDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-xl shadow-black/10 border border-gray-200 z-50 py-1">
+            <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-popover rounded-lg shadow-xl shadow-black/10 border border-gray-200 z-50 py-1">
               {SORT_OPTIONS.map((option) => (
                 <button
                   key={option.value}
@@ -735,7 +736,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
         {/* Desktop Table View */}
         <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left text-xs">
-          <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
+          <thead className="sticky top-0 z-10 bg-white/95 dark:bg-card/95 backdrop-blur-sm">
             <tr className="border-b border-gray-200">
               {onStatusChange && (
                 <th className={`${headerPadding} w-8`}>
@@ -939,9 +940,10 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   key={index}
                   data-row-index={index}
                   onClick={() => setFocusedRow(index)}
-                  className={`border-b border-gray-200 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
-                      isPending ? 'bg-violet-500/5' : 'hover:bg-gray-50'
+                  className={`border-b border-gray-200 transition-colors cursor-pointer group animate-stagger-in ${isFocused ? 'bg-violet-500/[0.06] border-l-2 border-l-violet-500' :
+                      isPending ? 'bg-violet-500/5' : 'hover:bg-violet-500/[0.03]'
                     }`}
+                  style={index <= 10 ? { animationDelay: `${index * 30}ms` } : undefined}
                 >
                   {onStatusChange && (
                     <td className={`${cellPadding} w-8`} onClick={(e) => e.stopPropagation()}>
@@ -1021,7 +1023,10 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   <td className={`${cellPadding} font-medium text-gray-800`}>
                     <div className="flex items-center gap-1.5">
                       {isEnriched && (
-                        <ScoreRing score={score} size="sm" />
+                        <div className="flex items-center gap-1.5">
+                          <ScoreRing score={score} size="sm" />
+                          <InlineScoreBar score={score} />
+                        </div>
                       )}
                       {isEnriched && onStatusChange && (
                         <StatusDotPopover
@@ -1325,7 +1330,7 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
 
       {/* Bulk Action Bar */}
       {checkedRows.size > 0 && onStatusChange && (
-        <div className="sticky bottom-0 left-0 right-0 z-30 bg-white border-t-2 border-violet-500 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] px-4 py-3">
+        <div className="sticky bottom-0 left-0 right-0 z-30 bg-white dark:bg-card border-t-2 border-violet-500 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-gray-900">{checkedRows.size} selected</span>

@@ -153,7 +153,7 @@ export function OutreachTemplatesModal({ business, niche, onClose }: OutreachTem
             onClick={() => handleTabChange(i)}
             className={`px-3 py-2 text-xs font-semibold rounded-t-lg border border-b-0 transition-colors ${
               i === activeIndex
-                ? 'bg-white text-gray-900 border-gray-200'
+                ? 'bg-white dark:bg-card text-gray-900 border-gray-200'
                 : 'bg-gray-50 text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-100'
             }`}
           >

@@ -18,7 +18,7 @@ export default function PipelineLoading() {
         {/* KPI strip skeleton */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 bg-white rounded-xl elevation-1 animate-pulse" />
+            <div key={i} className="h-20 bg-white dark:bg-card rounded-xl elevation-1 animate-pulse" />
           ))}
         </div>
 
@@ -31,12 +31,12 @@ export default function PipelineLoading() {
 
         {/* Toolbar skeleton */}
         <div className="flex gap-3">
-          <div className="h-10 flex-1 max-w-sm bg-white rounded-lg elevation-1 animate-pulse" />
+          <div className="h-10 flex-1 max-w-sm bg-white dark:bg-card rounded-lg elevation-1 animate-pulse" />
           <div className="h-10 w-32 bg-gray-100 rounded-lg animate-pulse" />
         </div>
 
         {/* Table skeleton */}
-        <div className="bg-white rounded-xl elevation-1 overflow-hidden">
+        <div className="bg-white dark:bg-card rounded-xl elevation-1 overflow-hidden">
           <div className="h-10 bg-gray-50 border-b border-gray-100" />
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">

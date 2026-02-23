@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -134,7 +135,7 @@ export function MarketingPage() {
   const businessCount = useCountUp(10000, 2200, stats.visible); // 2.2s heavy spin
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
       <MarketingHeader />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
@@ -221,7 +222,7 @@ export function MarketingPage() {
           <div ref={charts.ref} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Chart 1: Opportunity Breakdown */}
             <div
-              className={`rounded-xl p-5 border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-xl p-5 border border-gray-200 bg-white dark:bg-card shadow-sm transition-all duration-700 ease-out ${
                 charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
             >
@@ -250,7 +251,7 @@ export function MarketingPage() {
 
             {/* Chart 2: Claim Status (Donut) */}
             <div
-              className={`rounded-xl p-5 border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-xl p-5 border border-gray-200 bg-white dark:bg-card shadow-sm transition-all duration-700 ease-out ${
                 charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{ transitionDelay: charts.visible ? '150ms' : '0ms' }}
@@ -294,7 +295,7 @@ export function MarketingPage() {
 
             {/* Chart 3: Avg Market Health (Radar) */}
             <div
-              className={`rounded-xl p-5 border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-xl p-5 border border-gray-200 bg-white dark:bg-card shadow-sm transition-all duration-700 ease-out ${
                 charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{ transitionDelay: charts.visible ? '300ms' : '0ms' }}
@@ -417,14 +418,10 @@ export function MarketingPage() {
                   className="w-full flex items-center justify-between py-4 text-left group"
                 >
                   <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors pr-4">{item.q}</span>
-                  <svg
-                    className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronDown
+                    size={16}
+                    className={`text-gray-400 flex-shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
+                  />
                 </button>
                 {openFaq === i && (
                   <div className="pb-4">

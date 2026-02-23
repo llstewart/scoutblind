@@ -49,7 +49,7 @@ function HeaderTooltip({
       </div>
       {isVisible && typeof window !== 'undefined' && createPortal(
         <div
-          className="fixed w-72 p-3 bg-white rounded-lg shadow-2xl shadow-black/10 z-[9999] animate-in fade-in duration-150"
+          className="fixed w-72 p-3 bg-white dark:bg-popover rounded-lg shadow-2xl shadow-black/10 z-[9999] animate-in fade-in duration-150"
           style={{ top: position.top, left: position.left }}
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
@@ -493,7 +493,7 @@ export function GeneralListTable({
   return (
     <div className="relative">
       {/* Header bar with result count and compact toggle */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-200 bg-white/95 dark:bg-card/95">
         <span className="text-xs text-gray-500">
           {businesses.length.toLocaleString()} businesses
         </span>
@@ -555,7 +555,7 @@ export function GeneralListTable({
 
         {/* Desktop Table View */}
         <table ref={tableRef} className="hidden md:table w-full min-w-full border-collapse text-left text-xs">
-          <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm">
+          <thead className="sticky top-0 z-10 bg-white/95 dark:bg-card/95 backdrop-blur-sm">
             <tr className="border-b border-gray-200">
               {onSelectionChange && (
                 <th className={`${headerPadding} w-12`}>
@@ -752,9 +752,10 @@ export function GeneralListTable({
                   key={index}
                   data-row-index={index}
                   onClick={() => setFocusedRow(index)}
-                  className={`border-b border-gray-200 transition-colors cursor-pointer group ${isFocused ? 'bg-violet-500/10' :
-                      isSelected ? 'bg-violet-500/5' : 'hover:bg-gray-50'
+                  className={`border-b border-gray-200 transition-colors cursor-pointer group animate-stagger-in ${isFocused ? 'bg-violet-500/[0.06] border-l-2 border-l-violet-500' :
+                      isSelected ? 'bg-violet-500/5' : 'hover:bg-violet-500/[0.03]'
                     }`}
+                  style={index <= 10 ? { animationDelay: `${index * 30}ms` } : undefined}
                 >
                   {onSelectionChange && (
                     <td className={cellPadding}>
@@ -919,7 +920,7 @@ export function GeneralListTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-white/95">
+        <div className="flex items-center justify-between px-3 py-2 border-t border-gray-200 bg-white/95 dark:bg-card/95">
           <div className="text-xs text-gray-500 tabular-nums">
             {startIndex + 1}--{Math.min(endIndex, businesses.length)} of {businesses.length.toLocaleString()}
           </div>

@@ -23,8 +23,8 @@ export default function DashboardLoading() {
 
             {/* Search form skeleton */}
             <div className="space-y-3 mt-8">
-              <div className="h-12 bg-white rounded-xl elevation-1 animate-pulse" />
-              <div className="h-12 bg-white rounded-xl elevation-1 animate-pulse" />
+              <div className="h-12 bg-white dark:bg-card rounded-xl elevation-1 animate-pulse" />
+              <div className="h-12 bg-white dark:bg-card rounded-xl elevation-1 animate-pulse" />
               <div className="h-12 w-32 bg-violet-100 rounded-xl mx-auto animate-pulse" />
             </div>
           </div>

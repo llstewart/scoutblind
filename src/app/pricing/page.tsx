@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Check } from 'lucide-react';
 import { MarketingLayout } from '@/components/marketing/MarketingLayout';
 
 export default function PricingPage() {
@@ -36,24 +37,24 @@ export default function PricingPage() {
         <div className="flex items-center justify-center gap-6 md:gap-10 mb-12 py-4 px-6 rounded-xl bg-gray-50 border border-gray-200 max-w-lg mx-auto">
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900">$0.58</div>
-            <div className="text-[10px] text-gray-500 uppercase tracking-wider">per scan</div>
+            <div className="text-[11px] text-gray-500 uppercase tracking-wider">per scan</div>
           </div>
           <div className="w-px h-8 bg-gray-200" />
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900">~25</div>
-            <div className="text-[10px] text-gray-500 uppercase tracking-wider">leads per scan</div>
+            <div className="text-[11px] text-gray-500 uppercase tracking-wider">leads per scan</div>
           </div>
           <div className="w-px h-8 bg-gray-200" />
           <div className="text-center">
             <div className="text-lg font-bold text-violet-600">$0.02</div>
-            <div className="text-[10px] text-gray-500 uppercase tracking-wider">per lead</div>
+            <div className="text-[11px] text-gray-500 uppercase tracking-wider">per lead</div>
           </div>
         </div>
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Free */}
-          <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="p-6 rounded-xl border border-gray-200 bg-white dark:bg-card shadow-sm">
             <h2 className="text-base font-semibold text-gray-900 mb-1">Free</h2>
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$0</span>
@@ -62,9 +63,7 @@ export default function PricingPage() {
             <ul className="space-y-2.5 mb-7">
               {['5 market scans', 'Full signal analysis', 'CSV export', 'Search history'].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                  <svg className="w-4 h-4 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check size={16} className="text-violet-400 flex-shrink-0" />
                   {f}
                 </li>
               ))}
@@ -79,7 +78,7 @@ export default function PricingPage() {
 
           {/* Starter */}
           <div className="p-6 rounded-xl border border-violet-500/30 bg-violet-500/[0.05] relative">
-            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-violet-600 text-white text-[10px] font-semibold rounded-full uppercase tracking-wider">
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-violet-600 text-white text-[11px] font-semibold rounded-full uppercase tracking-wider">
               Most Popular
             </div>
             <h2 className="text-base font-semibold text-gray-900 mb-1">Starter</h2>
@@ -91,9 +90,7 @@ export default function PricingPage() {
             <ul className="space-y-2.5 mb-7">
               {['50 scans/month', 'Everything in Free', 'Priority support', 'Saved search library'].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                  <svg className="w-4 h-4 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check size={16} className="text-violet-400 flex-shrink-0" />
                   {f}
                 </li>
               ))}
@@ -107,7 +104,7 @@ export default function PricingPage() {
           </div>
 
           {/* Pro */}
-          <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="p-6 rounded-xl border border-gray-200 bg-white dark:bg-card shadow-sm">
             <h2 className="text-base font-semibold text-gray-900 mb-1">Pro</h2>
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$79</span>
@@ -117,9 +114,7 @@ export default function PricingPage() {
             <ul className="space-y-2.5 mb-7">
               {['200 scans/month', 'Everything in Starter', 'Bulk analysis', 'API access (coming soon)'].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                  <svg className="w-4 h-4 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check size={16} className="text-violet-400 flex-shrink-0" />
                   {f}
                 </li>
               ))}

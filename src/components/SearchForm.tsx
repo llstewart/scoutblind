@@ -219,7 +219,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               autoComplete="off"
             />
             {showNicheSuggestions && filteredNiches.length > 0 && (
-              <div className="absolute top-full left-0 mt-3 w-48 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1 overflow-hidden">
+              <div className="absolute top-full left-0 mt-3 w-48 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1 overflow-hidden">
                 {filteredNiches.map((item, index) => (
                   <button
                     key={index}
@@ -270,7 +270,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               </button>
 
               {showRegionPicker && (
-                <div className="absolute top-full right-0 mt-3 w-52 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
+                <div className="absolute top-full right-0 mt-3 w-52 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
                   <div className="px-3 py-2 border-b border-gray-200">
                     <input
                       autoFocus
@@ -318,7 +318,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               </button>
 
               {showCountryPicker && (
-                <div className="absolute top-full right-0 mt-3 w-44 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1 overflow-hidden">
+                <div className="absolute top-full right-0 mt-3 w-44 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1 overflow-hidden">
                   <div className="px-3 py-1.5 border-b border-gray-200">
                     <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Country</span>
                   </div>
@@ -351,7 +351,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             type="submit"
             disabled={isLoading || !isFormValid}
             className={`ml-auto px-4 py-1.5 text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${isFormValid
-              ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25'
+              ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/25 active:scale-[0.97]'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
           >
@@ -390,13 +390,13 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             }}
             onFocus={() => setShowNicheSuggestions(true)}
             placeholder="e.g. Dentist, Plumber, Lawyer"
-            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-100 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-violet-500/50 focus:bg-white transition-all"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-100 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-violet-500/50 focus:bg-white dark:focus:bg-secondary transition-all"
             disabled={isLoading}
             autoComplete="off"
           />
 
           {showNicheSuggestions && filteredNiches.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
               <div className="px-3 py-2 border-b border-gray-200 flex items-center justify-between">
                 <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Recent</span>
                 <button
@@ -444,7 +444,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="City"
-              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-100 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none focus:border-violet-500/50 focus:bg-white transition-all"
+              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-100 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-400 outline-none focus:border-violet-500/50 focus:bg-white dark:focus:bg-secondary transition-all"
               disabled={isLoading}
             />
 
@@ -468,7 +468,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                 </button>
 
                 {showRegionPicker && (
-                  <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
+                  <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-56 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 overflow-hidden">
                     <div className="px-2 py-2 border-b border-gray-200">
                       <input
                         autoFocus
@@ -520,7 +520,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
                 </button>
 
                 {showCountryPicker && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-popover border border-gray-200 rounded-xl shadow-lg shadow-black/5 z-50 py-1">
                     <div className="px-3 py-1.5 border-b border-gray-200">
                       <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Country</span>
                     </div>
@@ -556,7 +556,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
             type="submit"
             disabled={isLoading || !isFormValid}
             className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${isFormValid
-              ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25'
+              ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-500/25 active:scale-[0.97]'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
           >

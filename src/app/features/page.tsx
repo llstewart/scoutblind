@@ -68,7 +68,7 @@ const SCORE_RANGES = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
       <MarketingHeader />
 
       {/* Hero */}
@@ -97,7 +97,7 @@ export default function FeaturesPage() {
             {SIGNAL_CATEGORIES.map((cat) => (
               <div
                 key={cat.label}
-                className={`rounded-lg border border-gray-200 border-l-[3px] ${cat.accentColor} bg-white p-6`}
+                className={`rounded-lg border border-gray-200 border-l-[3px] ${cat.accentColor} bg-white dark:bg-card p-6`}
               >
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className={`text-xs font-semibold uppercase tracking-wider ${cat.textColor}`}>{cat.label}</span>

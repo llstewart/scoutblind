@@ -57,10 +57,10 @@ function SearchVisual() {
         <div className="rounded-xl bg-gray-50 border border-gray-200 p-3 shadow-lg shadow-black/10">
           {/* Fake search bar */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200">
               <span className="text-xs text-gray-500">plumber</span>
             </div>
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200">
               <span className="text-xs text-gray-500">Austin, TX</span>
             </div>
           </div>

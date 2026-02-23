@@ -103,7 +103,7 @@ export function LibraryTab({
     return (
       <div className="min-h-full flex flex-col">
         {/* Header for detail view */}
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 elevation-1">
+        <div className="sticky top-0 z-40 bg-white/95 dark:bg-card/95 backdrop-blur-sm border-b border-gray-200 elevation-1">
           <div className="px-4 py-3">
             <div className="flex items-center gap-3">
               {/* Back button */}
@@ -299,12 +299,13 @@ export function LibraryTab({
               {period}
             </h3>
             <div className="space-y-1">
-              {periodSearches.map((search) => (
+              {periodSearches.map((search, idx) => (
                 <div
                   key={search.id}
-                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-xl transition-colors group ${
-                    selectedIds.has(search.id) ? 'bg-violet-50 ring-1 ring-violet-200' : 'bg-gray-50 hover:bg-gray-100'
+                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-xl transition-all group animate-stagger-in ${
+                    selectedIds.has(search.id) ? 'bg-violet-50 ring-1 ring-violet-200' : 'bg-gray-50 hover:bg-gray-100 hover:shadow-elevation-1'
                   }`}
+                  style={{ animationDelay: `${Math.min(idx, 10) * 50}ms` }}
                 >
                   {/* Checkbox (edit mode) */}
                   {isEditing && (
@@ -375,7 +376,7 @@ export function LibraryTab({
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
-          <div className="relative bg-white rounded-xl p-6 elevation-3 w-full max-w-sm">
+          <div className="relative bg-white dark:bg-card rounded-xl p-6 elevation-3 w-full max-w-sm">
             <div className="flex justify-center mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10">
                 <Trash2 size={24} className="text-red-400" />

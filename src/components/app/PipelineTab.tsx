@@ -45,7 +45,7 @@ function StatusPill({ status, onChange }: { status: LeadStatus; onChange: (s: Le
         {config.label}
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg elevation-2 z-50 py-1 min-w-[130px]">
+        <div className="absolute left-0 top-full mt-1 bg-white dark:bg-card border border-gray-200 rounded-lg elevation-2 z-50 py-1 min-w-[130px]">
           {ALL_LEAD_STATUSES.filter(s => s !== status).map(s => {
             const c = LEAD_STATUS_CONFIG[s];
             return (
@@ -169,7 +169,7 @@ function MobileLeadCard({
   const status = lead.leadStatus || 'new';
 
   return (
-    <div className={`bg-white rounded-xl p-4 space-y-3 transition-all elevation-1 ${selected ? 'ring-2 ring-violet-300 bg-violet-50/30' : ''}`}>
+    <div className={`bg-white dark:bg-card rounded-xl p-4 space-y-3 transition-all elevation-1 hover:shadow-elevation-2 ${selected ? 'ring-2 ring-violet-300 bg-violet-50/30' : ''}`}>
       {/* Top row: status + score */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -464,7 +464,7 @@ export function PipelineTab() {
         {/* Skeleton KPI */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 bg-white rounded-xl elevation-1 animate-pulse" />
+            <div key={i} className="h-20 bg-white dark:bg-card rounded-xl elevation-1 animate-pulse" />
           ))}
         </div>
         {/* Skeleton toolbar */}
@@ -473,7 +473,7 @@ export function PipelineTab() {
           <div className="h-10 w-32 bg-gray-100 rounded-lg animate-pulse" />
         </div>
         {/* Skeleton table */}
-        <div className="bg-white rounded-xl overflow-hidden elevation-1">
+        <div className="bg-white dark:bg-card rounded-xl overflow-hidden elevation-1">
           <div className="h-10 bg-gray-50 border-b border-gray-100" />
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
@@ -566,22 +566,22 @@ export function PipelineTab() {
 
       {/* ── KPI strip ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl px-5 py-4 elevation-1 flex items-center gap-3">
+        <div className="bg-white dark:bg-card rounded-xl px-5 py-4 elevation-1 flex items-center gap-3">
           <ScoreRing score={avgScore} size="lg" />
           <div className="min-w-0">
             <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Avg Score</p>
             <p className="text-sm text-gray-500 mt-1">{allLeads.length} leads</p>
           </div>
         </div>
-        <div className="bg-white rounded-xl px-5 py-4 elevation-1">
+        <div className="bg-white dark:bg-card rounded-xl px-5 py-4 elevation-1">
           <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Active</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{activeLeads}</p>
         </div>
-        <div className="bg-white rounded-xl px-5 py-4 elevation-1">
+        <div className="bg-white dark:bg-card rounded-xl px-5 py-4 elevation-1">
           <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Won</p>
           <p className="text-2xl font-extrabold text-emerald-600 mt-1">{statusCounts.won}</p>
         </div>
-        <div className="bg-white rounded-xl px-5 py-4 elevation-1">
+        <div className="bg-white dark:bg-card rounded-xl px-5 py-4 elevation-1">
           <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Win Rate</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{wonRate}<span className="text-base font-semibold text-gray-400">%</span></p>
         </div>
@@ -596,7 +596,7 @@ export function PipelineTab() {
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all whitespace-nowrap ${
               statusFilter === 'all'
                 ? 'bg-gray-900 text-white border-gray-900'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                : 'bg-white dark:bg-card text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
           >
             All
@@ -612,7 +612,7 @@ export function PipelineTab() {
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all whitespace-nowrap ${
                   statusFilter === s
                     ? `${c.bg} ${c.color} ${c.border}`
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    : 'bg-white dark:bg-card text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusFilter === s ? c.dot : 'bg-gray-300'}`} />
@@ -632,7 +632,7 @@ export function PipelineTab() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or address..."
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300 transition-all"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-white dark:bg-secondary placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300 transition-all"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -645,7 +645,7 @@ export function PipelineTab() {
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300"
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white dark:bg-secondary text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300"
             >
               <option value="all">All sources</option>
               {uniqueSources.map(src => {
@@ -662,7 +662,7 @@ export function PipelineTab() {
               const [k, d] = e.target.value.split('-') as [SortKey, SortDir];
               setSortKey(k); setSortDir(d);
             }}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300 sm:hidden"
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white dark:bg-secondary text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300 sm:hidden"
           >
             <option value="score-desc">Score (High to Low)</option>
             <option value="score-asc">Score (Low to High)</option>
@@ -688,7 +688,7 @@ export function PipelineTab() {
           <div className="flex-1" />
           <button
             onClick={() => setSelectedLeads(new Set())}
-            className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
+            className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-gray-900 hover:bg-white dark:hover:bg-card rounded-lg transition-colors"
           >
             Clear
           </button>
@@ -706,7 +706,7 @@ export function PipelineTab() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative bg-white rounded-xl elevation-3 max-w-sm w-full p-6 space-y-4">
+          <div className="relative bg-white dark:bg-card rounded-xl elevation-3 max-w-sm w-full p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                 <Trash2 size={20} className="text-red-600" />
@@ -751,7 +751,7 @@ export function PipelineTab() {
 
       {/* ── No results ─────────────────────────────────────────── */}
       {filteredLeads.length === 0 ? (
-        <div className="bg-white rounded-xl elevation-1">
+        <div className="bg-white dark:bg-card rounded-xl elevation-1">
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Search size={40} className="text-gray-300 mb-4" />
             <p className="text-sm font-medium text-gray-600 mb-1">No leads match your filters</p>
@@ -767,7 +767,7 @@ export function PipelineTab() {
       ) : (
         <>
           {/* ── Desktop table ────────────────────────────────────── */}
-          <div className="hidden md:block bg-white rounded-xl overflow-hidden elevation-1">
+          <div className="hidden md:block bg-white dark:bg-card rounded-xl overflow-hidden elevation-1">
             <div
               ref={scrollRef}
               className="overflow-auto max-h-[calc(100vh-380px)] min-h-[300px]"
@@ -834,7 +834,7 @@ export function PipelineTab() {
                     return (
                       <tr
                         key={lead.leadId || lead.placeId || lead.name}
-                        className={`group transition-colors ${selectedLeads.has(lead.leadId || '') ? 'bg-violet-50/50' : 'hover:bg-violet-50/30'} ${idx < 10 ? 'animate-fadeInUp' : ''}`}
+                        className={`group transition-colors ${selectedLeads.has(lead.leadId || '') ? 'bg-violet-500/[0.06] border-l-2 border-l-violet-500' : 'hover:bg-violet-500/[0.03]'} ${idx < 10 ? 'animate-fadeInUp' : ''}`}
                         style={idx < 10 ? { animationDelay: staggerDelay, opacity: 0 } : undefined}
                       >
                         {/* Checkbox */}
@@ -993,7 +993,7 @@ export function PipelineTab() {
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg bg-white dark:bg-card hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Prev
             </button>
@@ -1015,7 +1015,7 @@ export function PipelineTab() {
                   className={`w-9 h-9 text-sm font-medium rounded-lg transition-colors ${
                     currentPage === page
                       ? 'bg-violet-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white'
+                      : 'text-gray-600 hover:bg-gray-50 border border-gray-200 bg-white dark:bg-card'
                   }`}
                 >
                   {page}
@@ -1025,7 +1025,7 @@ export function PipelineTab() {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg bg-white dark:bg-card hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>

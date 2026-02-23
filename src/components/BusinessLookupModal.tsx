@@ -452,21 +452,21 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
 
                 {/* Intel Grid */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-white rounded-lg">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">Rating</p>
                     <p className="text-gray-900 font-medium">
                       {enrichedBusiness.rating ? `${enrichedBusiness.rating}★` : 'No rating'}
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">Reviews</p>
                     <p className="text-gray-900 font-medium">{enrichedBusiness.reviewCount || 0}</p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">Response Rate</p>
                     <p className="text-gray-900 font-medium">{enrichedBusiness.responseRate}%</p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">Search Rank</p>
                     <StatusTag status={enrichedBusiness.searchVisibility !== null ? 'success' : 'error'}>
                       {enrichedBusiness.searchVisibility !== null
@@ -474,13 +474,13 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                         : 'Not in Top 20'}
                     </StatusTag>
                   </div>
-                  <div className="p-3 bg-white rounded-lg">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">Claim Status</p>
                     <StatusTag status={enrichedBusiness.claimed ? 'success' : 'warning'}>
                       {enrichedBusiness.claimed ? 'Claimed' : 'Unclaimed'}
                     </StatusTag>
                   </div>
-                  <div className="p-3 bg-white rounded-lg">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg">
                     <p className="text-gray-500 text-xs mb-1">Website Tech</p>
                     <p className="text-gray-900 font-medium text-xs truncate">
                       {enrichedBusiness.websiteTech || 'No website'}

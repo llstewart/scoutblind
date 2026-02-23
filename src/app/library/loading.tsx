@@ -22,12 +22,12 @@ export default function LibraryLoading() {
         </div>
 
         {/* Search bar skeleton */}
-        <div className="h-10 max-w-sm bg-white rounded-lg elevation-1 animate-pulse" />
+        <div className="h-10 max-w-sm bg-white dark:bg-card rounded-lg elevation-1 animate-pulse" />
 
         {/* Cards skeleton */}
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl elevation-1 p-4 flex items-center gap-4">
+            <div key={i} className="bg-white dark:bg-card rounded-xl elevation-1 p-4 flex items-center gap-4">
               <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse flex-shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 w-40 bg-gray-100 rounded-lg animate-pulse" />

@@ -58,7 +58,7 @@ export function AccountTab({
       <TabHeader icon={UserCircle} title="Account" />
 
       {/* Profile Card */}
-      <div className="rounded-xl bg-white p-6 mb-6 elevation-1">
+      <div className="rounded-xl bg-white dark:bg-card p-6 mb-6 elevation-1">
         <div className="flex items-center gap-4">
           {userAvatar ? (
             <img
@@ -82,7 +82,7 @@ export function AccountTab({
       </div>
 
       {/* Credits Card */}
-      <div className="rounded-xl bg-white p-6 mb-6 elevation-1">
+      <div className="rounded-xl bg-white dark:bg-card p-6 mb-6 elevation-1">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Credits Remaining</h3>
@@ -100,7 +100,7 @@ export function AccountTab({
 
         <button
           onClick={onOpenBilling}
-          className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 active:scale-[0.97]"
         >
           <Plus size={16} />
           {tier === 'free' ? 'Upgrade Plan' : 'Buy More Credits'}
@@ -108,7 +108,7 @@ export function AccountTab({
       </div>
 
       {/* Plan Card */}
-      <div className="rounded-xl bg-white p-6 mb-6 elevation-1">
+      <div className="rounded-xl bg-white dark:bg-card p-6 mb-6 elevation-1">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Current Plan</h3>
@@ -125,7 +125,7 @@ export function AccountTab({
       </div>
 
       {/* Menu Items */}
-      <div className="rounded-xl bg-white overflow-hidden mb-6 elevation-1">
+      <div className="rounded-xl bg-white dark:bg-card overflow-hidden mb-6 elevation-1">
         <button
           onClick={onOpenSettings}
           className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-gray-600 hover:bg-gray-50 transition-colors border-b border-gray-100"

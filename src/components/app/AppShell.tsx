@@ -100,7 +100,7 @@ export function TabContent({
   noPadding?: boolean;
 }) {
   return (
-    <div className={`${noPadding ? '' : 'p-4 md:p-6'} ${className}`}>
+    <div className={`animate-fade-in ${noPadding ? '' : 'p-4 md:p-6'} ${className}`}>
       {children}
     </div>
   );

@@ -53,7 +53,7 @@ export function ResultsView() {
   const [reportBusiness, setReportBusiness] = useState<EnrichedBusiness | null>(null);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl gap-4 elevation-1">
+    <div className="flex flex-col h-full bg-white dark:bg-card rounded-xl gap-4 elevation-1">
       {/* Search Context Header */}
       {searchParams && !isViewingSavedSearch && (
         <div className="flex items-center gap-2 text-sm text-gray-500 px-4 pt-4">
@@ -97,7 +97,7 @@ export function ResultsView() {
           <button
             onClick={() => setActiveTab('general')}
             className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap ${activeTab === 'general'
-              ? 'bg-white text-gray-900 shadow-sm'
+              ? 'bg-white dark:bg-card text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
           >
@@ -107,7 +107,7 @@ export function ResultsView() {
           <button
             onClick={() => setActiveTab('upgraded')}
             className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'upgraded'
-              ? 'bg-white text-gray-900 shadow-sm'
+              ? 'bg-white dark:bg-card text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
           >
@@ -128,7 +128,7 @@ export function ResultsView() {
           <button
             onClick={() => setActiveTab('market')}
             className={`px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${activeTab === 'market'
-              ? 'bg-white text-gray-900 shadow-sm'
+              ? 'bg-white dark:bg-card text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-900'
               }`}
           >

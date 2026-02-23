@@ -5,7 +5,7 @@ import { AuthForm } from '@/components/auth/AuthForm';
 
 export default function SignupPage() {
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-white dark:bg-gray-950 flex">
       {/* Left panel — value prop / conversion (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-[45%] relative flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-600 via-violet-600 to-violet-700">
         {/* Floating orbs — layered depth */}

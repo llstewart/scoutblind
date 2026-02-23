@@ -39,7 +39,7 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Background with blur */}
-      <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-t border-gray-200" />
+      <div className="absolute inset-0 bg-white/95 dark:bg-card/95 backdrop-blur-xl border-t border-gray-200" />
 
       {/* Safe area padding for iOS */}
       <div className="relative flex items-center justify-around px-2 pt-2 pb-safe">

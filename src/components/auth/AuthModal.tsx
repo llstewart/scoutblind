@@ -43,7 +43,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin', signupHeadi
           role="dialog"
           aria-modal="true"
           aria-labelledby="auth-modal-title"
-          className="w-full max-w-md bg-white rounded-2xl shadow-2xl shadow-black/10 my-auto"
+          className="w-full max-w-md bg-white dark:bg-card rounded-2xl shadow-2xl shadow-black/10 my-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}

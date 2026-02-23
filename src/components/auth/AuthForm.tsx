@@ -152,7 +152,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-gray-900 font-medium rounded-lg transition-colors disabled:opacity-50 border border-gray-200"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-card hover:bg-gray-100 text-gray-900 font-medium rounded-lg transition-colors disabled:opacity-50 border border-gray-200"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -180,7 +180,7 @@ export function AuthForm({ defaultMode = 'signin', onSuccess, modeSwitchLinks = 
                   <div className="w-full border-t border-gray-200" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500">or</span>
+                  <span className="px-4 bg-white dark:bg-card text-gray-500">or</span>
                 </div>
               </div>
             </>
