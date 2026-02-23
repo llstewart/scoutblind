@@ -8,18 +8,18 @@ export default function PricingPage() {
   const steps = [
     {
       step: '1',
-      title: 'Search',
-      description: 'Enter a niche and location to scan Google Business Profiles in any market.',
+      title: 'Pick a market',
+      description: 'Enter any niche and location — "Plumbers in Austin" — and get ~25 scored prospects back.',
     },
     {
       step: '2',
-      title: 'Analyze',
-      description: 'Get digital signals, review gaps, and visibility scores for every business found.',
+      title: 'See who needs you',
+      description: 'Every business gets a Need Score based on real gaps. You\'ll know who to call first and why.',
     },
     {
       step: '3',
-      title: 'Export',
-      description: 'Download your results to CSV and start outreach with qualified leads.',
+      title: 'Pitch with proof',
+      description: 'Send a personalized audit report, use a pre-filled outreach template, or export to your CRM.',
     },
   ];
 
@@ -27,27 +27,27 @@ export default function PricingPage() {
     <MarketingLayout>
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 text-center mb-2">
-          Simple, Transparent Pricing
+          Close one client and Packleads pays for itself
         </h1>
         <p className="text-sm text-gray-600 text-center mb-4">
-          One closed client pays for 3 years of Pro.
+          Every plan includes full lead scoring, audit reports, and outreach tools.
         </p>
 
         {/* ROI Math Strip */}
         <div className="flex items-center justify-center gap-6 md:gap-10 mb-12 py-4 px-6 rounded-xl bg-gray-50 border border-gray-200 max-w-lg mx-auto">
-          <div className="text-center">
-            <div className="text-lg font-bold text-gray-900">$0.58</div>
-            <div className="text-[11px] text-gray-500 uppercase tracking-wider">per scan</div>
-          </div>
-          <div className="w-px h-8 bg-gray-200" />
           <div className="text-center">
             <div className="text-lg font-bold text-gray-900">~25</div>
             <div className="text-[11px] text-gray-500 uppercase tracking-wider">leads per scan</div>
           </div>
           <div className="w-px h-8 bg-gray-200" />
           <div className="text-center">
-            <div className="text-lg font-bold text-violet-600">$0.02</div>
+            <div className="text-lg font-bold text-gray-900">$0.02</div>
             <div className="text-[11px] text-gray-500 uppercase tracking-wider">per lead</div>
+          </div>
+          <div className="w-px h-8 bg-gray-200" />
+          <div className="text-center">
+            <div className="text-lg font-bold text-violet-600">18x</div>
+            <div className="text-[11px] text-gray-500 uppercase tracking-wider">ROI per client closed</div>
           </div>
         </div>
 
@@ -59,9 +59,14 @@ export default function PricingPage() {
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$0</span>
             </div>
-            <p className="text-xs text-gray-600 mb-5">Get started with no commitment.</p>
+            <p className="text-xs text-gray-600 mb-5">See the data on a real market before you commit.</p>
             <ul className="space-y-2.5 mb-7">
-              {['5 market scans', 'Full signal analysis', 'CSV export', 'Search history'].map((f, i) => (
+              {[
+                '5 scans — ~125 leads to evaluate',
+                'Need Scores for every business',
+                'CSV export',
+                'Search history',
+              ].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                   <Check size={16} className="text-violet-400 flex-shrink-0" />
                   {f}
@@ -72,7 +77,7 @@ export default function PricingPage() {
               href="/signup"
               className="block w-full py-2.5 text-sm font-medium text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors text-center"
             >
-              Start Free
+              Try it free
             </Link>
           </div>
 
@@ -86,9 +91,15 @@ export default function PricingPage() {
               <span className="text-3xl font-bold text-gray-900">$29</span>
               <span className="text-sm text-gray-600">/mo</span>
             </div>
-            <p className="text-xs text-gray-600 mb-5">For agencies actively prospecting.</p>
+            <p className="text-xs text-gray-600 mb-5">Everything you need to prospect and pitch.</p>
             <ul className="space-y-2.5 mb-7">
-              {['50 scans/month', 'Everything in Free', 'Priority support', 'Saved search library'].map((f, i) => (
+              {[
+                '50 scans/month — ~1,250 leads',
+                'Personalized audit reports',
+                'Ready-to-send outreach templates',
+                'Saved search library',
+                'Priority support',
+              ].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                   <Check size={16} className="text-violet-400 flex-shrink-0" />
                   {f}
@@ -110,9 +121,14 @@ export default function PricingPage() {
               <span className="text-3xl font-bold text-gray-900">$79</span>
               <span className="text-sm text-gray-600">/mo</span>
             </div>
-            <p className="text-xs text-gray-600 mb-5">For teams running high volume.</p>
+            <p className="text-xs text-gray-600 mb-5">For teams closing multiple markets at once.</p>
             <ul className="space-y-2.5 mb-7">
-              {['200 scans/month', 'Everything in Starter', 'Bulk analysis', 'API access (coming soon)'].map((f, i) => (
+              {[
+                '200 scans/month — ~5,000 leads',
+                'Everything in Starter',
+                'Bulk analysis',
+                'Pipeline tracking',
+              ].map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
                   <Check size={16} className="text-violet-400 flex-shrink-0" />
                   {f}
@@ -150,9 +166,9 @@ export default function PricingPage() {
               href="/signup"
               className="inline-block px-6 py-2.5 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
             >
-              Start with 5 free scans
+              Try it on your market — free
             </Link>
-            <p className="text-xs text-gray-500 mt-2">No credit card required. ~125 businesses analyzed free.</p>
+            <p className="text-xs text-gray-500 mt-2">No credit card required.</p>
           </div>
         </div>
 
