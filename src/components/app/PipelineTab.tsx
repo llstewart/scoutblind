@@ -170,7 +170,7 @@ function MobileLeadCard({
   const status = lead.leadStatus || 'new';
 
   return (
-    <div className={`bg-white rounded-xl border p-4 space-y-3 transition-colors ${selected ? 'border-violet-300 bg-violet-50/30' : 'border-gray-200'}`}>
+    <div className={`bg-white rounded-2xl p-4 space-y-3 transition-all elevation-1 ${selected ? 'ring-2 ring-violet-300 bg-violet-50/30' : ''}`}>
       {/* Top row: status + score */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -373,6 +373,11 @@ export function PipelineTab() {
   // Pipeline metrics
   const activeLeads = statusCounts.new + statusCounts.contacted + statusCounts.pitched;
   const wonRate = allLeads.length > 0 ? Math.round((statusCounts.won / allLeads.length) * 100) : 0;
+  const avgScore = useMemo(() => {
+    if (leadsWithScores.length === 0) return 0;
+    const sum = leadsWithScores.reduce((acc, { score }) => acc + score, 0);
+    return Math.round(sum / leadsWithScores.length);
+  }, [leadsWithScores]);
 
   // ── Selection helpers ────────────────────────────────────────
 
@@ -466,7 +471,7 @@ export function PipelineTab() {
         {/* Skeleton KPI */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 bg-white border border-gray-200 rounded-xl animate-pulse" />
+            <div key={i} className="h-20 bg-white rounded-2xl elevation-1 animate-pulse" />
           ))}
         </div>
         {/* Skeleton toolbar */}
@@ -475,8 +480,8 @@ export function PipelineTab() {
           <div className="h-10 w-32 bg-gray-100 rounded-lg animate-pulse" />
         </div>
         {/* Skeleton table */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="h-10 bg-gray-50 border-b border-gray-200" />
+        <div className="bg-white rounded-2xl overflow-hidden elevation-1">
+          <div className="h-10 bg-gray-50 border-b border-gray-100" />
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
               <div className="h-6 w-20 bg-gray-100 rounded-md animate-pulse" />
@@ -570,20 +575,23 @@ export function PipelineTab() {
 
       {/* ── KPI strip ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Leads</p>
-          <p className="text-2xl font-extrabold text-gray-900 mt-1">{allLeads.length}</p>
+        <div className="bg-white rounded-2xl px-5 py-4 elevation-1 flex items-center gap-3">
+          <ScoreRing score={avgScore} size="lg" />
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Avg Score</p>
+            <p className="text-sm text-gray-500 mt-1">{allLeads.length} leads</p>
+          </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Active</p>
+        <div className="bg-white rounded-2xl px-5 py-4 elevation-1">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Active</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{activeLeads}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Won</p>
+        <div className="bg-white rounded-2xl px-5 py-4 elevation-1">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Won</p>
           <p className="text-2xl font-extrabold text-emerald-600 mt-1">{statusCounts.won}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Win Rate</p>
+        <div className="bg-white rounded-2xl px-5 py-4 elevation-1">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Win Rate</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{wonRate}<span className="text-base font-semibold text-gray-400">%</span></p>
         </div>
       </div>
@@ -686,7 +694,7 @@ export function PipelineTab() {
 
       {/* ── Bulk actions bar ──────────────────────────────────── */}
       {selectionMode && (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-violet-50 border border-violet-200 rounded-xl elevation-2">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-violet-50 rounded-2xl elevation-2">
           <span className="text-sm font-semibold text-violet-700">{selectedLeads.size} selected</span>
           <div className="flex-1" />
           <button
@@ -760,7 +768,7 @@ export function PipelineTab() {
 
       {/* ── No results ─────────────────────────────────────────── */}
       {filteredLeads.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl">
+        <div className="bg-white rounded-2xl elevation-1">
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <svg className="w-10 h-10 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -778,7 +786,7 @@ export function PipelineTab() {
       ) : (
         <>
           {/* ── Desktop table ────────────────────────────────────── */}
-          <div className="hidden md:block bg-white border border-gray-200 rounded-xl overflow-hidden elevation-1">
+          <div className="hidden md:block bg-white rounded-2xl overflow-hidden elevation-1">
             <div
               ref={scrollRef}
               className="overflow-auto max-h-[calc(100vh-380px)] min-h-[300px]"

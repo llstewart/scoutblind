@@ -2,6 +2,7 @@
 
 import { useState, useMemo, ReactNode } from 'react';
 import { TabContent } from './AppShell';
+import ScoreRing from '@/components/ui/ScoreRing';
 
 interface SavedSearch {
   id: string;
@@ -322,8 +323,8 @@ export function LibraryTab({
               {periodSearches.map((search) => (
                 <div
                   key={search.id}
-                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg transition-colors group ${
-                    selectedIds.has(search.id) ? 'bg-violet-50 border border-violet-200' : 'bg-gray-50 hover:bg-gray-100'
+                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-xl transition-colors group ${
+                    selectedIds.has(search.id) ? 'bg-violet-50 ring-1 ring-violet-200' : 'bg-gray-50 hover:bg-gray-100'
                   }`}
                 >
                   {/* Checkbox (edit mode) */}
@@ -342,22 +343,10 @@ export function LibraryTab({
                     />
                   )}
 
-                  {/* Status indicator */}
-                  <div
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      search.analyzedCount === search.totalCount && search.analyzedCount > 0
-                        ? 'bg-green-500' // Fully analyzed
-                        : search.analyzedCount > 0
-                          ? 'bg-violet-500' // Partially analyzed
-                          : 'bg-gray-300' // Not analyzed
-                    }`}
-                    title={
-                      search.analyzedCount === search.totalCount && search.analyzedCount > 0
-                        ? 'Fully analyzed'
-                        : search.analyzedCount > 0
-                          ? 'Partially analyzed'
-                          : 'Not analyzed'
-                    }
+                  {/* Analysis completion ring */}
+                  <ScoreRing
+                    score={search.totalCount > 0 ? Math.round((search.analyzedCount / search.totalCount) * 100) : 0}
+                    size="sm"
                   />
 
                   {/* Content - clickable */}
@@ -414,7 +403,7 @@ export function LibraryTab({
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
-          <div className="relative bg-white rounded-2xl p-6 elevation-3 w-full max-w-sm border border-gray-200">
+          <div className="relative bg-white rounded-2xl p-6 elevation-3 w-full max-w-sm">
             <div className="flex justify-center mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10">
                 <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

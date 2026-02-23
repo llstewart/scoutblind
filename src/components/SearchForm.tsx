@@ -386,7 +386,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   // ============================================
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="w-full max-w-lg mx-auto px-4 sm:px-0">
-      <div className="bg-gray-50 border border-gray-200 rounded-2xl elevation-1 p-3 sm:p-6 space-y-3 sm:space-y-4">
+      <div className="bg-gray-50 rounded-2xl elevation-1 p-3 sm:p-6 space-y-3 sm:space-y-4">
 
         {/* Niche Input */}
         <div ref={nicheInputRef} className="relative">

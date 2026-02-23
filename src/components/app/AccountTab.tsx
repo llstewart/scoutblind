@@ -59,7 +59,7 @@ export function AccountTab({
       </div>
 
       {/* Profile Card */}
-      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6 elevation-1">
+      <div className="rounded-2xl bg-white p-6 mb-6 elevation-1">
         <div className="flex items-center gap-4">
           {userAvatar ? (
             <img
@@ -83,7 +83,7 @@ export function AccountTab({
       </div>
 
       {/* Credits Card */}
-      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6 elevation-1">
+      <div className="rounded-2xl bg-white p-6 mb-6 elevation-1">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Credits Remaining</h3>
@@ -113,7 +113,7 @@ export function AccountTab({
       </div>
 
       {/* Plan Card */}
-      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6">
+      <div className="rounded-2xl bg-white p-6 mb-6 elevation-1">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Current Plan</h3>
@@ -130,10 +130,10 @@ export function AccountTab({
       </div>
 
       {/* Menu Items */}
-      <div className="rounded-xl bg-white border border-gray-200 overflow-hidden mb-6 elevation-1">
+      <div className="rounded-2xl bg-white overflow-hidden mb-6 elevation-1">
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-gray-600 hover:bg-gray-50 transition-colors border-b border-gray-200"
+          className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-gray-600 hover:bg-gray-50 transition-colors border-b border-gray-100"
         >
           <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -147,7 +147,7 @@ export function AccountTab({
 
         <button
           onClick={onOpenBilling}
-          className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-gray-600 hover:bg-gray-50 transition-colors border-b border-gray-200"
+          className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-gray-600 hover:bg-gray-50 transition-colors border-b border-gray-100"
         >
           <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -175,7 +175,7 @@ export function AccountTab({
       {/* Sign Out */}
       <button
         onClick={onSignOut}
-        className="w-full flex items-center justify-center gap-2 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/5 rounded-xl transition-colors"
+        className="w-full flex items-center justify-center gap-2 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/5 rounded-2xl transition-colors"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
