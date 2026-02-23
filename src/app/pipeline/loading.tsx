@@ -2,13 +2,13 @@ export default function PipelineLoading() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar skeleton (desktop) */}
-      <div className="hidden md:flex flex-col w-60 h-screen bg-white border-r border-gray-200">
-        <div className="p-4 border-b border-gray-200">
-          <div className="h-6 w-28 bg-gray-100 rounded animate-pulse" />
+      <div className="hidden md:flex flex-col w-60 h-screen bg-gray-950 border-r border-gray-800">
+        <div className="p-4 border-b border-gray-800">
+          <div className="h-6 w-28 bg-gray-800 rounded animate-pulse" />
         </div>
         <div className="flex-1 p-2 space-y-1">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-10 bg-gray-50 rounded-lg animate-pulse" />
+            <div key={i} className="h-10 bg-gray-800/50 rounded-lg animate-pulse" />
           ))}
         </div>
       </div>

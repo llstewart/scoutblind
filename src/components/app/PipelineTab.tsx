@@ -7,6 +7,7 @@ import { calculateSeoNeedScore } from '@/lib/signals';
 import { useAppContext } from '@/contexts/AppContext';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
+import ScoreRing from '@/components/ui/ScoreRing';
 
 const PAGE_SIZE = 25;
 
@@ -14,30 +15,6 @@ type SortKey = 'score' | 'name' | 'status' | 'rating' | 'updated';
 type SortDir = 'asc' | 'desc';
 
 const STATUS_ORDER: Record<LeadStatus, number> = { new: 0, contacted: 1, pitched: 2, won: 3, lost: 4 };
-
-// ── Score ring — tiny donut to visualize the 0-100 score ─────
-
-function ScoreRing({ score }: { score: number }) {
-  const r = 14;
-  const circumference = 2 * Math.PI * r;
-  const offset = circumference - (score / 100) * circumference;
-  const color = score >= 70 ? '#10b981' : score >= 40 ? '#f59e0b' : '#9ca3af';
-
-  return (
-    <div className="relative inline-flex items-center justify-center w-9 h-9">
-      <svg className="w-9 h-9 -rotate-90" viewBox="0 0 36 36">
-        <circle cx="18" cy="18" r={r} fill="none" stroke="#f3f4f6" strokeWidth="3" />
-        <circle
-          cx="18" cy="18" r={r} fill="none"
-          stroke={color} strokeWidth="3"
-          strokeDasharray={circumference} strokeDashoffset={offset}
-          strokeLinecap="round" className="transition-all duration-500"
-        />
-      </svg>
-      <span className="absolute text-[10px] font-bold text-gray-700">{score}</span>
-    </div>
-  );
-}
 
 // ── Status pill (clickable to change) ──────────────────────────
 
@@ -65,7 +42,7 @@ function StatusPill({ status, onChange }: { status: LeadStatus; onChange: (s: Le
         {config.label}
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl shadow-black/8 z-50 py-1 min-w-[130px]">
+        <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg elevation-2 z-50 py-1 min-w-[130px]">
           {ALL_LEAD_STATUSES.filter(s => s !== status).map(s => {
             const c = LEAD_STATUS_CONFIG[s];
             return (
@@ -207,7 +184,7 @@ function MobileLeadCard({
           )}
           <StatusPill status={status} onChange={onStatusChange} />
         </div>
-        <ScoreRing score={score} />
+        <ScoreRing score={score} size="sm" />
       </div>
 
       {/* Business info */}
@@ -544,18 +521,41 @@ export function PipelineTab() {
 
   if (allLeads.length === 0) {
     return (
-      <div className="p-4 md:p-6">
-        <div className="flex flex-col items-center justify-center py-28 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 flex items-center justify-center mb-6 shadow-sm">
-            <svg className="w-8 h-8 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      <div className="p-4 md:p-6 surface-pipeline min-h-full">
+        <div className="flex flex-col items-center justify-center py-28 text-center relative">
+          {/* Animated gradient orb */}
+          <div className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-violet-200/40 to-purple-200/20 blur-3xl -z-10 animate-pulse" />
+
+          {/* Pipeline illustration */}
+          <div className="mb-6">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="mx-auto">
+              <rect x="16" y="8" width="48" height="64" rx="8" stroke="url(#pipeline-grad)" strokeWidth="2.5" fill="none" />
+              <path d="M28 24h24M28 36h24M28 48h16" stroke="url(#pipeline-grad)" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="24" cy="24" r="2" fill="#8b5cf6" opacity="0.6" />
+              <circle cx="24" cy="36" r="2" fill="#8b5cf6" opacity="0.4" />
+              <circle cx="24" cy="48" r="2" fill="#8b5cf6" opacity="0.2" />
+              <defs>
+                <linearGradient id="pipeline-grad" x1="16" y1="8" x2="64" y2="72">
+                  <stop stopColor="#8b5cf6" />
+                  <stop offset="1" stopColor="#a78bfa" />
+                </linearGradient>
+              </defs>
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Your pipeline is empty</h3>
-          <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-            Every business you analyze through Lead Intel automatically becomes a lead here.
-            Run a search and get intel on businesses to start building your pipeline.
+
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Your pipeline is empty</h3>
+          <p className="text-sm text-gray-500 max-w-xs leading-relaxed mb-6">
+            When you save leads from search results, they&apos;ll appear here for tracking.
           </p>
+          <a
+            href="/dashboard"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Search for leads
+          </a>
         </div>
       </div>
     );
@@ -566,23 +566,23 @@ export function PipelineTab() {
   // ══════════════════════════════════════════════════════════════
 
   return (
-    <div className="p-4 md:p-6 space-y-5">
+    <div className="p-4 md:p-6 space-y-5 surface-pipeline min-h-full">
 
       {/* ── KPI strip ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Leads</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{allLeads.length}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Active</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{activeLeads}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Won</p>
           <p className="text-2xl font-extrabold text-emerald-600 mt-1">{statusCounts.won}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5">
+        <div className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 elevation-1 hover:border-violet-200 transition-colors">
           <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Win Rate</p>
           <p className="text-2xl font-extrabold text-gray-900 mt-1">{wonRate}<span className="text-base font-semibold text-gray-400">%</span></p>
         </div>
@@ -686,7 +686,7 @@ export function PipelineTab() {
 
       {/* ── Bulk actions bar ──────────────────────────────────── */}
       {selectionMode && (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-violet-50 border border-violet-200 rounded-xl">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-violet-50 border border-violet-200 rounded-xl elevation-2">
           <span className="text-sm font-semibold text-violet-700">{selectedLeads.size} selected</span>
           <div className="flex-1" />
           <button
@@ -711,7 +711,7 @@ export function PipelineTab() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4">
+          <div className="relative bg-white rounded-2xl elevation-3 max-w-sm w-full p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -778,7 +778,7 @@ export function PipelineTab() {
       ) : (
         <>
           {/* ── Desktop table ────────────────────────────────────── */}
-          <div className="hidden md:block bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="hidden md:block bg-white border border-gray-200 rounded-xl overflow-hidden elevation-1">
             <div
               ref={scrollRef}
               className="overflow-auto max-h-[calc(100vh-380px)] min-h-[300px]"
@@ -839,12 +839,14 @@ export function PipelineTab() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {paginatedLeads.map(({ lead, score }) => {
+                  {paginatedLeads.map(({ lead, score }, idx) => {
                     const status = lead.leadStatus || 'new';
+                    const staggerDelay = idx < 10 ? `${idx * 30}ms` : '0ms';
                     return (
                       <tr
                         key={lead.leadId || lead.placeId || lead.name}
-                        className={`group transition-colors ${selectedLeads.has(lead.leadId || '') ? 'bg-violet-50/50' : 'hover:bg-violet-50/30'}`}
+                        className={`group transition-colors ${selectedLeads.has(lead.leadId || '') ? 'bg-violet-50/50' : 'hover:bg-violet-50/30'} ${idx < 10 ? 'animate-fadeInUp' : ''}`}
+                        style={idx < 10 ? { animationDelay: staggerDelay, opacity: 0 } : undefined}
                       >
                         {/* Checkbox */}
                         <td className="pl-5 pr-1 py-3 align-middle w-10">

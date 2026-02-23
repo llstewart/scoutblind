@@ -22,6 +22,7 @@ interface SidebarProps {
   credits: number;
   tier: string;
   userName?: string;
+  pipelineCount?: number;
 }
 
 export function Sidebar({
@@ -32,33 +33,34 @@ export function Sidebar({
   credits,
   tier,
   userName,
+  pipelineCount,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { setShowBillingModal, setShowSettingsModal } = useAppContext();
 
   const tierColors: Record<string, string> = {
-    free: 'text-gray-500 bg-gray-100',
-    starter: 'text-emerald-400 bg-emerald-500/10',
-    pro: 'text-violet-400 bg-violet-500/10',
-    enterprise: 'text-amber-400 bg-amber-500/10',
+    free: 'text-gray-400 bg-white/5',
+    starter: 'text-emerald-400 bg-emerald-500/20',
+    pro: 'text-violet-400 bg-violet-500/20',
+    enterprise: 'text-amber-400 bg-amber-500/20',
   };
 
   return (
     <aside
-      className={`hidden md:flex flex-col h-screen bg-white border-r border-gray-200 transition-all duration-200 ${
+      className={`hidden md:flex flex-col h-screen bg-gray-950 border-r border-gray-800 transition-all duration-200 ${
         isCollapsed ? 'w-16' : 'w-60'
       }`}
     >
       {/* Logo / Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
         {!isCollapsed && (
-          <span className="text-lg font-bold tracking-tight text-gray-900">
+          <span className="text-lg font-bold tracking-tight text-white">
             Packleads<span className="text-violet-500">.</span>
           </span>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded-lg transition-colors"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <svg
@@ -74,15 +76,23 @@ export function Sidebar({
 
       {/* Navigation */}
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+        {/* Section label */}
+        {!isCollapsed && (
+          <p className="text-[10px] uppercase tracking-wider text-gray-600 px-3 mb-1 mt-1">Navigate</p>
+        )}
+
         {/* Search Tab */}
         <button
           onClick={() => onTabChange('search')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+          className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
             activeTab === 'search'
-              ? 'bg-violet-50 text-violet-600'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              ? 'bg-white/10 text-white'
+              : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
           }`}
         >
+          {activeTab === 'search' && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
+          )}
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -93,12 +103,15 @@ export function Sidebar({
         <div>
           <button
             onClick={() => onTabChange('library')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+            className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
               activeTab === 'library'
-                ? 'bg-violet-50 text-violet-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'bg-white/10 text-white'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
             }`}
           >
+            {activeTab === 'library' && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
+            )}
             <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
@@ -106,7 +119,9 @@ export function Sidebar({
               <>
                 <span className="font-semibold flex-1 text-left">Library</span>
                 {recentSearches.length > 0 && (
-                  <span className="text-xs text-gray-500">{recentSearches.length}</span>
+                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
+                    {recentSearches.length}
+                  </span>
                 )}
               </>
             )}
@@ -114,16 +129,16 @@ export function Sidebar({
 
           {/* Recent searches (nested under Library when expanded) */}
           {!isCollapsed && activeTab === 'library' && recentSearches.length > 0 && (
-            <div className="mt-1 ml-4 pl-4 border-l border-gray-200 space-y-0.5">
+            <div className="mt-1 ml-4 pl-4 border-l border-gray-800 space-y-0.5">
               {recentSearches.slice(0, 5).map((search) => (
                 <button
                   key={search.id}
                   onClick={() => onSearchSelect?.(search.id)}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-900 rounded transition-colors truncate"
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-300 rounded transition-colors truncate"
                 >
                   <span
                     className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                      search.analyzedCount > 0 ? 'bg-violet-500' : 'bg-gray-300'
+                      search.analyzedCount > 0 ? 'bg-violet-400' : 'bg-gray-600'
                     }`}
                   />
                   <span className="truncate">
@@ -134,7 +149,7 @@ export function Sidebar({
               {recentSearches.length > 5 && (
                 <button
                   onClick={() => onTabChange('library')}
-                  className="w-full px-2 py-1 text-xs text-gray-400 hover:text-gray-600 text-left"
+                  className="w-full px-2 py-1 text-xs text-gray-600 hover:text-gray-400 text-left"
                 >
                   +{recentSearches.length - 5} more
                 </button>
@@ -147,31 +162,50 @@ export function Sidebar({
         {tier !== 'free' && tier !== '' && (
           <button
             onClick={() => onTabChange('pipeline')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+            className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
               activeTab === 'pipeline'
-                ? 'bg-violet-50 text-violet-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'bg-white/10 text-white'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
             }`}
           >
+            {activeTab === 'pipeline' && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
+            )}
             <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
-            {!isCollapsed && <span className="font-semibold">Pipeline</span>}
+            {!isCollapsed && (
+              <>
+                <span className="font-semibold flex-1 text-left">Pipeline</span>
+                {pipelineCount != null && pipelineCount > 0 && (
+                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
+                    {pipelineCount}
+                  </span>
+                )}
+              </>
+            )}
           </button>
         )}
 
-        {/* Divider */}
-        <div className="my-3 border-t border-gray-200" />
+        {/* Settings section */}
+        <div className="my-3 border-t border-gray-800" />
+
+        {!isCollapsed && (
+          <p className="text-[10px] uppercase tracking-wider text-gray-600 px-3 mb-1">Settings</p>
+        )}
 
         {/* Account Tab */}
         <button
           onClick={() => onTabChange('account')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+          className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
             activeTab === 'account'
-              ? 'bg-violet-50 text-violet-600'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              ? 'bg-white/10 text-white'
+              : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
           }`}
         >
+          {activeTab === 'account' && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
+          )}
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
@@ -181,17 +215,17 @@ export function Sidebar({
 
       {/* Footer - Credits & User */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-gray-200 space-y-3">
+        <div className="p-3 border-t border-gray-800 space-y-3">
           {/* Credits */}
           <button
             onClick={() => setShowBillingModal(true)}
-            className="w-full flex items-center justify-between px-2 py-1.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-sm font-medium text-gray-900">{credits}</span>
+              <span className="text-sm font-medium text-gray-300">{credits}</span>
             </div>
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tierColors[tier] || tierColors.free}`}>
               {tier.toUpperCase()}
@@ -202,31 +236,31 @@ export function Sidebar({
           {userName && (
             <button
               onClick={() => setShowSettingsModal(true)}
-              className="w-full flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
             >
               <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs font-medium">
                 {userName.charAt(0).toUpperCase()}
               </div>
-              <span className="text-sm text-gray-600 truncate">{userName}</span>
+              <span className="text-sm text-gray-300 truncate">{userName}</span>
             </button>
           )}
 
           {/* Footer links */}
           <div className="flex items-center gap-3 px-2 pt-1">
-            <Link href="/contact" className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors">Help</Link>
-            <Link href="/privacy" className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-[10px] text-gray-400 hover:text-gray-600 transition-colors">Terms</Link>
+            <Link href="/contact" className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Help</Link>
+            <Link href="/privacy" className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors">Terms</Link>
           </div>
         </div>
       )}
 
       {/* Collapsed footer */}
       {isCollapsed && (
-        <div className="p-2 border-t border-gray-200">
+        <div className="p-2 border-t border-gray-800">
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={() => setShowBillingModal(true)}
-              className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-center"
+              className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center"
             >
               <span className="text-xs font-bold text-violet-400">{credits}</span>
             </button>

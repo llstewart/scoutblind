@@ -71,7 +71,7 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
             >
               {/* Active indicator line */}
               {isActive && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-violet-500 rounded-full" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] bg-violet-500 rounded-full" />
               )}
 
               {/* Icon with badge */}

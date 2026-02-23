@@ -99,7 +99,7 @@ export function LibraryTab({
     return (
       <div className="min-h-full flex flex-col">
         {/* Header for detail view */}
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 elevation-1">
           <div className="px-4 py-3">
             <div className="flex items-center gap-3">
               {/* Back button */}
@@ -170,28 +170,50 @@ export function LibraryTab({
   // Empty state
   if (searches.length === 0) {
     return (
-      <TabContent>
+      <TabContent className="surface-library min-h-full">
         <div className="mb-6">
           <h1 className="text-xl font-semibold tracking-tight text-gray-900">Library</h1>
           <p className="text-xs text-gray-500 mt-1">Your GBP prospect research</p>
         </div>
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
-            <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        <div className="flex flex-col items-center justify-center py-16 text-center relative">
+          {/* Animated gradient orb */}
+          <div className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-amber-100/40 to-yellow-100/20 blur-3xl -z-10 animate-pulse" />
+
+          {/* Bookmark illustration */}
+          <div className="mb-5">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="mx-auto">
+              <rect x="12" y="8" width="40" height="48" rx="6" stroke="url(#library-grad)" strokeWidth="2.5" fill="none" />
+              <path d="M24 8v20l8-6 8 6V8" stroke="url(#library-grad)" strokeWidth="2" strokeLinejoin="round" fill="none" />
+              <path d="M20 40h24M20 48h16" stroke="url(#library-grad)" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+              <defs>
+                <linearGradient id="library-grad" x1="12" y1="8" x2="52" y2="56">
+                  <stop stopColor="#f59e0b" />
+                  <stop offset="1" stopColor="#fbbf24" />
+                </linearGradient>
+              </defs>
             </svg>
           </div>
-          <h3 className="text-base font-medium text-gray-900 mb-1">No prospects yet</h3>
-          <p className="text-xs text-gray-500 max-w-xs">
-            Search for businesses in the Search tab to find prospects with weak GBP presence.
+
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No saved searches yet</h3>
+          <p className="text-sm text-gray-500 max-w-xs leading-relaxed mb-6">
+            Your search history will appear here after your first search.
           </p>
+          <a
+            href="/dashboard"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Start a search
+          </a>
         </div>
       </TabContent>
     );
   }
 
   return (
-    <TabContent>
+    <TabContent className="surface-library min-h-full">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
@@ -300,8 +322,8 @@ export function LibraryTab({
               {periodSearches.map((search) => (
                 <div
                   key={search.id}
-                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg transition-colors group ${
-                    selectedIds.has(search.id) ? 'bg-violet-50 border border-violet-200' : 'bg-gray-50 hover:bg-gray-100'
+                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg transition-colors group border ${
+                    selectedIds.has(search.id) ? 'bg-violet-50 border-violet-200' : 'bg-gray-50 border-transparent hover:bg-gray-100 hover:border-amber-200'
                   }`}
                 >
                   {/* Checkbox (edit mode) */}
@@ -392,7 +414,7 @@ export function LibraryTab({
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(null)} />
-          <div className="relative bg-white rounded-2xl p-6 shadow-2xl shadow-black/10 w-full max-w-sm border border-gray-200">
+          <div className="relative bg-white rounded-2xl p-6 elevation-3 w-full max-w-sm border border-gray-200">
             <div className="flex justify-center mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10">
                 <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

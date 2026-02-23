@@ -18,6 +18,7 @@ interface AppShellProps {
   children: ReactNode;
   recentSearches?: SavedSearch[];
   libraryCount?: number;
+  pipelineCount?: number;
   credits: number;
   tier: string;
   userName?: string;
@@ -28,6 +29,7 @@ export function AppShell({
   children,
   recentSearches = [],
   libraryCount = 0,
+  pipelineCount,
   credits,
   tier,
   userName,
@@ -55,6 +57,7 @@ export function AppShell({
         credits={credits}
         tier={tier}
         userName={userName}
+        pipelineCount={pipelineCount}
       />
 
       {/* Main Content Area */}

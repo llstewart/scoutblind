@@ -134,7 +134,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }} role="presentation" />
 
-      <div role="dialog" aria-modal="true" aria-labelledby="billing-modal-title" className="relative bg-white rounded-2xl shadow-2xl shadow-black/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto m-2 sm:m-4">
+      <div role="dialog" aria-modal="true" aria-labelledby="billing-modal-title" className="relative bg-white rounded-2xl elevation-3 w-full max-w-5xl max-h-[90vh] overflow-y-auto m-2 sm:m-4">
         {/* Header */}
         <div className="sticky top-0 bg-white p-4 sm:p-6 flex items-start sm:items-center justify-between z-10 gap-4">
           <div className="min-w-0">

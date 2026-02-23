@@ -247,7 +247,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl shadow-black/10 overflow-hidden">
+      <div className="relative w-full max-w-lg bg-white rounded-xl elevation-3 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">

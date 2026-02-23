@@ -200,7 +200,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   if (compact) {
     return (
       <form ref={formRef} onSubmit={handleSubmit} className="w-full">
-        <div className="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 shadow-lg shadow-black/5">
+        <div className="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 elevation-1">
           {/* Niche Section */}
           <div ref={nicheInputRef} className="relative flex items-center gap-2">
             <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -386,7 +386,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
   // ============================================
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="w-full max-w-lg mx-auto px-4 sm:px-0">
-      <div className="bg-gray-50 border border-gray-200 rounded-2xl shadow-lg shadow-black/5 p-3 sm:p-6 space-y-3 sm:space-y-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl elevation-1 p-3 sm:p-6 space-y-3 sm:space-y-4">
 
         {/* Niche Input */}
         <div ref={nicheInputRef} className="relative">

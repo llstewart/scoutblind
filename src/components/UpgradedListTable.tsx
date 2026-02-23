@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { EnrichedBusiness, TableBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
 import { StatusTag } from './StatusTag';
 import { CellSpinner } from './CellSpinner';
+import ScoreRing from '@/components/ui/ScoreRing';
 import { formatDate } from '@/utils/date';
 import {
   getDormancyStatus,
@@ -1063,6 +1064,9 @@ export function UpgradedListTable({ businesses, niche, location, isLoadingMore, 
                   {/* Business Name with status dot + actions */}
                   <td className={`${cellPadding} font-medium text-gray-800`}>
                     <div className="flex items-center gap-1.5">
+                      {isEnriched && (
+                        <ScoreRing score={score} size="sm" />
+                      )}
                       {isEnriched && onStatusChange && (
                         <StatusDotPopover
                           status={(business as EnrichedBusiness).leadStatus || 'new'}

@@ -181,7 +181,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Welcome to Packleads"
-        className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-black/10 w-full max-w-lg m-4 overflow-hidden"
+        className="relative bg-white border border-gray-200 rounded-2xl elevation-3 w-full max-w-lg m-4 overflow-hidden"
       >
         {/* Close button */}
         <button

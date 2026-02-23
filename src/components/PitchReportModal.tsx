@@ -80,7 +80,7 @@ export function PitchReportModal({ business, niche, location, onClose }: PitchRe
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm pitch-report-backdrop" onClick={onClose} />
 
         {/* Modal */}
-        <div className="relative w-full max-w-3xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col mx-4 pitch-report-container">
+        <div className="relative w-full max-w-3xl max-h-[90vh] bg-white rounded-xl elevation-3 overflow-hidden flex flex-col mx-4 pitch-report-container">
           {/* Action bar */}
           <div className="px-6 py-3 border-b border-gray-200 flex items-center justify-between flex-shrink-0 pitch-report-actions bg-white">
             <div className="flex items-center gap-3">

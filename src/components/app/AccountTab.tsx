@@ -59,8 +59,9 @@ export function AccountTab({
       </div>
 
       {/* Profile Card */}
-      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6">
-        <div className="flex items-center gap-4">
+      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6 elevation-1 overflow-hidden">
+        <div className="flex items-center gap-4 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-violet-50/50 to-transparent -m-6 p-6 pointer-events-none" />
           {userAvatar ? (
             <img
               src={userAvatar}
@@ -83,7 +84,7 @@ export function AccountTab({
       </div>
 
       {/* Credits Card */}
-      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6">
+      <div className="rounded-xl bg-white border border-gray-200 p-6 mb-6 elevation-1">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Credits Remaining</h3>
@@ -130,7 +131,7 @@ export function AccountTab({
       </div>
 
       {/* Menu Items */}
-      <div className="rounded-xl bg-white border border-gray-200 overflow-hidden mb-6">
+      <div className="rounded-xl bg-white border border-gray-200 overflow-hidden mb-6 elevation-1">
         <button
           onClick={onOpenSettings}
           className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-gray-600 hover:bg-gray-50 transition-colors border-b border-gray-200"

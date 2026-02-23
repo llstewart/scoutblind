@@ -21,6 +21,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     recentSearches,
     savedAnalysesCount,
     savedSearchesList,
+    allLeads,
     handleLoadFromHistory,
     showAuthModal,
     setShowAuthModal,
@@ -49,6 +50,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         userName={userName}
         recentSearches={recentSearches}
         libraryCount={savedAnalysesCount}
+        pipelineCount={allLeads.length}
         onSearchSelect={(searchId) => {
           const search = savedSearchesList.find(s => s.id === searchId);
           if (search) {

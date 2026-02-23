@@ -51,8 +51,7 @@ export function ResultsView() {
   const [reportBusiness, setReportBusiness] = useState<EnrichedBusiness | null>(null);
 
   return (
-    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl gap-4"
-         style={{ boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)' }}>
+    <div className="flex flex-col h-full bg-white border-l-2 border-violet-500 border border-gray-200 rounded-xl gap-4 elevation-1">
       {/* Search Context Header */}
       {searchParams && !isViewingSavedSearch && (
         <div className="flex items-center gap-2 text-sm text-gray-500 px-4 pt-4">
