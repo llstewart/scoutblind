@@ -1,6 +1,6 @@
 'use client';
 
-import { Lock, Check, Sparkles } from 'lucide-react';
+import { Lock, Check, ArrowUpRight } from 'lucide-react';
 import { StatusTag } from './StatusTag';
 
 interface PremiumGateProps {
@@ -193,7 +193,7 @@ export function PremiumGate({ onUpgradeClick, niche, location, exhausted }: Prem
                 onClick={onUpgradeClick}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20 active:scale-[0.97]"
               >
-                <Sparkles size={20} />
+                <ArrowUpRight size={20} />
                 View Subscription Plans
               </button>
 

@@ -10,7 +10,7 @@ import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/t
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
-import { Search, Plus, Download, ScanSearch, Zap, Lock, AlertTriangle, Check, Info, Loader2 } from 'lucide-react';
+import { Search, Plus, Download, ScanSearch, ArrowUpRight, Lock, AlertTriangle, Check, Info, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
@@ -346,7 +346,7 @@ export function ResultsView() {
               {/* Conversion Banner */}
               <div className="px-4 py-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-violet-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Zap size={20} className="text-violet-500" />
+                  <ArrowUpRight size={20} className="text-violet-500" />
                   <span className="text-sm text-gray-700">
                     You&apos;re seeing <strong className="text-violet-600">3 of {businesses.length}</strong> enriched results.{' '}
                     <button onClick={handleUpgradeClick} className="text-violet-600 font-semibold hover:underline">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Check, Zap, Loader2, CreditCard, Sparkles } from 'lucide-react';
+import { Check, Gauge, Loader2, CreditCard, TrendingUp, Coins } from 'lucide-react';
 import { SUBSCRIPTION_TIERS, CREDIT_PACKS } from '@/lib/pricing';
 import { useUser } from '@/hooks/useUser';
 import { Modal } from './ui/Modal';
@@ -212,7 +212,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
                     {isPopular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                         <span className="px-3 py-1 bg-violet-500 text-white text-xs font-medium rounded-full flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" />
+                          <TrendingUp className="w-3 h-3" />
                           Most Popular
                         </span>
                       </div>
@@ -236,7 +236,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
                         )}
                       </div>
                       <p className="text-sm text-violet-400 mt-2">
-                        <Zap className="w-4 h-4 inline mr-1" />
+                        <Gauge className="w-4 h-4 inline mr-1" />
                         {tier.credits} analyses/month
                       </p>
                     </div>
@@ -315,7 +315,7 @@ export function BillingModal({ isOpen, onClose, currentTier, creditsRemaining }:
                   >
                     <div className="text-center mb-4">
                       <div className="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <Zap className="w-6 h-6 text-violet-400" />
+                        <Coins className="w-6 h-6 text-violet-400" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900">{pack.name}</h3>
                     </div>
