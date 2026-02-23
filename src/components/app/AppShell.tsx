@@ -49,7 +49,7 @@ export function AppShell({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-background flex">
       {/* Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}

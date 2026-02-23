@@ -10,7 +10,7 @@ import { isPendingBusiness, isEnrichedBusiness, EnrichedBusiness } from '@/lib/t
 import { exportGeneralListToCSV, exportEnrichedListToCSV } from '@/lib/export';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
-import { Search, Plus, Download, Sparkles, Zap, Lock, AlertTriangle, Check, Info, Loader2 } from 'lucide-react';
+import { Search, Plus, Download, ScanSearch, Zap, Lock, AlertTriangle, Check, Info, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
@@ -177,7 +177,7 @@ export function ResultsView() {
                 disabled={isAnalyzing}
                 className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
               >
-                <Sparkles size={16} />
+                <ScanSearch size={16} />
                 <span className="hidden sm:inline">
                   {selectedBusinesses.size > 0
                     ? `Get Intel on ${selectedBusinesses.size}`
@@ -206,7 +206,7 @@ export function ResultsView() {
                     disabled={isPreviewEnriching}
                     className="px-3 sm:px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-all flex items-center gap-2 disabled:opacity-50"
                   >
-                    <Sparkles size={16} />
+                    <ScanSearch size={16} />
                     <span className="hidden sm:inline">
                       {isPreviewEnriching ? 'Analyzing...' : `Get Free Intel (${selectedBusinesses.size}/3)`}
                     </span>

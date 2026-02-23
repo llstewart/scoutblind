@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Loader2, Sparkles, Lock, Phone, Globe, Check, Download } from 'lucide-react';
+import { Search, Loader2, ScanSearch, Lock, Phone, Globe, Check, Download } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { Business, EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
 import { StatusTag } from './StatusTag';
@@ -387,7 +387,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                       </>
                     ) : (
                       <>
-                        <Sparkles size={16} />
+                        <ScanSearch size={16} />
                         Get Lead Intel
                       </>
                     )}
