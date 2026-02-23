@@ -68,7 +68,7 @@ const SCORE_RANGES = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
+    <div className="force-light min-h-screen bg-white flex flex-col">
       <MarketingHeader />
 
       {/* Hero */}
@@ -97,7 +97,7 @@ export default function FeaturesPage() {
             {SIGNAL_CATEGORIES.map((cat) => (
               <div
                 key={cat.label}
-                className={`rounded-lg border border-gray-200 border-l-[3px] ${cat.accentColor} bg-white dark:bg-card p-6`}
+                className={`rounded-lg border border-gray-200 border-l-[3px] ${cat.accentColor} bg-white p-6`}
               >
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className={`text-xs font-semibold uppercase tracking-wider ${cat.textColor}`}>{cat.label}</span>
@@ -158,19 +158,19 @@ export default function FeaturesPage() {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="rounded-lg border border-gray-200 bg-white dark:bg-card p-6">
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
               <h3 className="text-base font-semibold text-gray-900 mb-2">Audit Reports</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Generate a printable report showing a prospect their exact gaps — search ranking, review health, web presence. Send it cold or use it to open the call.
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white dark:bg-card p-6">
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
               <h3 className="text-base font-semibold text-gray-900 mb-2">Outreach Templates</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Get ready-to-send email templates pre-filled with each prospect&apos;s actual data. No more generic cold emails — every message references their specific problems.
               </p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white dark:bg-card p-6">
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
               <h3 className="text-base font-semibold text-gray-900 mb-2">CSV Export</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Download your full prospect list with scores, signals, and contact info — structured and ready for your CRM or outreach tool.

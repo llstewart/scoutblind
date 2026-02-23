@@ -135,7 +135,7 @@ export function MarketingPage() {
   const businessCount = useCountUp(10000, 2200, stats.visible); // 2.2s heavy spin
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col">
+    <div className="force-light min-h-screen bg-white flex flex-col">
       <MarketingHeader />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
@@ -222,7 +222,7 @@ export function MarketingPage() {
           <div ref={charts.ref} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Chart 1: Opportunity Breakdown */}
             <div
-              className={`rounded-xl p-5 border border-gray-200 bg-white dark:bg-card shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-xl p-5 border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out ${
                 charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
             >
@@ -251,7 +251,7 @@ export function MarketingPage() {
 
             {/* Chart 2: Claim Status (Donut) */}
             <div
-              className={`rounded-xl p-5 border border-gray-200 bg-white dark:bg-card shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-xl p-5 border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out ${
                 charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{ transitionDelay: charts.visible ? '150ms' : '0ms' }}
@@ -295,7 +295,7 @@ export function MarketingPage() {
 
             {/* Chart 3: Avg Market Health (Radar) */}
             <div
-              className={`rounded-xl p-5 border border-gray-200 bg-white dark:bg-card shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-xl p-5 border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out ${
                 charts.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               }`}
               style={{ transitionDelay: charts.visible ? '300ms' : '0ms' }}

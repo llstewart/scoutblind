@@ -13,7 +13,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <Suspense fallback={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-background flex items-center justify-center">
           <div className="text-center">
             <BrandedSpinner size="md" />
             <p className="text-gray-500 text-sm mt-4">Loading...</p>

@@ -54,7 +54,7 @@ export default function PricingPage() {
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Free */}
-          <div className="p-6 rounded-xl border border-gray-200 bg-white dark:bg-card shadow-sm">
+          <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
             <h2 className="text-base font-semibold text-gray-900 mb-1">Free</h2>
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$0</span>
@@ -115,7 +115,7 @@ export default function PricingPage() {
           </div>
 
           {/* Pro */}
-          <div className="p-6 rounded-xl border border-gray-200 bg-white dark:bg-card shadow-sm">
+          <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
             <h2 className="text-base font-semibold text-gray-900 mb-1">Pro</h2>
             <div className="mb-5">
               <span className="text-3xl font-bold text-gray-900">$79</span>

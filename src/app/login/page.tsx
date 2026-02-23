@@ -5,7 +5,7 @@ import { AuthForm } from '@/components/auth/AuthForm';
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 flex">
+    <div className="force-light min-h-screen bg-white flex">
       {/* Left panel — brand / trust (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-[45%] relative bg-gray-50 flex-col justify-between overflow-hidden">
         {/* Subtle dot pattern */}
@@ -67,7 +67,7 @@ export default function LoginPage() {
                 },
               ].map((item) => (
                 <div key={item.text} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white dark:bg-card border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
                     {item.icon}
                   </div>
                   <span className="text-sm text-gray-600">{item.text}</span>

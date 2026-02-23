@@ -25,7 +25,7 @@ export function MarketingHeader() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 bg-white dark:bg-gray-950 transition-shadow duration-200 ${scrolled ? 'shadow-[0_1px_3px_rgba(0,0,0,0.06)]' : ''}`}>
+    <header className={`sticky top-0 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-[0_1px_3px_rgba(0,0,0,0.06)]' : ''}`}>
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <img src="/icon.svg" alt="" className="w-7 h-7" />
@@ -87,7 +87,7 @@ export function MarketingHeader() {
 
       {/* Mobile dropdown */}
       {menuOpen && !isLoggedIn && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-950 border-t border-gray-200 px-4 py-3 flex flex-col gap-1 shadow-lg">
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex flex-col gap-1 shadow-lg">
           <Link
             href="/features"
             onClick={() => setMenuOpen(false)}
