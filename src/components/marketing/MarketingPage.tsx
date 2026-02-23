@@ -15,19 +15,19 @@ import { MarketingFooter } from './MarketingFooter';
 const faqItems = [
   {
     q: 'What is Packleads?',
-    a: 'Packleads scans Google Business Profiles in any market and analyzes key GBP signals — like review response rates, owner activity, and local pack rankings — to help agencies and freelancers find prospects who actually need their services.',
+    a: 'Packleads finds businesses that need your services and tells you exactly why — so you can pitch with proof instead of guessing. Enter a market, get a scored prospect list, and reach out with personalized audit reports and outreach templates.',
   },
   {
     q: 'How do credits work?',
-    a: 'Each search costs 1 credit. A search scans all GBP profiles for a given niche + location and returns a prioritized prospect list. You get 5 free credits on signup, and can purchase more anytime.',
+    a: 'Each scan costs 1 credit and returns ~25 qualified prospects. You get free credits on signup to try it on a real market. Paid plans start at $29/month for 50 scans — that\'s over 1,200 leads.',
   },
   {
     q: 'Is the data accurate?',
     a: 'We pull directly from Google\'s public business data — the same listings, reviews, and rankings you\'d find manually. Packleads automates the collection and scores each business based on concrete signals like reply rate, review recency, and local pack position. No guesswork, no AI-generated estimates.',
   },
   {
-    q: 'Can I export my data?',
-    a: 'Yes. Every search result can be exported as a CSV file with all prospect data and signal scores, ready for your outreach workflow.',
+    q: 'What do I get beyond a list of names?',
+    a: 'Every enriched lead comes with a Need Score, specific gap analysis (search visibility, review health, web presence), a printable audit report you can send to the prospect, and personalized outreach templates. You\'re not just finding leads — you\'re walking into every pitch prepared.',
   },
 ];
 
@@ -147,7 +147,7 @@ export function MarketingPage() {
           </h1>
 
           <p className="text-sm md:text-base text-gray-600 mb-8 max-w-xl mx-auto leading-relaxed">
-            Packleads scans your entire market and scores hidden signals most agencies miss — review response rates, owner dormancy, search visibility gaps — so you know exactly which businesses need help and how badly.
+            Know exactly which businesses need your services, why they need them, and what to say when you reach out — before you ever pick up the phone.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -158,7 +158,7 @@ export function MarketingPage() {
               Start Your First Scan
             </Link>
             <p className="text-xs text-gray-400">
-              No credit card required. 5 free scans.
+              No credit card required. Analyze your first market free.
             </p>
           </div>
         </div>
@@ -183,25 +183,25 @@ export function MarketingPage() {
             Stop guessing which businesses to pitch.
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10">
-            Enter a niche and location. Packleads pulls every business in that market, analyzes 10+ ranking signals per profile, and scores each one by how urgently they need your services — so you pitch the right businesses first.
+            Enter a niche and location. In minutes you&apos;ll have a scored prospect list — sorted by who needs help the most — with the data you need to pitch each one.
           </p>
 
           <div ref={stats.ref} className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4">
             <div>
               <div className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                {stats.visible ? `${signalCount}+` : '0+'}
+                ~25
               </div>
-              <div className="text-xs text-gray-600 mt-1">Signals per business</div>
+              <div className="text-xs text-gray-600 mt-1">Qualified leads per scan</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-extrabold text-gray-900">
                 {stats.visible ? `${businessCount.toLocaleString()}+` : '0+'}
               </div>
-              <div className="text-xs text-gray-600 mt-1">Businesses analyzed</div>
+              <div className="text-xs text-gray-600 mt-1">Businesses scored to date</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-extrabold text-gray-900">CSV</div>
-              <div className="text-xs text-gray-600 mt-1">One-click export</div>
+              <div className="text-3xl md:text-4xl font-extrabold text-gray-900">$0.02</div>
+              <div className="text-xs text-gray-600 mt-1">Per lead on Starter</div>
             </div>
           </div>
         </div>
@@ -344,13 +344,13 @@ export function MarketingPage() {
                 },
                 {
                   num: '02',
-                  title: 'Read the signals',
-                  desc: 'Review rates, response times, rankings, claim status, website quality — 10+ signals analyzed per business.',
+                  title: 'See who needs you',
+                  desc: 'Every business gets a Need Score based on real gaps — ignored reviews, missing websites, invisible search rankings. You\'ll know exactly why they need help.',
                 },
                 {
                   num: '03',
-                  title: 'Export and pitch',
-                  desc: 'Download a prioritized prospect list. Every business is sorted by who needs your services most.',
+                  title: 'Pitch with proof',
+                  desc: 'Generate a personalized audit report showing each prospect their gaps. Send it cold, or use it to open the call with something they can\'t ignore.',
                 },
               ].map((item, i) => (
                 <div key={i} className="flex gap-5">
@@ -371,10 +371,10 @@ export function MarketingPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="max-w-xl mb-10">
             <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
-              Export-ready prospect lists
+              Everything you need to close — built in
             </h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Every scan produces a structured CSV with scores, signals, and contact info — ready for your CRM or outreach tool.
+              Packleads doesn&apos;t just find leads. It arms you with the outreach tools to convert them.
             </p>
           </div>
 
@@ -389,9 +389,9 @@ export function MarketingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
             {[
-              'Name, phone, website, and address for every business',
-              'Rating, review count, response rate, and days dormant',
-              'Search visibility, website tech, optimization status, and claim data',
+              'Personalized audit reports you can send cold — showing each prospect exactly where they\'re losing customers',
+              'Ready-to-send outreach templates pre-filled with the prospect\'s actual gaps and data',
+              'CSV export with scores, contact info, and signals — ready for your CRM or outreach tool',
             ].map((text) => (
               <div key={text} className="flex items-start gap-2.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 mt-1.5" />
@@ -453,7 +453,7 @@ export function MarketingPage() {
             Every day you spend scrolling Maps is a day someone else closes that client.
           </p>
           <p className="text-xs text-gray-500 mb-8">
-            5 free scans. No credit card. Each scan returns ~25 businesses — that&apos;s $0.02 per lead on Starter.
+            Try it free. No credit card. One closed client pays for 3 years of Pro.
           </p>
           <Link
             href="/signup"
