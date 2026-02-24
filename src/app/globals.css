@@ -188,15 +188,16 @@ body {
   overflow-x: hidden;
   height: 100%;
   background: var(--background);
+  /* Prevent rubber-band overscroll from revealing background — standard for web apps */
+  overscroll-behavior-y: none;
 }
 
-/* Prevent black flash on mobile pull-to-refresh overscroll */
 html {
-  background-color: #ffffff;
-}
-.dark html,
-html.dark {
-  background-color: #0c0a09;
+  /* Mobile: remove tap highlight flash on interactive elements */
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent iOS text size inflation on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {

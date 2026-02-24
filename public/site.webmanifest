@@ -1,11 +1,11 @@
 {
-  "name": "Scoutblind",
-  "short_name": "Scoutblind",
-  "description": "Find SEO prospects in half the time",
+  "name": "Packleads",
+  "short_name": "Packleads",
+  "description": "Enriched local leads, instantly. Find businesses that need your services.",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#0f0f10",
-  "theme_color": "#0f0f10",
+  "background_color": "#ffffff",
+  "theme_color": "#0d7c7b",
   "icons": [
     {
       "src": "/icon-192.png",

@@ -53,7 +53,6 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   other: {
-    'theme-color': '#ffffff',
     'msapplication-TileColor': '#ffffff',
   },
 };
@@ -101,6 +100,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        {/* Browser chrome color — adapts to system color scheme */}
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0c0a09" media="(prefers-color-scheme: dark)" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdApp) }}
