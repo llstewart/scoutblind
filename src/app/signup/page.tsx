@@ -11,12 +11,12 @@ export default function SignupPage() {
         {/* Floating orbs — layered depth */}
         <div className="absolute top-[8%] right-[10%] w-[280px] h-[280px] bg-violet-400/20 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute top-[5%] left-[-5%] w-[180px] h-[180px] bg-violet-300/15 rounded-full blur-[60px] pointer-events-none" />
-        <div className="absolute top-[35%] right-[-8%] w-[120px] h-[120px] bg-purple-400/25 rounded-full blur-[40px] pointer-events-none" />
+        <div className="absolute top-[35%] right-[-8%] w-[120px] h-[120px] bg-violet-400/25 rounded-full blur-[40px] pointer-events-none" />
         <div className="absolute top-[50%] left-[15%] w-[350px] h-[350px] bg-violet-800/30 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-[15%] right-[20%] w-[200px] h-[200px] bg-violet-400/15 rounded-full blur-[70px] pointer-events-none" />
-        <div className="absolute bottom-[5%] left-[5%] w-[160px] h-[160px] bg-purple-300/10 rounded-full blur-[50px] pointer-events-none" />
+        <div className="absolute bottom-[5%] left-[5%] w-[160px] h-[160px] bg-violet-300/10 rounded-full blur-[50px] pointer-events-none" />
         <div className="absolute top-[18%] left-[40%] w-[80px] h-[80px] bg-violet-300/20 rounded-full blur-[25px] pointer-events-none" />
-        <div className="absolute bottom-[30%] left-[35%] w-[100px] h-[100px] bg-fuchsia-400/10 rounded-full blur-[35px] pointer-events-none" />
+        <div className="absolute bottom-[30%] left-[35%] w-[100px] h-[100px] bg-violet-400/10 rounded-full blur-[35px] pointer-events-none" />
 
         {/* Content */}
         <div className="relative flex flex-col justify-center flex-1 px-12 xl:px-16">

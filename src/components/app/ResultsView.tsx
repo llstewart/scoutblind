@@ -344,7 +344,7 @@ export function ResultsView() {
           isPreviewMode ? (
             <div>
               {/* Conversion Banner */}
-              <div className="px-4 py-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-violet-200 flex items-center justify-between">
+              <div className="px-4 py-3 bg-gradient-to-r from-violet-500/10 to-violet-400/10 border-b border-violet-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ArrowUpRight size={20} className="text-violet-500" />
                   <span className="text-sm text-gray-700">

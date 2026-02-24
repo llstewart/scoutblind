@@ -36,8 +36,8 @@ export function BrandedSpinner({ size = 'md', className = '' }: BrandedSpinnerPr
     >
       <defs>
         <linearGradient id={`spinner-grad-${size}`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#6f4fd4" />
-          <stop offset="100%" stopColor="#bfadfb" />
+          <stop offset="0%" stopColor="#0d7c7b" />
+          <stop offset="100%" stopColor="#78e3de" />
         </linearGradient>
       </defs>
       <circle

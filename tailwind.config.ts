@@ -10,19 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Custom deep indigo-violet — shifted cooler than Tailwind's stock violet
+        // Packleads Deep Teal — custom brand color
         violet: {
-          50: '#f5f2ff',
-          100: '#ece6ff',
-          200: '#d9cffd',
-          300: '#bfadfb',
-          400: '#a088f5',
-          500: '#8466e8',
-          600: '#6f4fd4',
-          700: '#5d3fc0',
-          800: '#4e35a0',
-          900: '#412c84',
-          950: '#281960',
+          50: '#eefdfb',
+          100: '#d5f7f5',
+          200: '#aef0ec',
+          300: '#78e3de',
+          400: '#3acfca',
+          500: '#119a98',
+          600: '#0d7c7b',
+          700: '#106463',
+          800: '#125050',
+          900: '#144242',
+          950: '#082929',
         },
         // Warm neutral gray scale — mapped to CSS variables
         gray: {

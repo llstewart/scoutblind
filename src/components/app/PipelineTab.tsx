@@ -520,20 +520,20 @@ export function PipelineTab() {
       <div className="p-4 md:p-6 surface-pipeline min-h-full">
         <div className="flex flex-col items-center justify-center py-28 text-center relative">
           {/* Animated gradient orb */}
-          <div className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-violet-200/40 to-purple-200/20 blur-3xl -z-10 animate-pulse" />
+          <div className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-violet-200/40 to-violet-300/20 blur-3xl -z-10 animate-pulse" />
 
           {/* Pipeline illustration */}
           <div className="mb-6">
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="mx-auto">
               <rect x="16" y="8" width="48" height="64" rx="8" stroke="url(#pipeline-grad)" strokeWidth="2.5" fill="none" />
               <path d="M28 24h24M28 36h24M28 48h16" stroke="url(#pipeline-grad)" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="24" cy="24" r="2" fill="#6f4fd4" opacity="0.6" />
-              <circle cx="24" cy="36" r="2" fill="#6f4fd4" opacity="0.4" />
-              <circle cx="24" cy="48" r="2" fill="#6f4fd4" opacity="0.2" />
+              <circle cx="24" cy="24" r="2" fill="#0d7c7b" opacity="0.6" />
+              <circle cx="24" cy="36" r="2" fill="#0d7c7b" opacity="0.4" />
+              <circle cx="24" cy="48" r="2" fill="#0d7c7b" opacity="0.2" />
               <defs>
                 <linearGradient id="pipeline-grad" x1="16" y1="8" x2="64" y2="72">
-                  <stop stopColor="#6f4fd4" />
-                  <stop offset="1" stopColor="#a088f5" />
+                  <stop stopColor="#0d7c7b" />
+                  <stop offset="1" stopColor="#3acfca" />
                 </linearGradient>
               </defs>
             </svg>

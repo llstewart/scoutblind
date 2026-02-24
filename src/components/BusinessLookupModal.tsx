@@ -395,7 +395,7 @@ export function BusinessLookupModal({ isOpen, onClose, isPremium, onUpgradeClick
                 ) : (
                   <button
                     onClick={onUpgradeClick}
-                    className="flex-1 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <Lock size={16} />
                     Unlock Lead Intel

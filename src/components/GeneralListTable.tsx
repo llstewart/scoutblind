@@ -888,7 +888,7 @@ export function GeneralListTable({
             <tfoot>
               <tr>
                 <td colSpan={99}>
-                  <div className="flex items-center justify-center gap-3 py-3 px-4 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 border-t border-violet-500/20">
+                  <div className="flex items-center justify-center gap-3 py-3 px-4 bg-gradient-to-r from-violet-500/10 via-violet-500/10 to-violet-500/10 border-t border-violet-500/20">
                     <Lock className="w-4 h-4 text-violet-400" />
                     <span className="text-xs text-gray-500">Claim status, website tech, search visibility &amp; more hidden</span>
                     <button

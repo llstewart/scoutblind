@@ -16,7 +16,7 @@ const COLORS = {
   high: '#10b981',    // emerald-500
   medium: '#f59e0b',  // amber-500
   low: '#ef4444',     // red-500
-  primary: '#6f4fd4', // custom violet-600
+  primary: '#0d7c7b', // packleads teal-600
   neutral: '#71717a', // zinc-500
   neutralDark: '#d1d5db', // gray-300
   claimed: '#10b981',
@@ -31,7 +31,7 @@ const TOOLTIP_STYLE = {
     color: '#374151',
     fontSize: '13px',
   },
-  cursor: { fill: 'rgba(139, 92, 246, 0.05)' },
+  cursor: { fill: 'rgba(13, 124, 123, 0.05)' },
 };
 
 const GRID_STROKE = '#e5e7eb';

@@ -36,7 +36,7 @@ const CHART_COLORS = {
   high: '#10b981',
   medium: '#f59e0b',
   low: '#ef4444',
-  primary: '#6f4fd4',
+  primary: '#0d7c7b',
   claimed: '#10b981',
   unclaimed: '#ef4444',
 };
@@ -49,7 +49,7 @@ const CHART_TOOLTIP_STYLE = {
     color: '#374151',
     fontSize: '13px',
   },
-  cursor: { fill: 'rgba(139, 92, 246, 0.05)' },
+  cursor: { fill: 'rgba(13, 124, 123, 0.05)' },
 };
 
 const CHART_GRID_STROKE = '#e5e7eb';

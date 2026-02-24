@@ -36,11 +36,11 @@ function WelcomeVisual() {
   return (
     <div className="relative flex items-center justify-center w-full h-44">
       {/* Layered gradient orbs */}
-      <div className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-violet-600/20 to-purple-600/10 blur-2xl" />
-      <div className="absolute w-24 h-24 rounded-full bg-gradient-to-tr from-violet-500/15 to-fuchsia-500/10 blur-xl" style={{ top: '10%', right: '25%' }} />
+      <div className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-violet-600/20 to-violet-500/10 blur-2xl" />
+      <div className="absolute w-24 h-24 rounded-full bg-gradient-to-tr from-violet-500/15 to-violet-400/10 blur-xl" style={{ top: '10%', right: '25%' }} />
       {/* Stylized wordmark */}
       <div className="relative">
-        <span className="text-4xl font-black tracking-tight bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+        <span className="text-4xl font-black tracking-tight bg-gradient-to-r from-violet-400 via-violet-500 to-violet-600 bg-clip-text text-transparent">
           SB
         </span>
         <div className="absolute -inset-3 rounded-2xl bg-violet-500/5 border border-violet-500/10" />
@@ -129,7 +129,7 @@ function ReadyVisual() {
   return (
     <div className="relative flex items-center justify-center w-full h-44">
       {/* Background glow */}
-      <div className="absolute w-36 h-36 rounded-full bg-gradient-to-br from-violet-600/15 to-purple-600/10 blur-2xl" />
+      <div className="absolute w-36 h-36 rounded-full bg-gradient-to-br from-violet-600/15 to-violet-500/10 blur-2xl" />
       {/* Big credit number */}
       <div className="relative flex flex-col items-center">
         <span className="text-7xl font-black bg-gradient-to-b from-gray-900 to-gray-500 bg-clip-text text-transparent leading-none">

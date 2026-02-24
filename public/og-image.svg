@@ -2,7 +2,7 @@
   <defs>
     <!-- Subtle radial glow behind the logo area -->
     <radialGradient id="glow" cx="50%" cy="45%" r="50%">
-      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.08"/>
+      <stop offset="0%" stop-color="#0d7c7b" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#0f0f10" stop-opacity="0"/>
     </radialGradient>
     <!-- Top-down subtle gradient for depth -->
@@ -10,10 +10,10 @@
       <stop offset="0%" stop-color="#141416"/>
       <stop offset="100%" stop-color="#0a0a0b"/>
     </linearGradient>
-    <!-- Violet accent gradient for the eye icon -->
-    <linearGradient id="violetGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#a78bfa"/>
-      <stop offset="100%" stop-color="#7c3aed"/>
+    <!-- Teal accent gradient for the eye icon -->
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3acfca"/>
+      <stop offset="100%" stop-color="#0d7c7b"/>
     </linearGradient>
     <!-- Subtle grid pattern -->
     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -34,22 +34,22 @@
   <rect x="1" y="1" width="1198" height="628" rx="0" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
 
   <!-- Top decorative line -->
-  <rect x="0" y="0" width="1200" height="2" fill="#8b5cf6" opacity="0.6"/>
+  <rect x="0" y="0" width="1200" height="2" fill="#0d7c7b" opacity="0.6"/>
 
   <!-- Eye icon - centered above text -->
   <g transform="translate(554, 145)">
     <!-- Eye outer shape -->
     <path d="M46 16C30 16 16 40 16 40s14 24 30 24 30-24 30-24-14-24-30-24z"
-          stroke="url(#violetGrad)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          stroke="url(#tealGrad)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     <!-- Pupil -->
-    <circle cx="46" cy="40" r="10" fill="url(#violetGrad)"/>
+    <circle cx="46" cy="40" r="10" fill="url(#tealGrad)"/>
     <!-- Inner highlight -->
-    <circle cx="43" cy="37" r="3" fill="#c4b5fd" opacity="0.5"/>
+    <circle cx="43" cy="37" r="3" fill="#78e3de" opacity="0.5"/>
   </g>
 
   <!-- Logo text: "Scoutblind." -->
   <text x="600" y="290" text-anchor="middle" font-family="'Outfit', 'Inter', system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#fafafa" letter-spacing="-1">
-    Scoutblind<tspan fill="#8b5cf6">.</tspan>
+    Scoutblind<tspan fill="#0d7c7b">.</tspan>
   </text>
 
   <!-- Tagline -->
@@ -58,21 +58,21 @@
   </text>
 
   <!-- Divider line -->
-  <rect x="525" y="370" width="150" height="1" fill="#8b5cf6" opacity="0.3" rx="1"/>
+  <rect x="525" y="370" width="150" height="1" fill="#0d7c7b" opacity="0.3" rx="1"/>
 
   <!-- Feature pills row -->
   <g transform="translate(600, 410)" text-anchor="middle">
     <!-- Pill 1 -->
-    <rect x="-295" y="-16" width="155" height="32" rx="16" fill="#8b5cf6" fill-opacity="0.08" stroke="#8b5cf6" stroke-opacity="0.2" stroke-width="1"/>
-    <text x="-218" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#a78bfa">Signal Analysis</text>
+    <rect x="-295" y="-16" width="155" height="32" rx="16" fill="#0d7c7b" fill-opacity="0.08" stroke="#0d7c7b" stroke-opacity="0.2" stroke-width="1"/>
+    <text x="-218" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Signal Analysis</text>
 
     <!-- Pill 2 -->
-    <rect x="-120" y="-16" width="155" height="32" rx="16" fill="#8b5cf6" fill-opacity="0.08" stroke="#8b5cf6" stroke-opacity="0.2" stroke-width="1"/>
-    <text x="-43" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#a78bfa">Lead Enrichment</text>
+    <rect x="-120" y="-16" width="155" height="32" rx="16" fill="#0d7c7b" fill-opacity="0.08" stroke="#0d7c7b" stroke-opacity="0.2" stroke-width="1"/>
+    <text x="-43" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Lead Enrichment</text>
 
     <!-- Pill 3 -->
-    <rect x="55" y="-16" width="175" height="32" rx="16" fill="#8b5cf6" fill-opacity="0.08" stroke="#8b5cf6" stroke-opacity="0.2" stroke-width="1"/>
-    <text x="143" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#a78bfa">Market Intelligence</text>
+    <rect x="55" y="-16" width="175" height="32" rx="16" fill="#0d7c7b" fill-opacity="0.08" stroke="#0d7c7b" stroke-opacity="0.2" stroke-width="1"/>
+    <text x="143" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Market Intelligence</text>
   </g>
 
   <!-- Bottom section: URL -->
@@ -82,11 +82,11 @@
 
   <!-- Decorative corner accents -->
   <!-- Top-left -->
-  <path d="M30 60 L30 30 L60 30" stroke="#8b5cf6" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
+  <path d="M30 60 L30 30 L60 30" stroke="#0d7c7b" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
   <!-- Top-right -->
-  <path d="M1170 60 L1170 30 L1140 30" stroke="#8b5cf6" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
+  <path d="M1170 60 L1170 30 L1140 30" stroke="#0d7c7b" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
   <!-- Bottom-left -->
-  <path d="M30 570 L30 600 L60 600" stroke="#8b5cf6" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
+  <path d="M30 570 L30 600 L60 600" stroke="#0d7c7b" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
   <!-- Bottom-right -->
-  <path d="M1170 570 L1170 600 L1140 600" stroke="#8b5cf6" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
+  <path d="M1170 570 L1170 600 L1140 600" stroke="#0d7c7b" stroke-opacity="0.15" stroke-width="1.5" fill="none"/>
 </svg>
