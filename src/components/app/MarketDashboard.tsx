@@ -16,7 +16,7 @@ const COLORS = {
   high: '#10b981',    // emerald-500
   medium: '#f59e0b',  // amber-500
   low: '#ef4444',     // red-500
-  primary: '#8b5cf6', // violet-500
+  primary: '#6f4fd4', // custom violet-600
   neutral: '#71717a', // zinc-500
   neutralDark: '#d1d5db', // gray-300
   claimed: '#10b981',

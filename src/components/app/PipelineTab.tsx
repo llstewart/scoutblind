@@ -527,13 +527,13 @@ export function PipelineTab() {
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="mx-auto">
               <rect x="16" y="8" width="48" height="64" rx="8" stroke="url(#pipeline-grad)" strokeWidth="2.5" fill="none" />
               <path d="M28 24h24M28 36h24M28 48h16" stroke="url(#pipeline-grad)" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="24" cy="24" r="2" fill="#8b5cf6" opacity="0.6" />
-              <circle cx="24" cy="36" r="2" fill="#8b5cf6" opacity="0.4" />
-              <circle cx="24" cy="48" r="2" fill="#8b5cf6" opacity="0.2" />
+              <circle cx="24" cy="24" r="2" fill="#6f4fd4" opacity="0.6" />
+              <circle cx="24" cy="36" r="2" fill="#6f4fd4" opacity="0.4" />
+              <circle cx="24" cy="48" r="2" fill="#6f4fd4" opacity="0.2" />
               <defs>
                 <linearGradient id="pipeline-grad" x1="16" y1="8" x2="64" y2="72">
-                  <stop stopColor="#8b5cf6" />
-                  <stop offset="1" stopColor="#a78bfa" />
+                  <stop stopColor="#6f4fd4" />
+                  <stop offset="1" stopColor="#a088f5" />
                 </linearGradient>
               </defs>
             </svg>

@@ -10,6 +10,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Custom deep indigo-violet — shifted cooler than Tailwind's stock violet
+        violet: {
+          50: '#f5f2ff',
+          100: '#ece6ff',
+          200: '#d9cffd',
+          300: '#bfadfb',
+          400: '#a088f5',
+          500: '#8466e8',
+          600: '#6f4fd4',
+          700: '#5d3fc0',
+          800: '#4e35a0',
+          900: '#412c84',
+          950: '#281960',
+        },
         // Warm neutral gray scale — mapped to CSS variables
         gray: {
           50: 'var(--gray-50)',

@@ -28,7 +28,7 @@
   --popover: #ffffff;
   --popover-foreground: var(--gray-900);
 
-  --primary: #8b5cf6;
+  --primary: #6f4fd4;
   --primary-foreground: #ffffff;
 
   --secondary: var(--gray-100);
@@ -37,7 +37,7 @@
   --muted: var(--gray-100);
   --muted-foreground: var(--gray-500);
 
-  --accent: #8b5cf6;
+  --accent: #6f4fd4;
   --accent-foreground: #ffffff;
 
   --destructive: #ef4444;
@@ -45,7 +45,7 @@
 
   --border: var(--gray-200);
   --input: var(--gray-200);
-  --ring: #8b5cf6;
+  --ring: #6f4fd4;
 
   --radius: 0.5rem;
 
@@ -86,7 +86,7 @@
   --popover: #1c1917;
   --popover-foreground: #fafaf9;
 
-  --primary: #a78bfa;
+  --primary: #a088f5;
   --primary-foreground: #0c0a09;
 
   --secondary: #292524;
@@ -95,7 +95,7 @@
   --muted: #292524;
   --muted-foreground: #a8a29e;
 
-  --accent: #a78bfa;
+  --accent: #a088f5;
   --accent-foreground: #0c0a09;
 
   --destructive: #ef4444;
@@ -103,7 +103,7 @@
 
   --border: #44403c;
   --input: #44403c;
-  --ring: #8b5cf6;
+  --ring: #6f4fd4;
 }
 
 /* Marketing / auth pages — pin variables to light-mode values so dark system preference doesn't break them */
@@ -125,19 +125,19 @@
   --card-foreground: #1c1917;
   --popover: #ffffff;
   --popover-foreground: #1c1917;
-  --primary: #8b5cf6;
+  --primary: #6f4fd4;
   --primary-foreground: #ffffff;
   --secondary: #f5f4f2;
   --secondary-foreground: #1c1917;
   --muted: #f5f4f2;
   --muted-foreground: #78716c;
-  --accent: #8b5cf6;
+  --accent: #6f4fd4;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --border: #e8e6e3;
   --input: #e8e6e3;
-  --ring: #8b5cf6;
+  --ring: #6f4fd4;
   color-scheme: light;
 }
 

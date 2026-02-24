@@ -36,7 +36,7 @@ const CHART_COLORS = {
   high: '#10b981',
   medium: '#f59e0b',
   low: '#ef4444',
-  primary: '#8b5cf6',
+  primary: '#6f4fd4',
   claimed: '#10b981',
   unclaimed: '#ef4444',
 };
