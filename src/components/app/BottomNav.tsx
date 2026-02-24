@@ -41,8 +41,8 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
       {/* Background with blur */}
       <div className="absolute inset-0 bg-white/95 dark:bg-card/95 backdrop-blur-xl border-t border-gray-200" />
 
-      {/* Safe area padding for iOS */}
-      <div className="relative flex items-center justify-around px-2 pt-2 pb-safe">
+      {/* Safe area padding for iOS home indicator */}
+      <div className="relative flex items-center justify-around px-2 pt-2 nav-bottom-safe">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
