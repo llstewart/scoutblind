@@ -197,10 +197,13 @@ html.dark {
   color-scheme: dark;
 }
 
-/* Force-light pages (marketing, auth): white canvas even when html.dark is set */
+/* Force-light pages (marketing, auth): white everything even when html.dark is set */
 html.dark:has(.force-light) {
   background-color: #ffffff;
   color-scheme: light;
+}
+html.dark:has(.force-light) body {
+  background-color: #ffffff;
 }
 
 html,
