@@ -28,8 +28,8 @@ export function MarketingHeader() {
     <header className={`sticky top-0 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-[0_1px_3px_rgba(0,0,0,0.06)]' : ''}`}>
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/icon.svg" alt="" className="w-7 h-7" />
-          <span className="text-lg font-semibold text-gray-900">
+          <img src="/icon.svg" alt="" className="w-9 h-9" />
+          <span className="text-xl font-semibold text-gray-900">
             Packleads<span className="text-violet-500">.</span>
           </span>
         </Link>
