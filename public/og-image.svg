@@ -10,7 +10,7 @@
       <stop offset="0%" stop-color="#141416"/>
       <stop offset="100%" stop-color="#0a0a0b"/>
     </linearGradient>
-    <!-- Teal accent gradient for the eye icon -->
+    <!-- Teal accent gradient for the P mark -->
     <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#3acfca"/>
       <stop offset="100%" stop-color="#0d7c7b"/>
@@ -36,25 +36,24 @@
   <!-- Top decorative line -->
   <rect x="0" y="0" width="1200" height="2" fill="#0d7c7b" opacity="0.6"/>
 
-  <!-- Eye icon - centered above text -->
-  <g transform="translate(554, 145)">
-    <!-- Eye outer shape -->
-    <path d="M46 16C30 16 16 40 16 40s14 24 30 24 30-24 30-24-14-24-30-24z"
-          stroke="url(#tealGrad)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- Pupil -->
-    <circle cx="46" cy="40" r="10" fill="url(#tealGrad)"/>
-    <!-- Inner highlight -->
-    <circle cx="43" cy="37" r="3" fill="#78e3de" opacity="0.5"/>
+  <!-- P monogram with wolf head — centered above text -->
+  <g transform="translate(554, 140)">
+    <path fill-rule="evenodd" d="
+      M23 70 L23 38 L28 28 L36 10 L30 24 L23 16
+      L45 16 C55 16 60 22 60 32 C60 42 55 48 45 48
+      L35 48 L35 70 Z
+      M35 26 L45 26 C50 26 52 29 52 32 C52 35 50 38 45 38 L35 38 Z
+    " fill="url(#tealGrad)"/>
   </g>
 
-  <!-- Logo text: "Scoutblind." -->
-  <text x="600" y="290" text-anchor="middle" font-family="'Outfit', 'Inter', system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#fafafa" letter-spacing="-1">
-    Scoutblind<tspan fill="#0d7c7b">.</tspan>
+  <!-- Logo text: "Packleads." -->
+  <text x="600" y="290" text-anchor="middle" font-family="'General Sans', 'Inter', system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#fafafa" letter-spacing="-1">
+    Packleads<tspan fill="#0d7c7b">.</tspan>
   </text>
 
   <!-- Tagline -->
-  <text x="600" y="340" text-anchor="middle" font-family="'Outfit', 'Inter', system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#a1a1aa" letter-spacing="0.5">
-    Find SEO Prospects in Half the Time
+  <text x="600" y="340" text-anchor="middle" font-family="'General Sans', 'Inter', system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#a1a1aa" letter-spacing="0.5">
+    Every weak Google listing in your market. One search.
   </text>
 
   <!-- Divider line -->
@@ -64,20 +63,20 @@
   <g transform="translate(600, 410)" text-anchor="middle">
     <!-- Pill 1 -->
     <rect x="-295" y="-16" width="155" height="32" rx="16" fill="#0d7c7b" fill-opacity="0.08" stroke="#0d7c7b" stroke-opacity="0.2" stroke-width="1"/>
-    <text x="-218" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Signal Analysis</text>
+    <text x="-218" y="5" font-family="'General Sans', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Signal Analysis</text>
 
     <!-- Pill 2 -->
     <rect x="-120" y="-16" width="155" height="32" rx="16" fill="#0d7c7b" fill-opacity="0.08" stroke="#0d7c7b" stroke-opacity="0.2" stroke-width="1"/>
-    <text x="-43" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Lead Enrichment</text>
+    <text x="-43" y="5" font-family="'General Sans', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Lead Enrichment</text>
 
     <!-- Pill 3 -->
     <rect x="55" y="-16" width="175" height="32" rx="16" fill="#0d7c7b" fill-opacity="0.08" stroke="#0d7c7b" stroke-opacity="0.2" stroke-width="1"/>
-    <text x="143" y="5" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Market Intelligence</text>
+    <text x="143" y="5" font-family="'General Sans', 'Inter', system-ui, sans-serif" font-size="13" font-weight="500" fill="#3acfca">Market Intelligence</text>
   </g>
 
   <!-- Bottom section: URL -->
-  <text x="600" y="545" text-anchor="middle" font-family="'Outfit', 'Inter', system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#71717a" letter-spacing="2">
-    scoutblind.com
+  <text x="600" y="545" text-anchor="middle" font-family="'General Sans', 'Inter', system-ui, -apple-system, sans-serif" font-size="18" font-weight="500" fill="#71717a" letter-spacing="2">
+    packleads.io
   </text>
 
   <!-- Decorative corner accents -->
