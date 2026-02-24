@@ -183,13 +183,24 @@
 }
 
 html {
-  /* White overscroll background — all public pages are white regardless of system dark mode */
+  /* Light canvas by default — controls iOS Safari overscroll color */
   background-color: #ffffff;
-  /* Mobile: remove tap highlight flash on interactive elements */
+  color-scheme: light;
   -webkit-tap-highlight-color: transparent;
-  /* Prevent iOS text size inflation on orientation change */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+/* Dark-mode app pages: dark canvas for overscroll */
+html.dark {
+  background-color: #0c0a09;
+  color-scheme: dark;
+}
+
+/* Force-light pages (marketing, auth): white canvas even when html.dark is set */
+html.dark:has(.force-light) {
+  background-color: #ffffff;
+  color-scheme: light;
 }
 
 html,

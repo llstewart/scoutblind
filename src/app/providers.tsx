@@ -11,7 +11,7 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem enableColorScheme={false}>
       <Suspense fallback={
         <div className="min-h-screen bg-gray-50 dark:bg-background flex items-center justify-center">
           <div className="text-center">

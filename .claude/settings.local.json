@@ -64,7 +64,14 @@
       "Bash(cd /c/Users/linco/Documents/TrueSignal && npx --yes sharp-cli -i public/icon.svg -o public/apple-touch-icon.png resize 180 180 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/icon-192.png resize 192 192 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/icon-512.png resize 512 512 2>&1)",
       "Bash(cd /c/Users/linco/Documents/TrueSignal && npx --yes sharp-cli -i public/og-image.svg -o public/og-image.png resize 1200 630 2>&1)",
       "Bash(cd /c/Users/linco/Documents/TrueSignal && npx --yes sharp-cli -i public/icon.svg -o public/favicon.ico resize 48 48 2>&1)",
-      "Bash(cd /c/Users/linco/Documents/TrueSignal && npx --yes sharp-cli -i public/icon.svg -o public/favicon.png resize 48 48 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/favicon.ico resize 48 48 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/apple-touch-icon.png resize 180 180 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/icon-192.png resize 192 192 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/icon-512.png resize 512 512 2>&1)"
+      "Bash(cd /c/Users/linco/Documents/TrueSignal && npx --yes sharp-cli -i public/icon.svg -o public/favicon.png resize 48 48 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/favicon.ico resize 48 48 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/apple-touch-icon.png resize 180 180 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/icon-192.png resize 192 192 2>&1 && npx --yes sharp-cli -i public/icon.svg -o public/icon-512.png resize 512 512 2>&1)",
+      "WebFetch(domain:peter.coffee)",
+      "WebFetch(domain:tyhopp.com)",
+      "WebFetch(domain:www.tempertemper.net)",
+      "WebFetch(domain:webkit.org)",
+      "WebFetch(domain:css-tricks.com)",
+      "WebFetch(domain:web.dev)",
+      "WebFetch(domain:camlittle.com)"
     ]
   }
 }

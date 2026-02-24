@@ -100,9 +100,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        {/* Browser chrome color — adapts to system color scheme */}
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#0c0a09" media="(prefers-color-scheme: dark)" />
+        {/* Browser chrome color — white for all public-facing pages */}
+        <meta name="theme-color" content="#ffffff" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdApp) }}
