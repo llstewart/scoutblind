@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
+import { useReveal, useCountUp } from './hooks';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -74,53 +75,7 @@ const MOCK_RADAR_DATA = [
   { axis: 'Local Ranking', value: 10 },
 ];
 
-// ─── Count-up hook (fires once on scroll) ────────────────────────────
-function useCountUp(target: number, duration: number, trigger: boolean) {
-  const [value, setValue] = useState(0);
-  const hasRun = useRef(false);
-
-  useEffect(() => {
-    if (!trigger || hasRun.current) return;
-    hasRun.current = true;
-
-    const start = performance.now();
-    const step = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      // ease-out: fast start, slow landing
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [trigger, target, duration]);
-
-  return value;
-}
-
-// ─── Scroll-reveal hook (fires once) ────────────────────────────────
-function useReveal(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return { ref, visible };
-}
+// Hooks imported from ./hooks
 
 export function MarketingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
