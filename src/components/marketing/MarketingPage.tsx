@@ -384,6 +384,7 @@ export function MarketingPage() {
               src="/export-preview.png"
               alt="CSV export showing lead data with columns for Name, Phone, Website, Rating, Reviews, Response Rate, Search Visibility, and more"
               className="w-full"
+              loading="lazy"
             />
           </div>
 
