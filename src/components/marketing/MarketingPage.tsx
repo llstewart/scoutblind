@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { MarketingHeader } from './MarketingHeader';
 import { MarketingFooter } from './MarketingFooter';
+import { HeroAnimation } from './HeroAnimation';
 
 const faqItems = [
   {
@@ -118,16 +119,9 @@ export function MarketingPage() {
           </div>
         </div>
 
-        {/* Product Screenshot — full width */}
-        <div className="max-w-7xl mx-auto">
-          <div className="rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),0_12px_40px_rgba(0,0,0,0.1),0_40px_80px_-20px_rgba(0,0,0,0.08)] border border-gray-200/60">
-            <img
-              src="/hero-screenshot.png"
-              alt="Packleads Lead Intel — SEO signals, search visibility, and opportunity scores for every business in your market"
-              className="w-full h-auto block"
-              loading="eager"
-            />
-          </div>
+        {/* Animated product demo */}
+        <div className="max-w-5xl mx-auto">
+          <HeroAnimation />
         </div>
       </section>
 
