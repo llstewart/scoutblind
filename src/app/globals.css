@@ -182,22 +182,21 @@
   border-color: var(--border);
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  height: 100%;
-  background: var(--background);
-  /* Prevent rubber-band overscroll from revealing background — standard for web apps */
-  overscroll-behavior-y: none;
-}
-
 html {
+  /* White overscroll background — all public pages are white regardless of system dark mode */
+  background-color: #ffffff;
   /* Mobile: remove tap highlight flash on interactive elements */
   -webkit-tap-highlight-color: transparent;
   /* Prevent iOS text size inflation on orientation change */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  height: 100%;
 }
 
 body {
