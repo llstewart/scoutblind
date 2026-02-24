@@ -286,7 +286,7 @@ export function FeaturesContent() {
   const scoreMed = useCountUp(40, 800, score.visible);
 
   return (
-    <div className="force-light min-h-screen bg-white flex flex-col">
+    <div className="force-light min-h-[100dvh] bg-white flex flex-col">
       <MarketingHeader />
 
       {/* ─── Hero ──────────────────────────────────────────────────── */}

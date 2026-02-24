@@ -90,7 +90,7 @@ export function MarketingPage() {
   const businessCount = useCountUp(10000, 2200, stats.visible); // 2.2s heavy spin
 
   return (
-    <div className="force-light min-h-screen bg-white flex flex-col">
+    <div className="force-light min-h-[100dvh] bg-white flex flex-col">
       <MarketingHeader />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}

@@ -5,7 +5,7 @@ import { AuthForm } from '@/components/auth/AuthForm';
 
 export default function LoginPage() {
   return (
-    <div className="force-light min-h-screen bg-white flex">
+    <div className="force-light min-h-[100dvh] bg-white flex">
       {/* Left panel — brand / trust (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-[45%] relative bg-gray-50 flex-col justify-between overflow-hidden">
         {/* Subtle dot pattern */}
