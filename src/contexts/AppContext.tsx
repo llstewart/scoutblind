@@ -906,6 +906,7 @@ export function AppProvider({ children }: AppProviderProps) {
     setAllLeads([]);
     setHasLeadsLoaded(false);
     backfillAttemptedRef.current = false;
+    localStorage.removeItem('packleads_tour_complete');
     router.replace('/');
   };
 

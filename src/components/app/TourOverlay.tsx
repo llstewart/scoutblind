@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { useAppContext } from '@/contexts/AppContext';
+import { createClient } from '@/lib/supabase/client';
 
 const TOUR_COMPLETE_KEY = 'packleads_tour_complete';
 
@@ -111,8 +112,14 @@ export function TourOverlay() {
   useEffect(() => {
     if (!user) return;
 
-    // Already completed tour
+    // Fast path: localStorage cache says already done
     if (localStorage.getItem(TOUR_COMPLETE_KEY)) return;
+
+    // Source of truth: user_metadata on the account
+    if (user.user_metadata?.onboarding_completed) {
+      localStorage.setItem(TOUR_COMPLETE_KEY, 'true'); // sync cache
+      return;
+    }
 
     // Only show for new users (created < 2 minutes ago)
     const createdAt = new Date(user.created_at).getTime();
@@ -185,8 +192,13 @@ export function TourOverlay() {
   }, [isActive, currentStep, measure]);
 
   const completeTour = useCallback(() => {
+    // Fast local cache
     localStorage.setItem(TOUR_COMPLETE_KEY, 'true');
     setIsActive(false);
+
+    // Persist to user account (source of truth)
+    const supabase = createClient();
+    supabase.auth.updateUser({ data: { onboarding_completed: true } });
   }, []);
 
   const handleNext = useCallback(() => {
