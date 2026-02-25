@@ -1,0 +1,294 @@
+'use client';
+
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
+import { X, ChevronRight } from 'lucide-react';
+import { useAppContext } from '@/contexts/AppContext';
+
+const TOUR_COMPLETE_KEY = 'packleads_tour_complete';
+
+interface TourStep {
+  target: string;
+  mobileTarget?: string;
+  title: string;
+  content: string;
+  position: 'top' | 'bottom' | 'left' | 'right';
+  mobilePosition?: 'top' | 'bottom' | 'left' | 'right';
+}
+
+const TOUR_STEPS: TourStep[] = [
+  {
+    target: 'search-form',
+    title: 'Start here',
+    content: 'Type a business niche and location to scan Google Business Profiles in your market.',
+    position: 'bottom',
+  },
+  {
+    target: 'search-button',
+    title: 'Run your first scan',
+    content: 'Each search costs 1 credit. You have 5 free credits to start.',
+    position: 'top',
+  },
+  {
+    target: 'library-tab',
+    mobileTarget: 'library-tab-mobile',
+    title: 'Your searches live here',
+    content: 'Every search is saved. Come back to view, analyze, or export anytime.',
+    position: 'right',
+    mobilePosition: 'top',
+  },
+  {
+    target: 'credits-display',
+    mobileTarget: 'credits-display-mobile',
+    title: 'Track your credits',
+    content: 'See how many scans you have left. Click to purchase more when you need them.',
+    position: 'right',
+    mobilePosition: 'top',
+  },
+];
+
+function getTargetElement(step: TourStep, isMobile: boolean): Element | null {
+  const attr = isMobile && step.mobileTarget ? step.mobileTarget : step.target;
+  return document.querySelector(`[data-tour="${attr}"]`);
+}
+
+function getPosition(step: TourStep, isMobile: boolean) {
+  return isMobile && step.mobilePosition ? step.mobilePosition : step.position;
+}
+
+interface TooltipCoords {
+  top: number;
+  left: number;
+}
+
+function computeTooltipCoords(
+  rect: DOMRect,
+  position: 'top' | 'bottom' | 'left' | 'right',
+  tooltipWidth: number,
+  tooltipHeight: number,
+): TooltipCoords {
+  const GAP = 12;
+  let top = 0;
+  let left = 0;
+
+  switch (position) {
+    case 'bottom':
+      top = rect.bottom + GAP;
+      left = rect.left + rect.width / 2 - tooltipWidth / 2;
+      break;
+    case 'top':
+      top = rect.top - tooltipHeight - GAP;
+      left = rect.left + rect.width / 2 - tooltipWidth / 2;
+      break;
+    case 'right':
+      top = rect.top + rect.height / 2 - tooltipHeight / 2;
+      left = rect.right + GAP;
+      break;
+    case 'left':
+      top = rect.top + rect.height / 2 - tooltipHeight / 2;
+      left = rect.left - tooltipWidth - GAP;
+      break;
+  }
+
+  // Clamp to viewport
+  const pad = 12;
+  left = Math.max(pad, Math.min(left, window.innerWidth - tooltipWidth - pad));
+  top = Math.max(pad, Math.min(top, window.innerHeight - tooltipHeight - pad));
+
+  return { top, left };
+}
+
+export function TourOverlay() {
+  const { user } = useAppContext();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipCoords, setTooltipCoords] = useState<TooltipCoords>({ top: 0, left: 0 });
+  const rafRef = useRef<number>(0);
+
+  // Check if tour should show
+  useEffect(() => {
+    if (!user) return;
+
+    // Already completed tour
+    if (localStorage.getItem(TOUR_COMPLETE_KEY)) return;
+
+    // Only show for new users (created < 2 minutes ago)
+    const createdAt = new Date(user.created_at).getTime();
+    if (Date.now() - createdAt > 2 * 60 * 1000) return;
+
+    // Small delay to let the dashboard render first
+    const timer = setTimeout(() => setIsActive(true), 800);
+    return () => clearTimeout(timer);
+  }, [user]);
+
+  // Track mobile breakpoint
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // Measure target element and reposition
+  const measure = useCallback(() => {
+    if (!isActive) return;
+
+    const step = TOUR_STEPS[currentStep];
+    const el = getTargetElement(step, isMobile);
+
+    if (!el) {
+      setTargetRect(null);
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    setTargetRect(rect);
+
+    // Position the tooltip
+    if (tooltipRef.current) {
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      const pos = getPosition(step, isMobile);
+      const coords = computeTooltipCoords(rect, pos, tooltipRect.width, tooltipRect.height);
+      setTooltipCoords(coords);
+    }
+  }, [isActive, currentStep, isMobile]);
+
+  // Measure on step change, resize, scroll
+  useLayoutEffect(() => {
+    measure();
+  }, [measure]);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleUpdate = () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(measure);
+    };
+
+    window.addEventListener('resize', handleUpdate);
+    window.addEventListener('scroll', handleUpdate, true);
+    return () => {
+      window.removeEventListener('resize', handleUpdate);
+      window.removeEventListener('scroll', handleUpdate, true);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [isActive, measure]);
+
+  // Re-measure after tooltip mounts (first render has no dimensions)
+  useEffect(() => {
+    if (isActive && tooltipRef.current) {
+      requestAnimationFrame(measure);
+    }
+  }, [isActive, currentStep, measure]);
+
+  const completeTour = useCallback(() => {
+    localStorage.setItem(TOUR_COMPLETE_KEY, 'true');
+    setIsActive(false);
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (currentStep >= TOUR_STEPS.length - 1) {
+      completeTour();
+    } else {
+      setCurrentStep(prev => prev + 1);
+    }
+  }, [currentStep, completeTour]);
+
+  const handleSkip = useCallback(() => {
+    completeTour();
+  }, [completeTour]);
+
+  if (!isActive || !targetRect) return null;
+
+  const step = TOUR_STEPS[currentStep];
+  const isLastStep = currentStep === TOUR_STEPS.length - 1;
+  const position = getPosition(step, isMobile);
+
+  // Arrow direction (opposite of tooltip position)
+  const arrowClass = {
+    bottom: '-top-2 left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent border-b-white',
+    top: '-bottom-2 left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent border-t-white',
+    right: '-left-2 top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-white border-l-transparent',
+    left: '-right-2 top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-white border-r-transparent',
+  }[position];
+
+  const PAD = 8;
+
+  return (
+    <div className="fixed inset-0 z-[60]" style={{ pointerEvents: 'auto' }}>
+      {/* Spotlight cutout — everything outside is dimmed */}
+      <div
+        className="absolute rounded-xl transition-all duration-300 ease-out"
+        style={{
+          top: targetRect.top - PAD,
+          left: targetRect.left - PAD,
+          width: targetRect.width + PAD * 2,
+          height: targetRect.height + PAD * 2,
+          boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Click backdrop to skip */}
+      <div
+        className="absolute inset-0"
+        style={{ zIndex: -1 }}
+        onClick={handleSkip}
+      />
+
+      {/* Tooltip */}
+      <div
+        ref={tooltipRef}
+        className="absolute w-72 bg-white rounded-xl shadow-2xl shadow-black/20 border border-gray-100 p-4 transition-all duration-300 ease-out animate-in fade-in zoom-in-95"
+        style={{
+          top: tooltipCoords.top,
+          left: tooltipCoords.left,
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Arrow */}
+        <div className={`absolute w-0 h-0 border-[8px] ${arrowClass}`} />
+
+        {/* Close button */}
+        <button
+          onClick={handleSkip}
+          className="absolute top-2.5 right-2.5 p-1 text-gray-400 hover:text-gray-600 rounded-md transition-colors"
+          aria-label="Skip tour"
+        >
+          <X size={14} />
+        </button>
+
+        {/* Content */}
+        <div className="pr-6">
+          <h3 className="text-sm font-semibold text-gray-900">{step.title}</h3>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">{step.content}</p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between mt-4">
+          <span className="text-[11px] text-gray-400">
+            {currentStep + 1} of {TOUR_STEPS.length}
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSkip}
+              className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Skip tour
+            </button>
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-1 px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              {isLastStep ? 'Done' : 'Next'}
+              {!isLastStep && <ChevronRight size={12} />}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

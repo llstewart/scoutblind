@@ -8,6 +8,7 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { BillingModal } from '@/components/BillingModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { BusinessLookupModal } from '@/components/BusinessLookupModal';
+import { TourOverlay } from './TourOverlay';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -100,6 +101,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         }}
         onSaved={fetchSavedSearchesList}
       />
+
+      {/* Onboarding Tour */}
+      <TourOverlay />
 
       {/* Toast Notification */}
       {toastMessage && (

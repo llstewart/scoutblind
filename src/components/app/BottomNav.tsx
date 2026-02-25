@@ -46,9 +46,14 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
+          const tourAttr = tab.id === 'library' ? 'library-tab-mobile'
+            : tab.id === 'account' ? 'credits-display-mobile'
+            : undefined;
+
           return (
             <button
               key={tab.id}
+              data-tour={tourAttr}
               onClick={() => onTabChange(tab.id)}
               className={`relative flex flex-col items-center justify-center w-full py-2 transition-colors ${
                 isActive ? 'text-violet-600' : 'text-gray-400'

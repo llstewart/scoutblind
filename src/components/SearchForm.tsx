@@ -553,6 +553,7 @@ export function SearchForm({ onSearch, isLoading, initialNiche = '', initialLoca
         {/* Submit Row - Button aligned right on desktop */}
         <div className="flex justify-end pt-1">
           <button
+            data-tour="search-button"
             type="submit"
             disabled={isLoading || !isFormValid}
             className={`w-full sm:w-auto px-6 py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${isFormValid

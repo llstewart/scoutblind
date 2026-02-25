@@ -98,6 +98,7 @@ export function Sidebar({
         {/* Library Tab */}
         <div>
           <button
+            data-tour="library-tab"
             onClick={() => onTabChange('library')}
             className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
               activeTab === 'library'
@@ -208,6 +209,7 @@ export function Sidebar({
         <div className="p-3 border-t border-gray-800 space-y-3">
           {/* Credits */}
           <button
+            data-tour="credits-display"
             onClick={() => setShowBillingModal(true)}
             className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
           >

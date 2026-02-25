@@ -52,7 +52,7 @@ export function SearchTab({
           </p>
 
           {/* Search Form */}
-          <div className="mb-6">
+          <div data-tour="search-form" className="mb-6">
             {searchForm}
           </div>
 

@@ -75,8 +75,6 @@ interface AppContextValue {
   setShowSettingsModal: (show: boolean) => void;
   showLookupModal: boolean;
   setShowLookupModal: (show: boolean) => void;
-  showOnboardingModal: boolean;
-  setShowOnboardingModal: (show: boolean) => void;
 
   // Search State
   businesses: Business[];
@@ -183,7 +181,6 @@ export function AppProvider({ children }: AppProviderProps) {
   const [showBillingModal, setShowBillingModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showLookupModal, setShowLookupModal] = useState(false);
-  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [tableBusinesses, setTableBusinesses] = useState<TableBusiness[]>([]);
@@ -228,7 +225,6 @@ export function AppProvider({ children }: AppProviderProps) {
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
 
   const leadSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onboardingCheckedRef = useRef(false);
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
   const analyzeWorkerRef = useRef<Worker | null>(null);
@@ -396,16 +392,6 @@ export function AppProvider({ children }: AppProviderProps) {
     if (isAuthLoading) return;
 
     if (user) {
-      // Welcome new users with a toast instead of a modal slideshow
-      if (!onboardingCheckedRef.current) {
-        onboardingCheckedRef.current = true;
-        const createdAt = new Date(user.created_at).getTime();
-        if (Date.now() - createdAt < 2 * 60 * 1000) {
-          setToastMessage('Welcome to Packleads! You have 5 free scans. Try your first search below.');
-          setTimeout(() => setToastMessage(null), 6000);
-        }
-      }
-
       try {
         const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (saved) {
@@ -1200,8 +1186,6 @@ export function AppProvider({ children }: AppProviderProps) {
     setShowSettingsModal,
     showLookupModal,
     setShowLookupModal,
-    showOnboardingModal,
-    setShowOnboardingModal,
 
     // Search State
     businesses,
