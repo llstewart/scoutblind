@@ -47,6 +47,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
         sessionStorage.clear();
         localStorage.removeItem('packleads_session');
         localStorage.removeItem('packleads_sid');
+        localStorage.removeItem('packleads_tour_complete');
       } catch (e) {
         console.error('Failed to clear storage:', e);
       }

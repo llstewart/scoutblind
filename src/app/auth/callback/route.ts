@@ -64,10 +64,13 @@ export async function GET(request: Request) {
         }
 
         // Mark new users for onboarding tour
-        if (isNewUser && !user.user_metadata?.onboarding_completed) {
-          await serviceClient.auth.admin.updateUserById(user.id, {
-            user_metadata: { onboarding_completed: false },
+        if (isNewUser && user.user_metadata?.onboarding_completed === undefined) {
+          const { error: metaError } = await serviceClient.auth.admin.updateUserById(user.id, {
+            user_metadata: { ...user.user_metadata, onboarding_completed: false },
           });
+          if (metaError) {
+            console.error('[Auth Callback] Failed to set onboarding flag:', metaError);
+          }
         }
       }
 
