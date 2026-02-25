@@ -29,21 +29,6 @@ export async function GET(request: NextRequest) {
     }, { status: 401 });
   }
 
-  // Check subscription tier - only paid users can access enriched data
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('tier')
-    .eq('user_id', user.id)
-    .single();
-
-  if (!subscription || subscription.tier === 'free') {
-    return NextResponse.json({
-      error: 'Upgrade to a paid plan to access saved analyses',
-      requiresUpgrade: true,
-      analyses: {} // Return empty data for free users
-    }, { status: 403 });
-  }
-
   try {
     if (niche && location) {
       // Get specific search

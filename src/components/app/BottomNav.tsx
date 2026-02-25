@@ -10,9 +10,7 @@ interface BottomNavProps {
   tier?: string;
 }
 
-export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: BottomNavProps) {
-  const isPremium = tier !== 'free' && tier !== '' && !!tier;
-
+export function BottomNav({ activeTab, onTabChange, libraryCount = 0 }: BottomNavProps) {
   const tabs: { id: AppTab; label: string; icon: React.ReactNode }[] = [
     {
       id: 'search',
@@ -24,11 +22,11 @@ export function BottomNav({ activeTab, onTabChange, libraryCount = 0, tier }: Bo
       label: 'Library',
       icon: <BookOpen size={24} />,
     },
-    ...(isPremium ? [{
-      id: 'pipeline' as AppTab,
+    {
+      id: 'pipeline',
       label: 'Pipeline',
       icon: <LayoutList size={24} />,
-    }] : []),
+    },
     {
       id: 'account',
       label: 'Account',

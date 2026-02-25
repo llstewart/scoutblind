@@ -153,32 +153,30 @@ export function Sidebar({
           )}
         </div>
 
-        {/* Pipeline Tab (premium only) */}
-        {tier !== 'free' && tier !== '' && (
-          <button
-            onClick={() => onTabChange('pipeline')}
-            className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
-              activeTab === 'pipeline'
-                ? 'bg-white/10 text-white'
-                : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
-            }`}
-          >
-            {activeTab === 'pipeline' && (
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
-            )}
-            <LayoutList size={20} className="flex-shrink-0" />
-            {!isCollapsed && (
-              <>
-                <span className="font-semibold flex-1 text-left">Pipeline</span>
-                {pipelineCount != null && pipelineCount > 0 && (
-                  <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[11px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
-                    {pipelineCount}
-                  </span>
-                )}
-              </>
-            )}
-          </button>
-        )}
+        {/* Pipeline Tab */}
+        <button
+          onClick={() => onTabChange('pipeline')}
+          className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+            activeTab === 'pipeline'
+              ? 'bg-white/10 text-white'
+              : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+          }`}
+        >
+          {activeTab === 'pipeline' && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-500 rounded-full" />
+          )}
+          <LayoutList size={20} className="flex-shrink-0" />
+          {!isCollapsed && (
+            <>
+              <span className="font-semibold flex-1 text-left">Pipeline</span>
+              {pipelineCount != null && pipelineCount > 0 && (
+                <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[11px] font-bold bg-violet-500/20 text-violet-300 rounded-full">
+                  {pipelineCount}
+                </span>
+              )}
+            </>
+          )}
+        </button>
 
         {/* Settings section */}
         <div className="my-3 border-t border-gray-800" />

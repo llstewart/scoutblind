@@ -316,7 +316,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
   // Load saved search from library
   const loadSavedAnalyses = useCallback(async (niche: string, location: string) => {
-    if (!user || !subscription || subscription.tier === 'free') return;
+    if (!user) return;
     setIsLoadingSaved(true);
     try {
       const response = await fetch(
@@ -347,7 +347,7 @@ export function AppProvider({ children }: AppProviderProps) {
     } finally {
       setIsLoadingSaved(false);
     }
-  }, [user, subscription]);
+  }, [user]);
 
   // Save businesses to database
   const saveToLibrary = useCallback(async (
@@ -422,14 +422,13 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isAuthLoading]);
 
-  // Fetch saved count and library list when user is logged in (paid users only)
-  // Free users get 403 from /api/session GET, so skip to avoid console spam
+  // Fetch saved count and library list when user is logged in
   useEffect(() => {
-    if (user && isPremium) {
+    if (user) {
       fetchSavedCount();
       fetchSavedSearchesList();
     }
-  }, [user, isPremium, fetchSavedCount, fetchSavedSearchesList]);
+  }, [user, fetchSavedCount, fetchSavedSearchesList]);
 
 
   // Clear analyzed data for free tier users (but preserve preview data)
