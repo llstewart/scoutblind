@@ -66,6 +66,7 @@ function computeTooltipCoords(
   position: 'top' | 'bottom' | 'left' | 'right',
   tooltipWidth: number,
   tooltipHeight: number,
+  isMobile: boolean,
 ): TooltipCoords {
   const GAP = 12;
   let top = 0;
@@ -90,10 +91,11 @@ function computeTooltipCoords(
       break;
   }
 
-  // Clamp to viewport
-  const pad = 12;
+  // Clamp to viewport — account for mobile bottom nav (~80px)
+  const pad = 16;
+  const bottomPad = isMobile ? 88 : pad;
   left = Math.max(pad, Math.min(left, window.innerWidth - tooltipWidth - pad));
-  top = Math.max(pad, Math.min(top, window.innerHeight - tooltipHeight - pad));
+  top = Math.max(pad, Math.min(top, window.innerHeight - tooltipHeight - bottomPad));
 
   return { top, left };
 }
@@ -106,6 +108,7 @@ export function TourOverlay() {
   const [isMobile, setIsMobile] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipCoords, setTooltipCoords] = useState<TooltipCoords>({ top: 0, left: 0 });
+  const [positioned, setPositioned] = useState(false);
   const rafRef = useRef<number>(0);
 
   // Check if tour should show
@@ -145,6 +148,11 @@ export function TourOverlay() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  // Reset positioned flag when step changes
+  useEffect(() => {
+    setPositioned(false);
+  }, [currentStep]);
+
   // Measure target element and reposition
   const measure = useCallback(() => {
     if (!isActive) return;
@@ -158,14 +166,24 @@ export function TourOverlay() {
     }
 
     const rect = el.getBoundingClientRect();
+
+    // Skip if element has zero dimensions (not rendered yet)
+    if (rect.width === 0 && rect.height === 0) {
+      setTargetRect(null);
+      return;
+    }
+
     setTargetRect(rect);
 
-    // Position the tooltip
+    // Position the tooltip — only mark as positioned when we have real tooltip dimensions
     if (tooltipRef.current) {
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const pos = getPosition(step, isMobile);
-      const coords = computeTooltipCoords(rect, pos, tooltipRect.width, tooltipRect.height);
-      setTooltipCoords(coords);
+      if (tooltipRect.width > 0 && tooltipRect.height > 0) {
+        const pos = getPosition(step, isMobile);
+        const coords = computeTooltipCoords(rect, pos, tooltipRect.width, tooltipRect.height, isMobile);
+        setTooltipCoords(coords);
+        setPositioned(true);
+      }
     }
   }, [isActive, currentStep, isMobile]);
 
@@ -192,11 +210,27 @@ export function TourOverlay() {
   }, [isActive, measure]);
 
   // Re-measure after tooltip mounts (first render has no dimensions)
+  // Poll until positioned to handle late-rendering targets
   useEffect(() => {
-    if (isActive && tooltipRef.current) {
-      requestAnimationFrame(measure);
+    if (!isActive) return;
+
+    // Immediate RAF for when tooltip just mounted
+    const raf = requestAnimationFrame(measure);
+
+    // If not positioned yet, poll every 100ms until we get valid measurements
+    // (handles cases where the target element renders after the tour activates)
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+    if (!positioned) {
+      pollTimer = setInterval(() => {
+        measure();
+      }, 100);
     }
-  }, [isActive, currentStep, measure]);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      if (pollTimer) clearInterval(pollTimer);
+    };
+  }, [isActive, currentStep, measure, positioned]);
 
   const completeTour = useCallback(() => {
     // Fast local cache
@@ -240,7 +274,7 @@ export function TourOverlay() {
     <div className="fixed inset-0 z-[60]" style={{ pointerEvents: 'auto' }}>
       {/* Spotlight cutout — everything outside is dimmed */}
       <div
-        className="absolute rounded-xl transition-all duration-300 ease-out"
+        className={`absolute rounded-xl transition-all duration-300 ease-out ${positioned ? 'opacity-100' : 'opacity-0'}`}
         style={{
           top: targetRect.top - PAD,
           left: targetRect.left - PAD,
@@ -258,10 +292,12 @@ export function TourOverlay() {
         onClick={handleSkip}
       />
 
-      {/* Tooltip */}
+      {/* Tooltip — hidden until positioned to prevent flash at (0,0) */}
       <div
         ref={tooltipRef}
-        className="absolute w-72 bg-white rounded-xl shadow-2xl shadow-black/20 border border-gray-100 p-4 transition-all duration-300 ease-out animate-in fade-in zoom-in-95"
+        className={`absolute w-[calc(100vw-32px)] max-w-72 bg-white rounded-xl shadow-2xl shadow-black/20 border border-gray-100 p-4 transition-all duration-300 ease-out ${
+          positioned ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+        }`}
         style={{
           top: tooltipCoords.top,
           left: tooltipCoords.left,
