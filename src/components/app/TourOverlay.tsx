@@ -109,21 +109,26 @@ export function TourOverlay() {
   const rafRef = useRef<number>(0);
 
   // Check if tour should show
+  // Source of truth: user_metadata.onboarding_completed
+  //   undefined = existing user (before this feature) → skip
+  //   false     = new user, hasn't done tour yet → show
+  //   true      = completed → skip
   useEffect(() => {
     if (!user) return;
 
     // Fast path: localStorage cache says already done
     if (localStorage.getItem(TOUR_COMPLETE_KEY)) return;
 
-    // Source of truth: user_metadata on the account
-    if (user.user_metadata?.onboarding_completed) {
-      localStorage.setItem(TOUR_COMPLETE_KEY, 'true'); // sync cache
+    const flag = user.user_metadata?.onboarding_completed;
+
+    // Already completed (synced from another browser) — cache locally
+    if (flag === true) {
+      localStorage.setItem(TOUR_COMPLETE_KEY, 'true');
       return;
     }
 
-    // Only show for new users (created < 2 minutes ago)
-    const createdAt = new Date(user.created_at).getTime();
-    if (Date.now() - createdAt > 2 * 60 * 1000) return;
+    // Only show when explicitly set to false (stamped at signup)
+    if (flag !== false) return;
 
     // Small delay to let the dashboard render first
     const timer = setTimeout(() => setIsActive(true), 800);

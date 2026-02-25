@@ -32,6 +32,15 @@ export async function GET(request: Request) {
         // Use service role client to bypass RLS
         const serviceClient = getServiceClient();
 
+        // Check if this user already has a subscription (existing user)
+        const { data: existingSub } = await serviceClient
+          .from('subscriptions')
+          .select('user_id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const isNewUser = !existingSub;
+
         // ATOMIC: Use upsert with ignoreDuplicates to prevent race condition
         // This handles the case where useUser hook and callback both try to create
         const { error: upsertError } = await serviceClient
@@ -49,10 +58,16 @@ export async function GET(request: Request) {
           });
 
         if (upsertError && upsertError.code !== '23505') {
-          // Log error only if it's not a duplicate key (which is expected)
           console.error('[Auth Callback] Error creating subscription:', upsertError);
         } else if (!upsertError) {
           console.log(`[Auth Callback] Created/verified subscription for user ${user.id.slice(0, 8)}...`);
+        }
+
+        // Mark new users for onboarding tour
+        if (isNewUser && !user.user_metadata?.onboarding_completed) {
+          await serviceClient.auth.admin.updateUserById(user.id, {
+            user_metadata: { onboarding_completed: false },
+          });
         }
       }
 
