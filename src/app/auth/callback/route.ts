@@ -33,13 +33,15 @@ export async function GET(request: Request) {
         const serviceClient = getServiceClient();
 
         // Check if this user already has a subscription (existing user)
-        const { data: existingSub } = await serviceClient
+        const { data: existingSub, error: subCheckError } = await serviceClient
           .from('subscriptions')
           .select('user_id')
           .eq('user_id', user.id)
           .maybeSingle();
 
+        console.log(`[Auth Callback] Subscription check: existingSub=${JSON.stringify(existingSub)}, error=${JSON.stringify(subCheckError)}`);
         const isNewUser = !existingSub;
+        console.log(`[Auth Callback] isNewUser=${isNewUser}, user_metadata=${JSON.stringify(user.user_metadata)}`);
 
         // ATOMIC: Use upsert with ignoreDuplicates to prevent race condition
         // This handles the case where useUser hook and callback both try to create
@@ -65,12 +67,17 @@ export async function GET(request: Request) {
 
         // Mark new users for onboarding tour
         if (isNewUser && user.user_metadata?.onboarding_completed === undefined) {
+          console.log(`[Auth Callback] Setting onboarding flag for new user ${user.id.slice(0, 8)}...`);
           const { error: metaError } = await serviceClient.auth.admin.updateUserById(user.id, {
             user_metadata: { ...user.user_metadata, onboarding_completed: false },
           });
           if (metaError) {
             console.error('[Auth Callback] Failed to set onboarding flag:', metaError);
+          } else {
+            console.log('[Auth Callback] Onboarding flag set successfully');
           }
+        } else {
+          console.log(`[Auth Callback] Skipping onboarding flag: isNewUser=${isNewUser}, onboarding_completed=${user.user_metadata?.onboarding_completed}`);
         }
       }
 
