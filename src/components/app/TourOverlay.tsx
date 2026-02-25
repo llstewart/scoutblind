@@ -280,16 +280,15 @@ export function TourOverlay() {
           left: targetRect.left - PAD,
           width: targetRect.width + PAD * 2,
           height: targetRect.height + PAD * 2,
-          boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)',
+          boxShadow: '0 0 0 9999px rgba(0,0,0,0.55)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* Click backdrop to skip */}
+      {/* Backdrop — blocks clicks but doesn't dismiss tour */}
       <div
         className="absolute inset-0"
         style={{ zIndex: -1 }}
-        onClick={handleSkip}
       />
 
       {/* Tooltip — hidden until positioned to prevent flash at (0,0) */}
