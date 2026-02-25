@@ -53,23 +53,25 @@ export function Sidebar({
       }`}
     >
       {/* Logo / Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        {!isCollapsed && (
+      <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} p-4 border-b border-gray-800`}>
+        {isCollapsed ? (
+          <button onClick={() => setIsCollapsed(false)} className="p-0.5 rounded-lg hover:bg-white/5 transition-colors" title="Expand sidebar">
+            <img src="/icon.svg" alt="Packleads" className="w-7 h-7" />
+          </button>
+        ) : (
           <span className="text-lg font-bold tracking-tight text-white">
             Packleads<span className="text-violet-500">.</span>
           </span>
         )}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded-lg transition-colors"
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? (
-            <ChevronsRight size={16} className="transition-transform" />
-          ) : (
+        {!isCollapsed && (
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-white/5 rounded-lg transition-colors"
+            title="Collapse sidebar"
+          >
             <ChevronsLeft size={16} className="transition-transform" />
-          )}
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
