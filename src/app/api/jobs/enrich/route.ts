@@ -8,7 +8,10 @@ import { upsertLeadFireAndForget } from '@/lib/leads';
 import { refundCredits } from '@/lib/credits';
 import { analysisLogger } from '@/lib/logger';
 
-const BATCH_SIZE = 3;
+// Allow up to 60s per workflow step (Vercel Pro)
+export const maxDuration = 60;
+
+const WEBSITE_BATCH_SIZE = 12;
 
 interface EnrichPayload {
   jobId: string;
@@ -39,23 +42,42 @@ export const { POST } = serve<EnrichPayload>(async (context) => {
     await updateJobStatus(jobId, 'processing');
   });
 
-  // Step 2-N: Process in batches of 5
-  for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
-    const batch = businesses.slice(i, i + BATCH_SIZE);
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+  // Step 2: Fetch ALL reviews in one step (fetchBatchReviews handles concurrency internally)
+  const reviewResultsArray = await context.run('fetch-reviews', async () => {
+    analysisLogger.info({ jobId, count: businesses.length }, 'Fetching all reviews');
 
-    // Each batch is a durable step — survives Vercel function timeouts
-    await context.run(`batch-${batchNum}`, async () => {
-      analysisLogger.info({ jobId, batchNum, batchSize: batch.length }, 'Processing batch');
+    const reviewQueries = businesses.map((b, idx) => ({
+      id: `${idx}`,
+      query: b.placeId || `${b.name}, ${b.address}`,
+    }));
 
-      // Fetch reviews for this batch
-      const reviewQueries = batch.map((b, idx) => ({
-        id: `${i + idx}`,
-        query: b.placeId || `${b.name}, ${b.address}`,
-      }));
-      const reviewResults = await fetchBatchReviews(reviewQueries, 5);
+    const reviewMap = await fetchBatchReviews(reviewQueries, 5);
 
-      // Analyze websites for this batch (parallel)
+    // Convert Map to serializable array for QStash state
+    const results: Array<{ id: string; data: ReviewData }> = [];
+    reviewMap.forEach((data, id) => {
+      results.push({ id, data });
+    });
+
+    analysisLogger.info({ jobId, fetched: results.length }, 'All reviews fetched');
+    return results;
+  });
+
+  // Reconstruct review map from serialized array
+  const reviewResults = new Map<string, ReviewData>();
+  for (const entry of reviewResultsArray) {
+    reviewResults.set(entry.id, entry.data);
+  }
+
+  // Step 3+: Analyze websites and save results in larger batches
+  for (let i = 0; i < businesses.length; i += WEBSITE_BATCH_SIZE) {
+    const batch = businesses.slice(i, i + WEBSITE_BATCH_SIZE);
+    const batchNum = Math.floor(i / WEBSITE_BATCH_SIZE) + 1;
+
+    await context.run(`enrich-${batchNum}`, async () => {
+      analysisLogger.info({ jobId, batchNum, batchSize: batch.length }, 'Enriching batch');
+
+      // Analyze websites in parallel
       const websiteResults = await Promise.all(
         batch.map(b => b.website
           ? analyzeWebsite(b.website)
@@ -69,7 +91,7 @@ export const { POST } = serve<EnrichPayload>(async (context) => {
         )
       );
 
-      // Combine and save each result
+      // Combine reviews + website analysis and save each result
       for (let j = 0; j < batch.length; j++) {
         const business = batch[j];
         const globalIndex = i + j;
@@ -100,7 +122,7 @@ export const { POST } = serve<EnrichPayload>(async (context) => {
       }
 
       await incrementJobProgress(jobId, batch.length);
-      analysisLogger.info({ jobId, batchNum, processed: Math.min(i + BATCH_SIZE, businesses.length) }, 'Batch complete');
+      analysisLogger.info({ jobId, batchNum, processed: Math.min(i + WEBSITE_BATCH_SIZE, businesses.length) }, 'Enrich batch complete');
     });
   }
 
@@ -115,7 +137,6 @@ export const { POST } = serve<EnrichPayload>(async (context) => {
 
     analysisLogger.error({ jobId, failStatus, failResponse }, 'Workflow permanently failed');
 
-    // Refund credits for unprocessed businesses
     const job = await getJobStatus(jobId);
     const unprocessed = businesses.length - (job?.completedCount || 0);
 
