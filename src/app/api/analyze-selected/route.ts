@@ -8,15 +8,11 @@ import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { Semaphore, sleep } from '@/lib/rate-limiter';
 import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
-import { deductCredits } from '@/lib/credits';
+import { deductCredits, refundCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
 import { upsertLeadFireAndForget } from '@/lib/leads';
-
-interface AnalyzeSelectedRequest {
-  businesses: Business[];
-  niche: string;
-  location: string;
-}
+import { analyzeSchema } from '@/lib/validations';
+import { analysisLogger } from '@/lib/logger';
 
 const BATCH_SIZE = 5;
 const websiteAnalysisSemaphore = new Semaphore(5);
@@ -72,17 +68,18 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const body: AnalyzeSelectedRequest = await request.json();
+  const body = await request.json();
 
-  if (!body.businesses || !Array.isArray(body.businesses) || body.businesses.length === 0) {
-    return new Response(JSON.stringify({ error: 'At least one business is required' }), {
+  const parsed = analyzeSchema.safeParse(body);
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
   // Validate credits before analysis (include both remaining and purchased)
-  const requestedCount = body.businesses.length;
+  const requestedCount = parsed.data.businesses.length;
   const totalCredits = (subscription.credits_remaining || 0) + (subscription.credits_purchased || 0);
   if (totalCredits < requestedCount) {
     return new Response(JSON.stringify({
@@ -100,7 +97,7 @@ export async function POST(request: NextRequest) {
   const deductResult = await deductCredits(
     user.id,
     requestedCount,
-    `Selected analysis: ${requestedCount} businesses for "${body.niche}" in "${body.location}"`
+    `Selected analysis: ${requestedCount} businesses for "${parsed.data.niche}" in "${parsed.data.location}"`
   );
 
   if (!deductResult.success) {
@@ -115,16 +112,17 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  console.log(`[Analyze Selected] Deducted ${requestedCount} credits for user ${user.id.slice(0, 8)} (${deductResult.creditsRemaining} remaining)`);
+  analysisLogger.info({ userId: user.id.slice(0, 8), creditsDeducted: requestedCount, creditsRemaining: deductResult.creditsRemaining }, 'Credits deducted for selected analysis');
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
+      let completedCount = 0;
       try {
-        const { businesses, niche, location } = body;
+        const { businesses, niche, location } = parsed.data;
         const totalBusinesses = businesses.length;
 
-        console.log(`[Analyze Selected] Starting analysis for ${totalBusinesses} selected businesses`);
+        analysisLogger.info({ totalBusinesses }, 'Starting selected analysis');
 
         // Immediately notify client that credits were deducted server-side
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({
@@ -154,9 +152,9 @@ export async function POST(request: NextRequest) {
           // Convert Map to plain object for caching
           visibilityResults = Object.fromEntries(visibilityMap);
           await cache.set(visibilityCacheKey, visibilityResults, CACHE_TTL.VISIBILITY);
-          console.log(`[Analyze Selected] Visibility cached for ${niche} in ${location}`);
+          analysisLogger.info({ niche, location }, 'Visibility results cached');
         } else {
-          console.log(`[Analyze Selected] Visibility cache HIT`);
+          analysisLogger.info('Visibility cache hit');
         }
 
         // Phase 2: Fetch reviews (check cache for each)
@@ -184,7 +182,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        console.log(`[Analyze Selected] Reviews: ${reviewResults.size} cached, ${uncachedReviewQueries.length} to fetch`);
+        analysisLogger.info({ cached: reviewResults.size, toFetch: uncachedReviewQueries.length }, 'Review fetch status');
 
         // Fetch uncached reviews
         if (uncachedReviewQueries.length > 0) {
@@ -219,8 +217,6 @@ export async function POST(request: NextRequest) {
           phase: 3,
           totalPhases: 3
         })}\n\n`));
-
-        let completedCount = 0;
 
         // Process in batches
         for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
@@ -283,7 +279,7 @@ export async function POST(request: NextRequest) {
               };
 
               return enrichedBusiness;
-            });
+            }, 10000);
           });
 
           const batchResults = await Promise.all(batchPromises);
@@ -317,10 +313,25 @@ export async function POST(request: NextRequest) {
         controller.close();
 
       } catch (error) {
-        console.error('[Analyze Selected] Error:', error);
+        analysisLogger.error({ err: error }, 'Selected analysis error');
+
+        // Refund credits for unprocessed businesses
+        const unprocessed = requestedCount - completedCount;
+        if (unprocessed > 0) {
+          try {
+            await refundCredits(user.id, unprocessed,
+              `Refund: ${unprocessed}/${requestedCount} selected businesses not processed due to error`);
+            analysisLogger.info({ userId: user.id.slice(0, 8), refunded: unprocessed }, 'Refunded credits for unprocessed businesses');
+          } catch (refundError) {
+            analysisLogger.error({ err: refundError }, 'Failed to refund credits');
+          }
+        }
+
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({
           type: 'error',
-          message: sanitizeErrorMessage(error, 'Analysis failed. Please try again.')
+          message: sanitizeErrorMessage(error, 'Analysis failed. Please try again.'),
+          creditsRefunded: unprocessed > 0 ? unprocessed : 0,
+          creditsRemaining: deductResult.creditsRemaining + (unprocessed > 0 ? unprocessed : 0),
         })}\n\n`));
         controller.close();
       }

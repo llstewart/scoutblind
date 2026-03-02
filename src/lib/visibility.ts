@@ -1,4 +1,5 @@
 import { searchGoogleMaps } from './outscraper';
+import { visibilityLogger } from '@/lib/logger';
 
 // Number of top results to check for visibility
 const VISIBILITY_TOP_N = 20; // Increased to show more ranking positions
@@ -13,7 +14,7 @@ export async function checkSearchVisibility(
   location: string
 ): Promise<number | null> {
   try {
-    console.log(`[Visibility] Checking rank for "${businessName}" in "${niche}" search in "${location}"`);
+    visibilityLogger.info({ businessName, niche, location }, 'Checking search rank');
 
     // Search Google Maps for the niche in location
     const results = await searchGoogleMaps(niche, location, VISIBILITY_TOP_N);
@@ -27,13 +28,13 @@ export async function checkSearchVisibility(
 
       // Check for exact match or significant overlap
       if (resultName === normalizedBusinessName) {
-        console.log(`[Visibility] ✓ "${businessName}" ranked #${position} (exact match)`);
+        visibilityLogger.info({ businessName, position, matchType: 'exact' }, 'Business ranked');
         return position;
       }
 
       // Check if one contains the other (handles "Joe's Plumbing" vs "Joe's Plumbing LLC")
       if (resultName.includes(normalizedBusinessName) || normalizedBusinessName.includes(resultName)) {
-        console.log(`[Visibility] ✓ "${businessName}" ranked #${position} (partial match: "${results[i].name}")`);
+        visibilityLogger.info({ businessName, position, matchType: 'partial', matchedName: results[i].name }, 'Business ranked');
         return position;
       }
 
@@ -43,15 +44,15 @@ export async function checkSearchVisibility(
       const matchingWords = businessWords.filter(w => resultWords.includes(w));
 
       if (businessWords.length > 0 && matchingWords.length >= Math.ceil(businessWords.length * 0.6)) {
-        console.log(`[Visibility] ✓ "${businessName}" ranked #${position} (word match: "${results[i].name}")`);
+        visibilityLogger.info({ businessName, position, matchType: 'word', matchedName: results[i].name }, 'Business ranked');
         return position;
       }
     }
 
-    console.log(`[Visibility] ✗ "${businessName}" not found in top ${results.length} results`);
+    visibilityLogger.info({ businessName, searchedCount: results.length }, 'Business not found in top results');
     return null;
   } catch (error) {
-    console.error('[Visibility] Check failed:', error);
+    visibilityLogger.error({ err: error }, 'Visibility check failed');
     return null;
   }
 }
@@ -98,7 +99,7 @@ export async function batchCheckVisibility(
   const results = new Map<string, number | null>();
 
   try {
-    console.log(`[Visibility] Batch checking ${businesses.length} businesses for "${niche}" in "${location}"`);
+    visibilityLogger.info({ count: businesses.length, niche, location }, 'Batch checking visibility');
 
     // Make ONE search request
     const searchResults = await searchGoogleMaps(niche, location, VISIBILITY_TOP_N);
@@ -110,7 +111,7 @@ export async function batchCheckVisibility(
       position: index + 1, // 1-based position
     }));
 
-    console.log(`[Visibility] Top ${searchResults.length} results:`, topBusinesses.slice(0, 5).map(b => `#${b.position} ${b.name}`));
+    visibilityLogger.debug({ topResults: topBusinesses.slice(0, 5).map(b => `#${b.position} ${b.name}`) }, 'Top search results');
 
     // Track which positions have been claimed (each position can only be assigned once)
     const claimedPositions = new Set<number>();
@@ -146,7 +147,7 @@ export async function batchCheckVisibility(
           results.set(business.name, matchedPosition);
           claimedPositions.add(matchedPosition);
           unmatchedBusinesses.delete(business.name);
-          console.log(`[Visibility] ✓ "${business.name}" ranked #${matchedPosition} (priority ${matchPriority})`);
+          visibilityLogger.info({ businessName: business.name, position: matchedPosition, priority: matchPriority }, 'Batch: business ranked');
         }
       }
     }
@@ -157,10 +158,10 @@ export async function batchCheckVisibility(
     });
 
     const rankedCount = Array.from(results.values()).filter(v => v !== null).length;
-    console.log(`[Visibility] Batch complete: ${rankedCount}/${businesses.length} businesses found in top ${VISIBILITY_TOP_N} results`);
+    visibilityLogger.info({ rankedCount, total: businesses.length, topN: VISIBILITY_TOP_N }, 'Batch visibility check complete');
 
   } catch (error) {
-    console.error('[Visibility] Batch check failed:', error);
+    visibilityLogger.error({ err: error }, 'Batch visibility check failed');
     // Default all to null on error
     for (const business of businesses) {
       results.set(business.name, null);

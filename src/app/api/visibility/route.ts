@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkSearchVisibility } from '@/lib/visibility';
-import { VisibilityRequest, VisibilityResponse } from '@/lib/types';
+import { VisibilityResponse } from '@/lib/types';
 import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
+import { visibilitySchema } from '@/lib/validations';
+import { visibilityLogger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   // Check rate limit
@@ -39,19 +41,21 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body: VisibilityRequest = await request.json();
+    const body = await request.json();
 
-    if (!body.businessName || !body.niche || !body.location) {
+    const parsed = visibilitySchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Business name, niche, and location are required' },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+    const { businessName, niche, location } = parsed.data;
 
     const rank = await checkSearchVisibility(
-      body.businessName,
-      body.niche,
-      body.location
+      businessName,
+      niche,
+      location
     );
 
     const response: VisibilityResponse = {
@@ -60,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Visibility API error:', error);
+    visibilityLogger.error({ err: error }, 'Visibility API error');
 
     const message = error instanceof Error ? error.message : 'An unexpected error occurred';
 

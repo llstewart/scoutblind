@@ -1,6 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimitLogger } from '@/lib/logger';
 
 // Initialize Redis client (will be undefined if env vars not set)
 const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
@@ -165,7 +166,7 @@ export async function checkRateLimit(
   // If Redis is not configured, skip rate limiting (development mode)
   if (!limiter) {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Rate Limit] Skipped (no Redis configured) for ${type}`);
+      rateLimitLogger.debug({ type }, 'Skipped (no Redis configured)');
     }
     return null;
   }
@@ -174,13 +175,13 @@ export async function checkRateLimit(
   const { success, limit, remaining, reset } = await limiter.limit(ip);
 
   if (!success) {
-    console.log(`[Rate Limit] Blocked ${ip} for ${type} endpoint`);
+    rateLimitLogger.info({ ip, type }, 'Rate limit blocked');
     return rateLimitResponse(reset, type);
   }
 
   // Log rate limit status in development
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[Rate Limit] ${ip} - ${type}: ${remaining}/${limit} remaining`);
+    rateLimitLogger.debug({ ip, type, remaining, limit }, 'Rate limit status');
   }
 
   return null;
@@ -198,7 +199,7 @@ export async function checkUserRateLimit(
 
   if (!limiter) {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[User Rate Limit] Skipped (no Redis configured) for ${type}`);
+      rateLimitLogger.debug({ type }, 'User rate limit skipped (no Redis configured)');
     }
     return null;
   }
@@ -206,12 +207,12 @@ export async function checkUserRateLimit(
   const { success, limit, remaining, reset } = await limiter.limit(userId);
 
   if (!success) {
-    console.log(`[User Rate Limit] Blocked user ${userId} for ${type} endpoint`);
+    rateLimitLogger.info({ userId: userId.slice(0, 8), type }, 'User rate limit blocked');
     return rateLimitResponse(reset, type);
   }
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[User Rate Limit] ${userId} - ${type}: ${remaining}/${limit} remaining`);
+    rateLimitLogger.debug({ userId: userId.slice(0, 8), type, remaining, limit }, 'User rate limit status');
   }
 
   return null;

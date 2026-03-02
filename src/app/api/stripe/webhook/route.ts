@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStripeServer, SUBSCRIPTION_TIERS, SubscriptionTier } from '@/lib/stripe/server';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+import { stripeLogger } from '@/lib/logger';
 
 // Lazy initialization to avoid build-time errors
 let _supabase: SupabaseClient | null = null;
@@ -36,11 +37,11 @@ export async function POST(request: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error('[Stripe Webhook] Signature verification failed:', err);
+    stripeLogger.error({ err }, 'Webhook signature verification failed');
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  console.log(`[Stripe Webhook] Received event: ${event.type}`);
+  stripeLogger.info({ eventType: event.type }, 'Webhook event received');
 
   try {
     switch (event.type) {
@@ -76,25 +77,24 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
+        stripeLogger.debug({ eventType: event.type }, 'Unhandled webhook event type');
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('[Stripe Webhook] Error processing event:', error);
+    stripeLogger.error({ err: error }, 'Error processing webhook event');
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
-  console.log('[Stripe Webhook] handleCheckoutComplete called');
-  console.log('[Stripe Webhook] Session metadata:', JSON.stringify(session.metadata));
+  stripeLogger.info({ metadata: session.metadata }, 'handleCheckoutComplete called');
 
   const userId = session.metadata?.user_id;
   const type = session.metadata?.type;
 
   if (!userId) {
-    console.error('[Stripe Webhook] No user_id in session metadata');
+    stripeLogger.error('No user_id in session metadata');
     return;
   }
 
@@ -117,11 +117,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   // If insert failed due to duplicate key (already exists), skip processing
   if (lockResult.error) {
     if (lockResult.error.code === '23505') { // Postgres unique violation
-      console.log(`[Stripe Webhook] Checkout ${session.id} already processed (unique constraint), skipping`);
+      stripeLogger.info({ sessionId: session.id }, 'Checkout already processed (unique constraint), skipping');
       return;
     }
     // For other errors, log but continue with legacy check
-    console.warn('[Stripe Webhook] Lock insert warning:', lockResult.error.message);
+    stripeLogger.warn({ err: lockResult.error.message }, 'Lock insert warning');
 
     // Fallback: Check if transaction exists (legacy behavior)
     const { data: existingTransaction } = await getSupabase()
@@ -131,17 +131,17 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       .single();
 
     if (existingTransaction) {
-      console.log(`[Stripe Webhook] Checkout ${session.id} already processed, skipping (idempotent)`);
+      stripeLogger.info({ sessionId: session.id }, 'Checkout already processed, skipping (idempotent)');
       return;
     }
   }
 
-  console.log(`[Stripe Webhook] Processing checkout for user ${userId}, type: ${type}`);
+  stripeLogger.info({ userId: userId.slice(0, 8), type }, 'Processing checkout');
 
   if (type === 'credits') {
     // Handle one-time credit purchase
     const credits = parseInt(session.metadata?.credits || '0', 10);
-    console.log(`[Stripe Webhook] Credit purchase: ${credits} credits for user ${userId}`);
+    stripeLogger.info({ credits, userId: userId.slice(0, 8) }, 'Credit purchase');
 
     if (credits > 0) {
       // First verify the user exists in subscriptions table
@@ -152,8 +152,8 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         .single();
 
       if (fetchError) {
-        console.error('[Stripe Webhook] Error fetching subscription:', fetchError);
-        console.log('[Stripe Webhook] Creating subscription record for user...');
+        stripeLogger.error({ err: fetchError }, 'Error fetching subscription');
+        stripeLogger.info('Creating subscription record for user');
 
         // Create subscription record if it doesn't exist
         const { error: insertError } = await getSupabase()
@@ -168,7 +168,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
           });
 
         if (insertError) {
-          console.error('[Stripe Webhook] Error creating subscription:', insertError);
+          stripeLogger.error({ err: insertError }, 'Error creating subscription');
           return;
         }
 
@@ -183,11 +183,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
           })
           .eq('stripe_session_id', session.id);
 
-        console.log(`[Stripe Webhook] Created subscription with ${credits} purchased credits`);
+        stripeLogger.info({ credits }, 'Created subscription with purchased credits');
         return;
       }
 
-      console.log(`[Stripe Webhook] Current subscription: purchased=${existingSub.credits_purchased}, remaining=${existingSub.credits_remaining}`);
+      stripeLogger.info({ purchased: existingSub.credits_purchased, remaining: existingSub.credits_remaining }, 'Current subscription state');
 
       // Try direct update first (more reliable than RPC)
       const { error: updateError } = await getSupabase()
@@ -198,7 +198,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         .eq('user_id', userId);
 
       if (updateError) {
-        console.error('[Stripe Webhook] Error updating credits directly:', updateError);
+        stripeLogger.error({ err: updateError }, 'Error updating credits directly');
 
         // Fallback to RPC
         const { error: rpcError } = await getSupabase().rpc('add_credits', {
@@ -209,7 +209,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         });
 
         if (rpcError) {
-          console.error('[Stripe Webhook] RPC add_credits also failed:', rpcError);
+          stripeLogger.error({ err: rpcError }, 'RPC add_credits also failed');
           return;
         }
       }
@@ -225,16 +225,16 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         })
         .eq('stripe_session_id', session.id);
 
-      console.log(`[Stripe Webhook] Successfully added ${credits} credits to user ${userId}`);
+      stripeLogger.info({ credits, userId: userId.slice(0, 8) }, 'Successfully added credits');
     } else {
-      console.log('[Stripe Webhook] No credits to add (credits <= 0)');
+      stripeLogger.warn('No credits to add (credits <= 0)');
     }
   } else if (type === 'subscription') {
     // Handle subscription checkout completion
     const tier = session.metadata?.tier as SubscriptionTier | undefined;
     const tierConfig = tier ? SUBSCRIPTION_TIERS[tier] : SUBSCRIPTION_TIERS.starter;
 
-    console.log(`[Stripe Webhook] Subscription checkout: ${tier} for user ${userId}`);
+    stripeLogger.info({ tier, userId: userId.slice(0, 8) }, 'Subscription checkout');
 
     // Ensure user has the subscription record with credits
     const { data: existingSub } = await getSupabase()
@@ -256,7 +256,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         .eq('user_id', userId);
 
       if (updateError) {
-        console.error('[Stripe Webhook] Error updating subscription on checkout:', updateError);
+        stripeLogger.error({ err: updateError }, 'Error updating subscription on checkout');
       } else {
         // Update the lock record with actual transaction data
         await getSupabase()
@@ -268,7 +268,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
             balance_after: tierConfig.credits,
           })
           .eq('stripe_session_id', session.id);
-        console.log(`[Stripe Webhook] Updated subscription to ${tier} with ${tierConfig.credits} credits`);
+        stripeLogger.info({ tier, credits: tierConfig.credits }, 'Updated subscription');
       }
     } else {
       // Create subscription record
@@ -284,7 +284,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         });
 
       if (insertError) {
-        console.error('[Stripe Webhook] Error creating subscription on checkout:', insertError);
+        stripeLogger.error({ err: insertError }, 'Error creating subscription on checkout');
       } else {
         // Update the lock record with actual transaction data
         await getSupabase()
@@ -296,7 +296,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
             balance_after: tierConfig.credits,
           })
           .eq('stripe_session_id', session.id);
-        console.log(`[Stripe Webhook] Created subscription ${tier} with ${tierConfig.credits} credits`);
+        stripeLogger.info({ tier, credits: tierConfig.credits }, 'Created new subscription');
       }
     }
   }
@@ -316,7 +316,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       .single();
 
     if (!sub) {
-      console.error('[Stripe Webhook] Could not find user for subscription');
+      stripeLogger.error('Could not find user for subscription');
       return;
     }
   }
@@ -363,7 +363,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   // Grant credits on new subscription or upgrade
   if (isNewOrUpgrade && status === 'active') {
     updateData.credits_remaining = tierConfig.credits;
-    console.log(`[Stripe Webhook] Granting ${tierConfig.credits} credits for new/upgraded subscription`);
+    stripeLogger.info({ credits: tierConfig.credits }, 'Granting credits for new/upgraded subscription');
   }
 
   const { error } = await getSupabase()
@@ -372,9 +372,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     .eq('user_id', actualUserId);
 
   if (error) {
-    console.error('[Stripe Webhook] Error updating subscription:', error);
+    stripeLogger.error({ err: error }, 'Error updating subscription');
   } else {
-    console.log(`[Stripe Webhook] Updated subscription for user ${actualUserId} to ${tier}, credits: ${isNewOrUpgrade ? tierConfig.credits : 'unchanged'}`);
+    stripeLogger.info({ userId: actualUserId.slice(0, 8), tier, credits: isNewOrUpgrade ? tierConfig.credits : 'unchanged' }, 'Subscription updated');
   }
 }
 
@@ -394,9 +394,9 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
     .eq('user_id', userId);
 
   if (error) {
-    console.error('[Stripe Webhook] Error canceling subscription:', error);
+    stripeLogger.error({ err: error }, 'Error canceling subscription');
   } else {
-    console.log(`[Stripe Webhook] Canceled subscription for user ${userId}`);
+    stripeLogger.info({ userId: userId.slice(0, 8) }, 'Subscription canceled');
   }
 }
 
@@ -427,7 +427,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     .eq('user_id', userId);
 
   if (error) {
-    console.error('[Stripe Webhook] Error resetting credits:', error);
+    stripeLogger.error({ err: error }, 'Error resetting credits');
   } else {
     // Log the credit grant
     await getSupabase().rpc('add_credits', {
@@ -437,7 +437,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       p_description: `Monthly credit refresh: ${sub.credits_monthly_allowance} credits`,
     });
 
-    console.log(`[Stripe Webhook] Reset ${sub.credits_monthly_allowance} credits for user ${userId}`);
+    stripeLogger.info({ userId: userId.slice(0, 8), credits: sub.credits_monthly_allowance }, 'Monthly credits reset');
   }
 }
 
@@ -453,9 +453,9 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
     .eq('user_id', userId);
 
   if (error) {
-    console.error('[Stripe Webhook] Error updating payment status:', error);
+    stripeLogger.error({ err: error }, 'Error updating payment status');
   } else {
-    console.log(`[Stripe Webhook] Marked subscription as past_due for user ${userId}`);
+    stripeLogger.info({ userId: userId.slice(0, 8) }, 'Subscription marked as past_due');
   }
 }
 

@@ -2,7 +2,10 @@
 
 import { ReactNode } from 'react';
 import { X } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
+import { useLibrary } from '@/contexts/LibraryContext';
+import { usePipeline } from '@/contexts/PipelineContext';
 import { AppShell } from './AppShell';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { BillingModal } from '@/components/BillingModal';
@@ -15,16 +18,8 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const { user, credits, tier, isPremium, refreshUser } = useAuth();
   const {
-    user,
-    credits,
-    tier,
-    isPremium,
-    recentSearches,
-    savedAnalysesCount,
-    savedSearchesList,
-    allLeads,
-    handleLoadFromHistory,
     showAuthModal,
     setShowAuthModal,
     authMode,
@@ -34,12 +29,12 @@ export function AppLayout({ children }: AppLayoutProps) {
     setShowSettingsModal,
     showLookupModal,
     setShowLookupModal,
-    refreshUser,
-    fetchSavedSearchesList,
     toastMessage,
     setToastMessage,
     rateLimitCountdown,
-  } = useAppContext();
+  } = useUI();
+  const { recentSearches, savedAnalysesCount, savedSearchesList, handleLoadFromHistory, fetchSavedSearchesList } = useLibrary();
+  const { allLeads } = usePipeline();
 
   // Get user display name for sidebar
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';

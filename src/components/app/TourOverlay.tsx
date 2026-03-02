@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { X, ChevronRight } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 
 const TOUR_COMPLETE_KEY = 'packleads_tour_complete';
@@ -101,7 +101,7 @@ function computeTooltipCoords(
 }
 
 export function TourOverlay() {
-  const { user } = useAppContext();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);

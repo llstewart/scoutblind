@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchGoogleMaps } from '@/lib/outscraper';
-import { SearchRequest, SearchResponse, Business } from '@/lib/types';
+import { SearchResponse, Business } from '@/lib/types';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { deductCredits, refundCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
+import { searchSchema } from '@/lib/validations';
+import { searchLogger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   // Check rate limit
@@ -28,21 +30,23 @@ export async function POST(request: NextRequest) {
   if (userRateLimitResponse) return userRateLimitResponse;
 
   try {
-    const body: SearchRequest = await request.json();
+    const body = await request.json();
 
-    if (!body.niche || !body.location) {
+    const parsed = searchSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Niche and location are required' },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+    const { niche, location } = parsed.data;
 
     // Check cache first - cached results are FREE (no credit cost)
-    const cacheKey = Cache.searchKey(body.niche, body.location);
+    const cacheKey = Cache.searchKey(niche, location);
     const cachedResults = await cache.get<Business[]>(cacheKey);
 
     if (cachedResults) {
-      console.log(`[Search API] Cache HIT for "${body.niche}" in "${body.location}" - no credit cost`);
+      searchLogger.info({ niche, location, cached: true }, 'Search cache hit');
       const response: SearchResponse = {
         businesses: cachedResults,
         totalResults: cachedResults.length,
@@ -52,14 +56,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response);
     }
 
-    console.log(`[Search API] Cache MISS for "${body.niche}" in "${body.location}"`);
+    searchLogger.info({ niche, location, cached: false }, 'Search cache miss');
 
     // CRITICAL: Deduct 1 credit SERVER-SIDE before making API call
     // This prevents the race condition where client could bypass credit deduction
     const deductResult = await deductCredits(
       user.id,
       1,
-      `Search: "${body.niche}" in "${body.location}"`
+      `Search: "${niche}" in "${location}"`
     );
 
     if (!deductResult.success) {
@@ -71,19 +75,19 @@ export async function POST(request: NextRequest) {
       }, { status: 402 });
     }
 
-    console.log(`[Search API] Deducted 1 credit for user ${user.id.slice(0, 8)} (${deductResult.creditsRemaining} remaining)`);
+    searchLogger.info({ userId: user.id.slice(0, 8), creditsRemaining: deductResult.creditsRemaining }, 'Deducted 1 credit for search');
 
     // Call Outscraper API - if this fails, we need to refund the credit
     let businesses: Business[];
     try {
-      businesses = await searchGoogleMaps(body.niche, body.location, 25);
+      businesses = await searchGoogleMaps(niche, location, 25);
     } catch (searchError) {
       // Outscraper failed - refund the credit
-      console.error('[Search API] Outscraper failed, refunding credit:', searchError);
+      searchLogger.error({ err: searchError }, 'Outscraper failed, refunding credit');
       await refundCredits(
         user.id,
         1,
-        `Refund: Search failed for "${body.niche}" in "${body.location}"`
+        `Refund: Search failed for "${niche}" in "${location}"`
       );
 
       // Re-throw to be caught by outer catch
@@ -103,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Search API error:', error);
+    searchLogger.error({ err: error }, 'Search API error');
 
     // Sanitize error message to prevent leaking internal details
     const message = sanitizeErrorMessage(error, 'Search failed. Please try again.');

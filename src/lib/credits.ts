@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { creditsLogger } from '@/lib/logger';
 
 // Lazy-initialized service role client for bypassing RLS
 let _serviceClient: ReturnType<typeof createClient> | null = null;
@@ -159,7 +160,7 @@ export async function deductCredits(
   if (updateError || !updated) {
     // Race condition detected - credits changed between read and update
     // Retry once
-    console.warn(`[Credits] Optimistic lock failed for user ${userId.slice(0, 8)}, retrying...`);
+    creditsLogger.warn({ userId: userId.slice(0, 8) }, 'Optimistic lock failed, retrying');
     return deductCreditsWithRetry(userId, amount, description, 1);
   }
 
@@ -175,10 +176,10 @@ export async function deductCredits(
         balance_after: updated.credits_remaining + updated.credits_purchased,
       });
   } catch (err) {
-    console.error('[Credits] Failed to log transaction:', err);
+    creditsLogger.error({ err }, 'Failed to log transaction');
   }
 
-  console.log(`[Credits] Deducted ${amount} credits from user ${userId.slice(0, 8)}: ${totalCredits} -> ${updated.credits_remaining + updated.credits_purchased}`);
+  creditsLogger.info({ userId: userId.slice(0, 8), amount, before: totalCredits, after: updated.credits_remaining + updated.credits_purchased }, 'Credits deducted');
 
   return {
     success: true,
@@ -286,10 +287,10 @@ async function deductCreditsWithRetry(
         balance_after: updated.credits_remaining + updated.credits_purchased,
       });
   } catch (err) {
-    console.error('[Credits] Failed to log transaction:', err);
+    creditsLogger.error({ err }, 'Failed to log transaction');
   }
 
-  console.log(`[Credits] Deducted ${amount} credits from user ${userId.slice(0, 8)} (retry ${attempt})`);
+  creditsLogger.info({ userId: userId.slice(0, 8), amount, attempt }, 'Credits deducted on retry');
 
   return {
     success: true,
@@ -360,10 +361,10 @@ export async function refundCredits(
         balance_after: refunded.credits_remaining + refunded.credits_purchased,
       });
   } catch (err) {
-    console.error('[Credits] Failed to log refund:', err);
+    creditsLogger.error({ err }, 'Failed to log refund');
   }
 
-  console.log(`[Credits] Refunded ${amount} credits to user ${userId.slice(0, 8)}`);
+  creditsLogger.info({ userId: userId.slice(0, 8), amount }, 'Credits refunded');
 
   return {
     success: true,

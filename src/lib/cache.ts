@@ -4,6 +4,7 @@
  */
 
 import { Redis } from '@upstash/redis';
+import { cacheLogger } from '@/lib/logger';
 
 // Cache TTL constants (in minutes)
 export const CACHE_TTL = {
@@ -28,7 +29,7 @@ const redis = isRedisConfigured
   : null;
 
 if (!isRedisConfigured) {
-  console.warn('[Cache] Upstash Redis not configured - falling back to in-memory cache (not recommended for production)');
+  cacheLogger.warn('Upstash Redis not configured - falling back to in-memory cache (not recommended for production)');
 }
 
 /**
@@ -121,7 +122,7 @@ class Cache {
       }
       return memoryCache.get<T>(key);
     } catch (error) {
-      console.error('[Cache] Error getting key:', key, error);
+      cacheLogger.error({ key, err: error }, 'Error getting key');
       return null;
     }
   }
@@ -138,7 +139,7 @@ class Cache {
         memoryCache.set(key, data, ttlMinutes * 60 * 1000);
       }
     } catch (error) {
-      console.error('[Cache] Error setting key:', key, error);
+      cacheLogger.error({ key, err: error }, 'Error setting key');
     }
   }
 
@@ -153,7 +154,7 @@ class Cache {
         memoryCache.delete(key);
       }
     } catch (error) {
-      console.error('[Cache] Error deleting key:', key, error);
+      cacheLogger.error({ key, err: error }, 'Error deleting key');
     }
   }
 

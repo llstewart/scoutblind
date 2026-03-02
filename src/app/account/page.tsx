@@ -2,21 +2,15 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
 import { AccountTab } from '@/components/app/AccountTab';
 import { AppLayout } from '@/components/app/AppLayout';
 
 export default function AccountPage() {
   const router = useRouter();
-  const {
-    user,
-    isAuthLoading,
-    credits,
-    tier,
-    setShowBillingModal,
-    setShowSettingsModal,
-    handleSignOut,
-  } = useAppContext();
+  const { user, isAuthLoading, credits, tier, handleSignOut } = useAuth();
+  const { setShowBillingModal, setShowSettingsModal } = useUI();
 
   // Redirect to home if not logged in
   useEffect(() => {

@@ -9,6 +9,8 @@ import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createServiceSupabase } from '@supabase/supabase-js';
 import { upsertLeadFireAndForget } from '@/lib/leads';
+import { analyzePreviewSchema } from '@/lib/validations';
+import { analysisLogger } from '@/lib/logger';
 
 const FREE_PREVIEW_LIFETIME_CAP = 1; // Max preview sessions ever (each = up to 3 businesses)
 
@@ -20,12 +22,6 @@ function getServiceClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
-}
-
-interface AnalyzePreviewRequest {
-  businesses: Business[];
-  niche: string;
-  location: string;
 }
 
 interface WebsiteAnalysisResult {
@@ -83,20 +79,20 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body: AnalyzePreviewRequest = await request.json();
+    const body = await request.json();
 
-    if (!body.businesses || !body.niche || !body.location) {
+    const parsed = analyzePreviewSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Businesses, niche, and location are required' },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    // Hard cap: max 3 businesses
-    const businessesToAnalyze = body.businesses.slice(0, 3);
-    const { niche, location } = body;
+    // Schema already enforces max 3 businesses
+    const { businesses: businessesToAnalyze, niche, location } = parsed.data;
 
-    console.log(`[Preview] Starting preview analysis for ${businessesToAnalyze.length} businesses (user: ${user.id.slice(0, 8)})`);
+    analysisLogger.info({ count: businessesToAnalyze.length, userId: user.id.slice(0, 8) }, 'Starting preview analysis');
 
     // Enrich all businesses in parallel
     const enrichedBusinesses: EnrichedBusiness[] = await Promise.all(
@@ -154,7 +150,7 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    console.log(`[Preview] Completed preview analysis for ${enrichedBusinesses.length} businesses`);
+    analysisLogger.info({ count: enrichedBusinesses.length }, 'Preview analysis completed');
 
     // Upsert each enriched business into leads table
     for (const eb of enrichedBusinesses) {
@@ -179,7 +175,7 @@ export async function POST(request: NextRequest) {
       isPreview: true,
     });
   } catch (error) {
-    console.error('[Preview] Error:', error);
+    analysisLogger.error({ err: error }, 'Preview analysis error');
     const message = error instanceof Error ? error.message : 'An unexpected error occurred';
     return NextResponse.json({ error: message }, { status: 500 });
   }

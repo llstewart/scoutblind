@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
+import { useSearch } from '@/contexts/SearchContext';
+import { usePipeline } from '@/contexts/PipelineContext';
 import { GeneralListTable } from '@/components/GeneralListTable';
 import { UpgradedListTable } from '@/components/UpgradedListTable';
 import { PremiumGate } from '@/components/PremiumGate';
@@ -16,6 +19,8 @@ import { Badge } from '@/components/ui/Badge';
 const MarketDashboard = dynamic(() => import('./MarketDashboard').then(m => ({ default: m.MarketDashboard })), { ssr: false });
 
 export function ResultsView() {
+  const { isPremium } = useAuth();
+  const { handleUpgradeClick, setShowBillingModal } = useUI();
   const {
     businesses,
     tableBusinesses,
@@ -26,7 +31,6 @@ export function ResultsView() {
     setSelectedBusinesses,
     isCached,
     isViewingSavedSearch,
-    isPremium,
     isAnalyzing,
     analyzeProgress,
     wasAnalysisInterrupted,
@@ -36,17 +40,12 @@ export function ResultsView() {
     handleSearch,
     handleAnalyze,
     handleNewSearch,
-    handleUpgradeClick,
-    setShowBillingModal,
-    updateLeadStatus,
-    updateLeadNotes,
-    statusFilter,
-    setStatusFilter,
     isPreviewMode,
     isPreviewEnriching,
     previewExhausted,
     triggerFreePreview,
-  } = useAppContext();
+  } = useSearch();
+  const { updateLeadStatus, updateLeadNotes, statusFilter, setStatusFilter } = usePipeline();
 
   // Modal state for outreach templates and pitch report
   const [outreachBusiness, setOutreachBusiness] = useState<EnrichedBusiness | null>(null);

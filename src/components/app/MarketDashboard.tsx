@@ -7,7 +7,10 @@ import {
   PieChart, Pie, Cell, Legend,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from 'recharts';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
+import { useSearch } from '@/contexts/SearchContext';
+import { useLibrary } from '@/contexts/LibraryContext';
 import { calculateBasicOpportunityScore, getOpportunityLevel, calculateSeoNeedScore } from '@/lib/signals';
 import { isEnrichedBusiness, isPendingBusiness, EnrichedBusiness } from '@/lib/types';
 
@@ -117,13 +120,10 @@ const FAKE_ACTIVITY = { totalProspects: 156, markets: 4, avgScore: 67 };
 // ─── Main component ─────────────────────────────────────────────────
 
 export function MarketDashboard() {
-  const {
-    businesses,
-    tableBusinesses,
-    savedSearchesList,
-    isPremium,
-    handleUpgradeClick,
-  } = useAppContext();
+  const { isPremium } = useAuth();
+  const { handleUpgradeClick } = useUI();
+  const { businesses, tableBusinesses } = useSearch();
+  const { savedSearchesList } = useLibrary();
 
   // Chart 1: Opportunity Distribution
   const opportunityData = useMemo(() => {

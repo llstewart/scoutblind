@@ -52,9 +52,17 @@ export class Semaphore {
     }
   }
 
-  async withPermit<T>(fn: () => Promise<T>): Promise<T> {
+  async withPermit<T>(fn: () => Promise<T>, timeoutMs?: number): Promise<T> {
     await this.acquire();
     try {
+      if (timeoutMs) {
+        return await Promise.race([
+          fn(),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Semaphore task timed out after ${timeoutMs}ms`)), timeoutMs)
+          ),
+        ]);
+      }
       return await fn();
     } finally {
       this.release();

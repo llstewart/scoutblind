@@ -4,7 +4,8 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { EnrichedBusiness, LeadStatus } from '@/lib/types';
 import { LEAD_STATUS_CONFIG, ALL_LEAD_STATUSES } from '@/lib/lead-constants';
 import { calculateSeoNeedScore } from '@/lib/signals';
-import { useAppContext } from '@/contexts/AppContext';
+import { usePipeline } from '@/contexts/PipelineContext';
+import { useSearch } from '@/contexts/SearchContext';
 import { OutreachTemplatesModal } from '@/components/OutreachTemplatesModal';
 import { PitchReportModal } from '@/components/PitchReportModal';
 import ScoreRing from '@/components/ui/ScoreRing';
@@ -256,7 +257,8 @@ function MobileLeadCard({
 // ══════════════════════════════════════════════════════════════
 
 export function PipelineTab() {
-  const { allLeads, isLoadingLeads, leadsError, fetchAllLeads, updateLeadDirect, deleteLeadsDirect, searchParams: contextSearchParams } = useAppContext();
+  const { allLeads, isLoadingLeads, leadsError, fetchAllLeads, updateLeadDirect, deleteLeadsDirect } = usePipeline();
+  const { searchParams: contextSearchParams } = useSearch();
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all');

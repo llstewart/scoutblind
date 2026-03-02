@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, SUBSCRIPTION_TIERS, CREDIT_PACKS, SubscriptionTier, CreditPack } from '@/lib/stripe/server';
+import { stripe, SUBSCRIPTION_TIERS, CREDIT_PACKS } from '@/lib/stripe/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkoutSchema } from '@/lib/validations';
+import { stripeLogger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,12 +14,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, tier, pack, interval } = body as {
-      type: 'subscription' | 'credits';
-      tier?: SubscriptionTier;
-      pack?: CreditPack;
-      interval?: 'month' | 'year';
-    };
+
+    const parsed = checkoutSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+    const validatedBody = parsed.data;
+    const type = validatedBody.type;
+    const tier = type === 'subscription' ? validatedBody.tier : undefined;
+    const pack = type === 'credits' ? validatedBody.pack : undefined;
+    const interval = type === 'subscription' ? validatedBody.interval : undefined;
 
     // Get or create Stripe customer
     const { data: subscription } = await supabase
@@ -60,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
-    if (type === 'subscription' && tier && tier !== 'free') {
+    if (type === 'subscription' && tier) {
       const tierConfig = SUBSCRIPTION_TIERS[tier];
       const priceInCents = interval === 'year'
         ? tierConfig.priceYearly * 100
@@ -141,7 +150,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   } catch (error) {
-    console.error('[Stripe Checkout] Error:', error);
+    stripeLogger.error({ err: error }, 'Checkout session creation error');
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

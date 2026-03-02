@@ -1,5 +1,7 @@
 import { Business } from './types';
 import { withRetry, Semaphore, sleep, RetryOptions } from './rate-limiter';
+import { CircuitBreaker } from './circuit-breaker';
+import { outscrapterLogger } from '@/lib/logger';
 
 // Outscraper has multiple API endpoints for redundancy (from their official Python SDK)
 // We try them in order if one fails
@@ -31,6 +33,10 @@ const REVIEWS_RETRY_OPTIONS: Partial<RetryOptions> = {
   maxDelayMs: 8000,
   jitterMs: 500,
 };
+
+// Circuit breakers to prevent cascading failures when Outscraper is down
+const searchCircuitBreaker = new CircuitBreaker('outscraper-search', 5, 60000, 2);
+const reviewsCircuitBreaker = new CircuitBreaker('outscraper-reviews', 5, 60000, 2);
 
 // Global semaphore to limit concurrent reviews API calls
 const reviewsApiSemaphore = new Semaphore(3); // Max 3 concurrent reviews requests
@@ -108,7 +114,7 @@ async function searchGoogleMapsInternal(
 
     try {
       const url = `${baseUrl}${SEARCH_ENDPOINT}?${params}`;
-      console.log(`[Outscraper] Trying: ${baseUrl}`);
+      outscrapterLogger.info({ baseUrl }, 'Trying API endpoint');
 
       const response = await fetch(url, {
         method: 'GET',
@@ -131,7 +137,7 @@ async function searchGoogleMapsInternal(
       // Outscraper returns results in a nested array structure
       const places: OutscraperRawPlace[] = data.data?.[0] || data.data || [];
 
-      console.log(`[Outscraper] Found ${places.length} places via ${baseUrl}`);
+      outscrapterLogger.info({ count: places.length, baseUrl }, 'Found places');
 
       return places.map(parseOutscraperPlace);
     } catch (error) {
@@ -139,7 +145,7 @@ async function searchGoogleMapsInternal(
       lastError = error instanceof Error ? error : new Error(String(error));
 
       // Log the failure and try next URL
-      console.log(`[Outscraper] Failed with ${baseUrl}: ${lastError.message}`);
+      outscrapterLogger.warn({ baseUrl, err: lastError }, 'API endpoint failed');
 
       // Continue to next URL unless it's a non-recoverable error (like bad API key)
       if (lastError.message.includes('401') || lastError.message.includes('403')) {
@@ -164,15 +170,17 @@ export async function searchGoogleMaps(
   }
 
   const searchQuery = `${query} in ${location}`;
-  console.log(`[Outscraper] Searching: ${searchQuery}`);
+  outscrapterLogger.info({ searchQuery }, 'Starting search');
 
-  // Use retry logic to handle transient network/DNS failures
-  return withRetry(
-    () => searchGoogleMapsInternal(searchQuery, limit, apiKey),
-    SEARCH_RETRY_OPTIONS,
-    (attempt, error, delayMs) => {
-      console.log(`[Outscraper] Search retry ${attempt} after ${delayMs}ms: ${error.message}`);
-    }
+  // Circuit breaker wraps retry logic to fail fast when Outscraper is down
+  return searchCircuitBreaker.execute(
+    () => withRetry(
+      () => searchGoogleMapsInternal(searchQuery, limit, apiKey),
+      SEARCH_RETRY_OPTIONS,
+      (attempt, error, delayMs) => {
+        outscrapterLogger.warn({ attempt, delayMs, err: error }, 'Search retry');
+      }
+    )
   );
 }
 
@@ -190,7 +198,7 @@ function parseOutscraperPlace(place: OutscraperRawPlace): Business {
 
   // Log the IDs we're getting for debugging
   if (place.name) {
-    console.log(`[Outscraper] Parsed ${place.name}: place_id=${place.place_id}, google_id=${place.google_id?.substring(0, 30)}`);
+    outscrapterLogger.debug({ name: place.name, placeId: place.place_id, googleId: place.google_id?.substring(0, 30) }, 'Parsed place');
   }
 
   const parsed: Business = {
@@ -369,27 +377,31 @@ export async function fetchBusinessReviews(
     reviewCount: 0,
   };
 
-  // Use semaphore to limit concurrent requests
+  // Use semaphore to limit concurrent requests (25s timeout per request)
   return reviewsApiSemaphore.withPermit(async () => {
     try {
-      console.log(`[Outscraper Reviews] Fetching reviews for: ${placeIdOrName}`);
+      outscrapterLogger.info({ placeIdOrName }, 'Fetching reviews');
 
-      const result = await withRetry(
-        () => fetchReviewsInternal(placeIdOrName, reviewsLimit, apiKey),
-        REVIEWS_RETRY_OPTIONS,
-        (attempt, error, delayMs) => {
-          console.log(`[Outscraper Reviews] Retry ${attempt} for ${placeIdOrName} after ${delayMs}ms: ${error.message}`);
-        }
+      // Circuit breaker wraps retry logic; falls back to default on open circuit
+      const result = await reviewsCircuitBreaker.execute(
+        () => withRetry(
+          () => fetchReviewsInternal(placeIdOrName, reviewsLimit, apiKey),
+          REVIEWS_RETRY_OPTIONS,
+          (attempt, error, delayMs) => {
+            outscrapterLogger.warn({ attempt, placeIdOrName, delayMs, err: error }, 'Reviews retry');
+          }
+        ),
+        () => defaultResult
       );
 
-      console.log(`[Outscraper Reviews] Success for ${placeIdOrName}: responseRate=${result.responseRate}%`);
+      outscrapterLogger.info({ placeIdOrName, responseRate: result.responseRate }, 'Reviews fetch success');
       return result;
 
     } catch (error) {
-      console.error(`[Outscraper Reviews] All retries failed for ${placeIdOrName}:`, error);
+      outscrapterLogger.error({ placeIdOrName, err: error }, 'All retries failed for reviews');
       return defaultResult;
     }
-  });
+  }, 25000);
 }
 
 /**
@@ -415,7 +427,7 @@ export async function fetchBatchReviews(
     reviewCount: 0,
   };
 
-  console.log(`[Outscraper Reviews] Batch fetching reviews for ${businesses.length} businesses`);
+  outscrapterLogger.info({ count: businesses.length }, 'Batch fetching reviews');
 
   // Process all businesses with controlled concurrency via semaphore
   let completedCount = 0;
@@ -426,21 +438,25 @@ export async function fetchBatchReviews(
       await sleep(Math.random() * 300);
 
       try {
-        const result = await withRetry(
-          () => fetchReviewsInternal(query, reviewsLimit, apiKey),
-          REVIEWS_RETRY_OPTIONS,
-          (attempt, error, delayMs) => {
-            console.log(`[Outscraper Reviews] Retry ${attempt} for ${id} after ${delayMs}ms: ${error.message}`);
-          }
+        // Circuit breaker wraps retry logic; falls back to default on open circuit
+        const result = await reviewsCircuitBreaker.execute(
+          () => withRetry(
+            () => fetchReviewsInternal(query, reviewsLimit, apiKey),
+            REVIEWS_RETRY_OPTIONS,
+            (attempt, error, delayMs) => {
+              outscrapterLogger.warn({ attempt, businessId: id, delayMs, err: error }, 'Batch reviews retry');
+            }
+          ),
+          () => defaultResult
         );
 
         results.set(id, result);
         completedCount++;
         onProgress?.(completedCount, businesses.length, id, true);
-        console.log(`[Outscraper Reviews] ✓ ${id} (${completedCount}/${businesses.length})`);
+        outscrapterLogger.info({ businessId: id, completed: completedCount, total: businesses.length }, 'Batch review success');
 
       } catch (error) {
-        console.error(`[Outscraper Reviews] ✗ ${id}: All retries failed`);
+        outscrapterLogger.error({ businessId: id }, 'Batch review failed, all retries exhausted');
         results.set(id, defaultResult);
         completedCount++;
         onProgress?.(completedCount, businesses.length, id, false);
@@ -448,11 +464,11 @@ export async function fetchBatchReviews(
 
       // Throttle between requests within semaphore
       await sleep(500 + Math.random() * 500); // 500-1000ms between requests
-    });
+    }, 25000);
   });
 
   await Promise.all(promises);
 
-  console.log(`[Outscraper Reviews] Batch complete: ${results.size}/${businesses.length} succeeded`);
+  outscrapterLogger.info({ succeeded: results.size, total: businesses.length }, 'Batch reviews complete');
   return results;
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { contactSchema } from '@/lib/validations';
 
 // Simple in-memory rate limit for contact form (3 per IP per hour)
 const submissions = new Map<string, number[]>();
@@ -33,39 +34,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { name?: string; email?: string; subject?: string; message?: string };
+  let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
   }
 
-  const { name, email, subject, message } = body;
-
-  // Validate required fields
-  if (!name || !email || !subject || !message) {
+  const parsed = contactSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: 'All fields are required.' },
+      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
       { status: 400 }
     );
   }
-
-  // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return NextResponse.json(
-      { error: 'Please provide a valid email address.' },
-      { status: 400 }
-    );
-  }
-
-  // Length validation
-  if (name.length > 200 || email.length > 200 || subject.length > 200 || message.length > 5000) {
-    return NextResponse.json(
-      { error: 'One or more fields exceed maximum length.' },
-      { status: 400 }
-    );
-  }
+  const { name, email, subject, message } = parsed.data;
 
   try {
     const supabase = await createClient();

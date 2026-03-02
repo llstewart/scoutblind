@@ -3,7 +3,10 @@
 import { useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
+import { useSearch } from '@/contexts/SearchContext';
+import { useLibrary } from '@/contexts/LibraryContext';
 import { SearchForm } from '@/components/SearchForm';
 import { LoadingState } from '@/components/LoadingState';
 import { AppLayout } from '@/components/app/AppLayout';
@@ -29,23 +32,10 @@ function DashboardContent() {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
 
-  const {
-    user,
-    isAuthLoading,
-    credits,
-    handleSearch,
-    isSearching,
-    hasResults,
-    searchParams,
-    isViewingSavedSearch,
-    recentSearches,
-    error,
-    setShowLookupModal,
-    handleLoadFromHistory,
-    refreshUser,
-    getCredits,
-    setToastMessage,
-  } = useAppContext();
+  const { user, isAuthLoading, credits, refreshUser, getCredits } = useAuth();
+  const { setShowLookupModal, setToastMessage } = useUI();
+  const { handleSearch, isSearching, hasResults, searchParams, isViewingSavedSearch, error } = useSearch();
+  const { recentSearches, handleLoadFromHistory } = useLibrary();
 
   // Handle checkout success/cancel from Stripe redirect
   useEffect(() => {

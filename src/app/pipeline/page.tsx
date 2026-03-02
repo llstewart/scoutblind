@@ -2,14 +2,18 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
+import { usePipeline } from '@/contexts/PipelineContext';
 import { PipelineTab } from '@/components/app/PipelineTab';
 import { AppLayout } from '@/components/app/AppLayout';
 import { LayoutList, ArrowRight } from 'lucide-react';
 
 export default function PipelinePage() {
   const router = useRouter();
-  const { user, isAuthLoading, isPremium, fetchAllLeads, setShowBillingModal } = useAppContext();
+  const { user, isAuthLoading, isPremium } = useAuth();
+  const { setShowBillingModal } = useUI();
+  const { fetchAllLeads } = usePipeline();
 
   // Redirect to home if not logged in
   useEffect(() => {

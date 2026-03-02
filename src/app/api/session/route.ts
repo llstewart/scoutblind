@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { EnrichedBusiness, Business } from '@/lib/types';
+import { sessionSaveSchema } from '@/lib/validations';
+import { searchLogger } from '@/lib/logger';
 
 // Helper to generate search key
 function getSearchKey(niche: string, location: string): string {
@@ -90,7 +92,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ analyses });
 
   } catch (error) {
-    console.error('[Session API] GET error:', error);
+    searchLogger.error({ err: error }, 'Session GET error');
     return NextResponse.json({ error: 'Failed to get saved searches' }, { status: 500 });
   }
 }
@@ -118,18 +120,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { niche, location, businesses } = body as {
-      niche: string;
-      location: string;
-      businesses: (Business | EnrichedBusiness)[];
-    };
 
-    if (!niche || !location || !businesses || !Array.isArray(businesses)) {
+    const parsed = sessionSaveSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'niche, location, and businesses array are required' },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+    const { niche, location } = parsed.data;
+    const businesses = parsed.data.businesses as unknown as (Business | EnrichedBusiness)[];
 
     const normalizedNiche = niche.toLowerCase().trim();
     const normalizedLocation = location.toLowerCase().trim();
@@ -171,11 +171,11 @@ export async function POST(request: NextRequest) {
         .eq('id', existing.id);
 
       if (error) {
-        console.error('[Session API] Error updating saved search:', error);
+        searchLogger.error({ err: error }, 'Error updating saved search');
         return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
       }
 
-      console.log(`[Session API] Updated search with ${mergedBusinesses.length} businesses for user ${user.id.slice(0, 8)}...`);
+      searchLogger.info({ count: mergedBusinesses.length, userId: user.id.slice(0, 8) }, 'Updated saved search');
     } else {
       // Create new record
       const { error } = await supabase
@@ -189,17 +189,17 @@ export async function POST(request: NextRequest) {
         });
 
       if (error) {
-        console.error('[Session API] Error creating saved search:', error);
+        searchLogger.error({ err: error }, 'Error creating saved search');
         return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
       }
 
-      console.log(`[Session API] Created new search with ${businesses.length} businesses for user ${user.id.slice(0, 8)}...`);
+      searchLogger.info({ count: businesses.length, userId: user.id.slice(0, 8) }, 'Created new saved search');
     }
 
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('[Session API] POST error:', error);
+    searchLogger.error({ err: error }, 'Session POST error');
     return NextResponse.json({ error: 'Failed to save search' }, { status: 500 });
   }
 }
@@ -241,11 +241,11 @@ export async function DELETE(request: NextRequest) {
         .eq('location', location.toLowerCase().trim());
 
       if (error) {
-        console.error('[Session API] Error deleting saved search:', error);
+        searchLogger.error({ err: error }, 'Error deleting saved search');
         return NextResponse.json({ error: 'Failed to delete search' }, { status: 500 });
       }
 
-      console.log(`[Session API] Deleted search "${niche}|${location}" for user ${user.id.slice(0, 8)}...`);
+      searchLogger.info({ niche, location, userId: user.id.slice(0, 8) }, 'Deleted saved search');
       return NextResponse.json({ success: true });
     }
 
@@ -256,15 +256,15 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('[Session API] Error deleting saved searches:', error);
+      searchLogger.error({ err: error }, 'Error deleting saved searches');
       return NextResponse.json({ error: 'Failed to clear' }, { status: 500 });
     }
 
-    console.log(`[Session API] Cleared all searches for user ${user.id.slice(0, 8)}...`);
+    searchLogger.info({ userId: user.id.slice(0, 8) }, 'Cleared all saved searches');
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('[Session API] DELETE error:', error);
+    searchLogger.error({ err: error }, 'Session DELETE error');
     return NextResponse.json({ error: 'Failed to clear saved searches' }, { status: 500 });
   }
 }

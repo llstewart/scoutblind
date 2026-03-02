@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // Get service role client for admin operations
 function getServiceClient() {
@@ -27,7 +28,7 @@ export async function DELETE() {
   }
 
   const userId = user.id;
-  console.log(`[Account Delete] Starting deletion for user ${userId.slice(0, 8)}...`);
+  logger.info({ userId: userId.slice(0, 8) }, 'Starting account deletion');
 
   try {
     const serviceClient = getServiceClient();
@@ -39,10 +40,10 @@ export async function DELETE() {
       .eq('user_id', userId);
 
     if (analysesError) {
-      console.error('[Account Delete] Error deleting saved analyses:', analysesError);
+      logger.error({ err: analysesError }, 'Error deleting saved analyses');
       // Continue anyway - don't fail the whole deletion
     } else {
-      console.log('[Account Delete] Deleted saved analyses');
+      logger.info('Deleted saved analyses');
     }
 
     // 2. Delete credit transactions (if table exists)
@@ -52,9 +53,9 @@ export async function DELETE() {
       .eq('user_id', userId);
 
     if (transactionsError && !transactionsError.message.includes('does not exist')) {
-      console.error('[Account Delete] Error deleting credit transactions:', transactionsError);
+      logger.error({ err: transactionsError }, 'Error deleting credit transactions');
     } else {
-      console.log('[Account Delete] Deleted credit transactions');
+      logger.info('Deleted credit transactions');
     }
 
     // 3. Delete subscription
@@ -64,23 +65,23 @@ export async function DELETE() {
       .eq('user_id', userId);
 
     if (subscriptionError) {
-      console.error('[Account Delete] Error deleting subscription:', subscriptionError);
+      logger.error({ err: subscriptionError }, 'Error deleting subscription');
     } else {
-      console.log('[Account Delete] Deleted subscription');
+      logger.info('Deleted subscription');
     }
 
     // 4. Delete the auth user (this is the main deletion)
     const { error: authError } = await serviceClient.auth.admin.deleteUser(userId);
 
     if (authError) {
-      console.error('[Account Delete] Error deleting auth user:', authError);
+      logger.error({ err: authError }, 'Error deleting auth user');
       return NextResponse.json(
         { error: 'Failed to delete account. Please contact support.' },
         { status: 500 }
       );
     }
 
-    console.log(`[Account Delete] Successfully deleted user ${userId.slice(0, 8)}...`);
+    logger.info({ userId: userId.slice(0, 8) }, 'Account successfully deleted');
 
     // 5. Sign out the current session
     await supabase.auth.signOut();
@@ -88,7 +89,7 @@ export async function DELETE() {
     return NextResponse.json({ success: true, message: 'Account deleted successfully' });
 
   } catch (error) {
-    console.error('[Account Delete] Unexpected error:', error);
+    logger.error({ err: error }, 'Unexpected error during account deletion');
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please contact support.' },
       { status: 500 }

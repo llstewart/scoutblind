@@ -2,7 +2,11 @@
 
 import { ReactNode, Suspense } from 'react';
 import { ThemeProvider } from 'next-themes';
-import { AppProvider } from '@/contexts/AppContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { UIProvider } from '@/contexts/UIContext';
+import { SearchProvider } from '@/contexts/SearchContext';
+import { LibraryProvider } from '@/contexts/LibraryContext';
+import { PipelineProvider } from '@/contexts/PipelineContext';
 import { BrandedSpinner } from '@/components/ui/BrandedSpinner';
 
 interface ProvidersProps {
@@ -20,9 +24,17 @@ export function Providers({ children }: ProvidersProps) {
           </div>
         </div>
       }>
-        <AppProvider>
-          {children}
-        </AppProvider>
+        <AuthProvider>
+          <UIProvider>
+            <SearchProvider>
+              <LibraryProvider>
+                <PipelineProvider>
+                  {children}
+                </PipelineProvider>
+              </LibraryProvider>
+            </SearchProvider>
+          </UIProvider>
+        </AuthProvider>
       </Suspense>
     </ThemeProvider>
   );

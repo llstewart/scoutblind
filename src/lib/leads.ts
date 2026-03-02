@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { EnrichedBusiness } from '@/lib/types';
 import crypto from 'crypto';
+import { leadsLogger } from '@/lib/logger';
 
 let _serviceClient: ReturnType<typeof createClient> | null = null;
 
@@ -70,6 +71,6 @@ export function upsertLeadFireAndForget(
   location: string
 ): void {
   upsertLead(userId, business, niche, location).catch(err => {
-    console.error(`[Leads] Failed to upsert lead ${business.name}:`, err);
+    leadsLogger.error({ businessName: business.name, err }, 'Failed to upsert lead');
   });
 }

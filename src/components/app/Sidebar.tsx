@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Search, BookOpen, LayoutList, UserCircle, ChevronsLeft, ChevronsRight, Coins } from 'lucide-react';
 import { AppTab } from '@/hooks/useAppNavigation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useUI } from '@/contexts/UIContext';
 
 interface SavedSearch {
   id: string;
@@ -37,7 +37,7 @@ export function Sidebar({
   pipelineCount,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { setShowBillingModal, setShowSettingsModal } = useAppContext();
+  const { setShowBillingModal, setShowSettingsModal } = useUI();
 
   const tierColors: Record<string, string> = {
     free: 'text-gray-400 bg-white/5',

@@ -2,30 +2,18 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSearch } from '@/contexts/SearchContext';
+import { useLibrary } from '@/contexts/LibraryContext';
 import { LibraryTab } from '@/components/app/LibraryTab';
 import { ResultsView } from '@/components/app/ResultsView';
 import { AppLayout } from '@/components/app/AppLayout';
 
 export default function LibraryPage() {
   const router = useRouter();
-  const {
-    user,
-    isAuthLoading,
-    savedSearchesList,
-    isLoadingLibrary,
-    handleLoadFromHistory,
-    handleDeleteSearch,
-    handleClearAllSearches,
-    hasResults,
-    searchParams,
-    isLoadingSaved,
-    isViewingSavedSearch,
-    setSearchParams,
-    setBusinesses,
-    setTableBusinesses,
-    setIsViewingSavedSearch,
-  } = useAppContext();
+  const { user, isAuthLoading } = useAuth();
+  const { hasResults, searchParams, isViewingSavedSearch, setSearchParams, setBusinesses, setTableBusinesses, setIsViewingSavedSearch } = useSearch();
+  const { savedSearchesList, isLoadingLibrary, isLoadingSaved, handleLoadFromHistory, handleDeleteSearch, handleClearAllSearches } = useLibrary();
 
   // Redirect to home if not logged in
   useEffect(() => {

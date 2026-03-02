@@ -7,13 +7,9 @@ import { classifyLocationType } from '@/utils/address';
 import Cache, { cache, CACHE_TTL } from '@/lib/cache';
 import { checkRateLimit, checkUserRateLimit } from '@/lib/api-rate-limit';
 import { createClient } from '@/lib/supabase/server';
-import { deductCredits } from '@/lib/credits';
-
-interface AnalyzeSingleRequest {
-  business: Business;
-  niche: string;
-  location: string;
-}
+import { deductCredits, refundCredits } from '@/lib/credits';
+import { analyzeSingleSchema } from '@/lib/validations';
+import { analysisLogger } from '@/lib/logger';
 
 interface WebsiteAnalysisResult {
   cms: string | null;
@@ -95,20 +91,28 @@ export async function POST(request: NextRequest) {
     }, { status: 402 });
   }
 
-  console.log(`[Analyze Single] Deducted 1 credit for user ${user.id.slice(0, 8)} (${deductResult.creditsRemaining} remaining)`);
+  analysisLogger.info({ userId: user.id.slice(0, 8), creditsRemaining: deductResult.creditsRemaining }, 'Deducted 1 credit for single analysis');
 
   try {
-    const body: AnalyzeSingleRequest = await request.json();
+    const body = await request.json();
 
-    if (!body.business || !body.niche || !body.location) {
+    const parsed = analyzeSingleSchema.safeParse(body);
+    if (!parsed.success) {
+      // Refund the credit since we can't proceed with invalid input
+      try {
+        await refundCredits(user.id, 1, 'Refund: invalid request parameters for single analysis');
+        analysisLogger.info({ userId: user.id.slice(0, 8) }, 'Refunded 1 credit for invalid params');
+      } catch (refundError) {
+        analysisLogger.error({ err: refundError }, 'Failed to refund credit');
+      }
       return NextResponse.json(
-        { error: 'Business, niche, and location are required' },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    const { business, niche, location } = body;
-    console.log(`[Analyze Single] Starting analysis for: ${business.name}`);
+    const { business, niche, location } = parsed.data;
+    analysisLogger.info({ businessName: business.name }, 'Starting single analysis');
 
     // Run all enrichment in parallel
     const [visibilityResult, reviewData, websiteAnalysis] = await Promise.all([
@@ -119,11 +123,11 @@ export async function POST(request: NextRequest) {
         const cachedVisibility = await cache.get<Record<string, number | null>>(cacheKey);
 
         if (cachedVisibility && business.name in cachedVisibility) {
-          console.log(`[Analyze Single] Visibility cache HIT for ${business.name}`);
+          analysisLogger.debug({ businessName: business.name }, 'Visibility cache hit');
           return cachedVisibility[business.name] ?? null;
         }
 
-        console.log(`[Analyze Single] Checking visibility for ${business.name}`);
+        analysisLogger.debug({ businessName: business.name }, 'Checking visibility');
         const result = await checkSearchVisibility(business.name, niche, location);
         return result;
       })(),
@@ -135,11 +139,11 @@ export async function POST(request: NextRequest) {
         const cachedReviews = await cache.get<ReviewData>(cacheKey);
 
         if (cachedReviews) {
-          console.log(`[Analyze Single] Reviews cache HIT for ${business.name}`);
+          analysisLogger.debug({ businessName: business.name }, 'Reviews cache hit');
           return cachedReviews;
         }
 
-        console.log(`[Analyze Single] Fetching reviews for ${business.name}`);
+        analysisLogger.debug({ businessName: business.name }, 'Fetching reviews');
         const result = await fetchBusinessReviews(query, 10);
         await cache.set(cacheKey, result, CACHE_TTL.REVIEWS);
         return result;
@@ -161,11 +165,11 @@ export async function POST(request: NextRequest) {
         const cachedAnalysis = await cache.get<WebsiteAnalysisResult>(cacheKey);
 
         if (cachedAnalysis) {
-          console.log(`[Analyze Single] Website cache HIT for ${business.name}`);
+          analysisLogger.debug({ businessName: business.name }, 'Website cache hit');
           return cachedAnalysis;
         }
 
-        console.log(`[Analyze Single] Analyzing website for ${business.name}`);
+        analysisLogger.debug({ businessName: business.name }, 'Analyzing website');
         const result = await analyzeWebsite(business.website);
         await cache.set(cacheKey, result, CACHE_TTL.WEBSITE_ANALYSIS);
         return result;
@@ -186,7 +190,7 @@ export async function POST(request: NextRequest) {
       seoOptimized: websiteAnalysis.seoOptimized,
     };
 
-    console.log(`[Analyze Single] Completed analysis for: ${business.name}`);
+    analysisLogger.info({ businessName: business.name }, 'Single analysis completed');
 
     return NextResponse.json({
       success: true,
@@ -195,12 +199,24 @@ export async function POST(request: NextRequest) {
       creditsRemaining: deductResult.creditsRemaining,
     });
   } catch (error) {
-    console.error('[Analyze Single] Error:', error);
+    analysisLogger.error({ err: error }, 'Single analysis error');
+
+    // Refund the credit since analysis failed
+    try {
+      await refundCredits(user.id, 1, 'Refund: single business analysis failed due to error');
+      analysisLogger.info({ userId: user.id.slice(0, 8) }, 'Refunded 1 credit after error');
+    } catch (refundError) {
+      analysisLogger.error({ err: refundError }, 'Failed to refund credit after error');
+    }
 
     const message = error instanceof Error ? error.message : 'An unexpected error occurred';
 
     return NextResponse.json(
-      { error: message },
+      {
+        error: message,
+        creditsRefunded: 1,
+        creditsRemaining: deductResult.creditsRemaining + 1,
+      },
       { status: 500 }
     );
   }

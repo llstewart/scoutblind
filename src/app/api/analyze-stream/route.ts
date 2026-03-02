@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { AnalyzeRequest, EnrichedBusiness, Business } from '@/lib/types';
+import { EnrichedBusiness, Business } from '@/lib/types';
+import { analyzeSchema } from '@/lib/validations';
 import { analyzeWebsite } from '@/lib/website-analyzer';
 import { batchCheckVisibility } from '@/lib/visibility';
 import { fetchBatchReviews, ReviewData } from '@/lib/outscraper';
@@ -10,6 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 import { deductCredits, refundCredits } from '@/lib/credits';
 import { sanitizeErrorMessage } from '@/lib/errors';
 import { upsertLeadFireAndForget } from '@/lib/leads';
+import { analysisLogger } from '@/lib/logger';
 
 // Configuration
 const FIRST_PAGE_SIZE = 20; // Prioritize first page for fast initial load
@@ -85,7 +87,7 @@ async function processBatch(
 
         return { success: true, business: enrichedBusiness, index: globalIndex };
       } catch (error) {
-        console.error(`[Stream API] Error processing ${business.name}:`, error);
+        analysisLogger.error({ businessName: business.name, err: error }, 'Error processing business in stream');
         const reviewData: ReviewData = reviewResults.get(`${globalIndex}`) || {
           lastReviewDate: null,
           lastOwnerActivity: null,
@@ -109,7 +111,7 @@ async function processBatch(
 
         return { success: false, business: enrichedBusiness, index: globalIndex };
       }
-    });
+    }, 10000);
   });
 
   const results = await Promise.all(batchPromises);
@@ -168,17 +170,19 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const body: AnalyzeRequest = await request.json();
+  const body = await request.json();
 
-  if (!body.businesses || !Array.isArray(body.businesses)) {
-    return new Response(JSON.stringify({ error: 'Businesses array is required' }), {
+  const parsed = analyzeSchema.safeParse(body);
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
+  const { businesses, niche, location } = parsed.data;
 
   // Validate credits before analysis (include both remaining and purchased)
-  const requestedCount = body.businesses.length;
+  const requestedCount = businesses.length;
   const totalCredits = (subscription.credits_remaining || 0) + (subscription.credits_purchased || 0);
   if (totalCredits < requestedCount) {
     return new Response(JSON.stringify({
@@ -197,7 +201,7 @@ export async function POST(request: NextRequest) {
   const deductResult = await deductCredits(
     user.id,
     requestedCount,
-    `Analysis: ${requestedCount} businesses for "${body.niche}" in "${body.location}"`
+    `Analysis: ${requestedCount} businesses for "${niche}" in "${location}"`
   );
 
   if (!deductResult.success) {
@@ -212,17 +216,18 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  console.log(`[Stream API] Deducted ${requestedCount} credits for user ${user.id.slice(0, 8)} (${deductResult.creditsRemaining} remaining)`);
+  analysisLogger.info({ userId: user.id.slice(0, 8), creditsDeducted: requestedCount, creditsRemaining: deductResult.creditsRemaining }, 'Credits deducted for stream analysis');
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
+      const completedCount = { value: 0 };
       try {
-        const totalBusinesses = body.businesses.length;
+        const totalBusinesses = businesses.length;
         const firstPageCount = Math.min(FIRST_PAGE_SIZE, totalBusinesses);
         const hasMorePages = totalBusinesses > FIRST_PAGE_SIZE;
 
-        console.log(`[Stream API] Starting prioritized analysis: ${firstPageCount} first page, ${totalBusinesses} total`);
+        analysisLogger.info({ firstPageCount, totalBusinesses }, 'Starting prioritized stream analysis');
 
         // Immediately notify client that credits were deducted server-side
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({
@@ -235,8 +240,8 @@ export async function POST(request: NextRequest) {
         })}\n\n`));
 
         // Split businesses into first page (priority) and rest
-        const firstPageBusinesses = body.businesses.slice(0, FIRST_PAGE_SIZE);
-        const remainingBusinesses = body.businesses.slice(FIRST_PAGE_SIZE);
+        const firstPageBusinesses = businesses.slice(0, FIRST_PAGE_SIZE);
+        const remainingBusinesses = businesses.slice(FIRST_PAGE_SIZE);
 
         // Phase 1: Quick visibility check for ALL businesses (single API call)
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({
@@ -247,9 +252,9 @@ export async function POST(request: NextRequest) {
         })}\n\n`));
 
         const visibilityResults = await batchCheckVisibility(
-          body.businesses,
-          body.niche,
-          body.location
+          businesses,
+          niche,
+          location
         );
 
         // Phase 2: Fetch reviews - PRIORITIZE first page
@@ -301,8 +306,6 @@ export async function POST(request: NextRequest) {
           totalPhases: 3
         })}\n\n`));
 
-        const completedCount = { value: 0 };
-
         // Process first page in batches
         for (let i = 0; i < firstPageBusinesses.length; i += BATCH_SIZE) {
           const batch = firstPageBusinesses.slice(i, i + BATCH_SIZE);
@@ -316,8 +319,8 @@ export async function POST(request: NextRequest) {
             completedCount,
             totalBusinesses,
             user.id,
-            body.niche,
-            body.location
+            niche,
+            location
           );
 
           if (i + BATCH_SIZE < firstPageBusinesses.length) {
@@ -382,8 +385,8 @@ export async function POST(request: NextRequest) {
               completedCount,
               totalBusinesses,
               user.id,
-              body.niche,
-              body.location
+              niche,
+              location
             );
 
             if (i + BATCH_SIZE < remainingBusinesses.length) {
@@ -405,12 +408,27 @@ export async function POST(request: NextRequest) {
         controller.close();
 
       } catch (error) {
-        console.error('[Stream API] Fatal error:', error);
+        analysisLogger.error({ err: error }, 'Stream analysis fatal error');
+
+        // Refund credits for unprocessed businesses
+        const unprocessed = requestedCount - completedCount.value;
+        if (unprocessed > 0) {
+          try {
+            await refundCredits(user.id, unprocessed,
+              `Refund: ${unprocessed}/${requestedCount} businesses not processed due to error`);
+            analysisLogger.info({ userId: user.id.slice(0, 8), refunded: unprocessed }, 'Refunded credits for unprocessed businesses');
+          } catch (refundError) {
+            analysisLogger.error({ err: refundError }, 'Failed to refund credits');
+          }
+        }
+
         controller.enqueue(
           encoder.encode(`data: ${JSON.stringify({
             type: 'error',
             message: sanitizeErrorMessage(error, 'Analysis failed. Please try again.'),
-            recoverable: false
+            recoverable: false,
+            creditsRefunded: unprocessed > 0 ? unprocessed : 0,
+            creditsRemaining: deductResult.creditsRemaining + (unprocessed > 0 ? unprocessed : 0),
           })}\n\n`)
         );
         controller.close();

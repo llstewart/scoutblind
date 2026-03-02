@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/hooks/useUser';
-import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness, LeadStatus } from '@/lib/types';
-import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUI } from '@/contexts/UIContext';
+import { Business, EnrichedBusiness, TableBusiness, PendingBusiness, isPendingBusiness, isEnrichedBusiness } from '@/lib/types';
 
-type TabType = 'general' | 'upgraded' | 'market';
+export type TabType = 'general' | 'upgraded' | 'market';
 
 const SESSION_STORAGE_KEY = 'packleads_session';
 const PERSISTENT_SESSION_ID_KEY = 'packleads_sid';
@@ -33,17 +33,7 @@ interface SessionState {
   wasAnalyzing?: boolean;
 }
 
-interface SavedSearch {
-  id: string;
-  niche: string;
-  location: string;
-  totalCount: number;
-  analyzedCount: number;
-  createdAt: Date;
-  lastAccessed: Date;
-}
-
-interface AnalyzeProgress {
+export interface AnalyzeProgress {
   completed: number;
   total: number;
   phase?: number;
@@ -53,29 +43,7 @@ interface AnalyzeProgress {
   firstPageComplete?: boolean;
 }
 
-interface AppContextValue {
-  // User & Auth
-  user: ReturnType<typeof useUser>['user'];
-  subscription: ReturnType<typeof useUser>['subscription'];
-  isAuthLoading: boolean;
-  credits: number;
-  tier: string;
-  isPremium: boolean;
-  refreshUser: () => Promise<void>;
-  getCredits: () => Promise<number>;
-
-  // Modals
-  showAuthModal: boolean;
-  setShowAuthModal: (show: boolean) => void;
-  authMode: 'signin' | 'signup';
-  setAuthMode: (mode: 'signin' | 'signup') => void;
-  showBillingModal: boolean;
-  setShowBillingModal: (show: boolean) => void;
-  showSettingsModal: boolean;
-  setShowSettingsModal: (show: boolean) => void;
-  showLookupModal: boolean;
-  setShowLookupModal: (show: boolean) => void;
-
+interface SearchContextValue {
   // Search State
   businesses: Business[];
   setBusinesses: (businesses: Business[]) => void;
@@ -98,38 +66,11 @@ interface AppContextValue {
   isViewingSavedSearch: boolean;
   setIsViewingSavedSearch: (viewing: boolean) => void;
 
-  // Library State
-  savedSearchesList: SavedSearch[];
-  setSavedSearchesList: (searches: SavedSearch[]) => void;
-  savedAnalysesCount: number;
-  isLoadingLibrary: boolean;
-  isLoadingSaved: boolean;
-
   // Analysis State
   analyzeProgress: AnalyzeProgress | null;
   setAnalyzeProgress: (progress: AnalyzeProgress | null) => void;
   wasAnalysisInterrupted: boolean;
   setWasAnalysisInterrupted: (interrupted: boolean) => void;
-
-  // Toast
-  toastMessage: string | null;
-  setToastMessage: (message: string | null) => void;
-  rateLimitCountdown: number | null;
-  setRateLimitCountdown: (countdown: number | null) => void;
-
-  // Lead Status
-  updateLeadStatus: (businessId: string, status: LeadStatus) => void;
-  updateLeadNotes: (businessId: string, notes: string) => void;
-  statusFilter: LeadStatus | null;
-  setStatusFilter: (filter: LeadStatus | null) => void;
-
-  // Leads DB
-  allLeads: EnrichedBusiness[];
-  isLoadingLeads: boolean;
-  leadsError: string | null;
-  fetchAllLeads: () => Promise<void>;
-  updateLeadDirect: (leadId: string, updates: { status?: LeadStatus; notes?: string }) => Promise<void>;
-  deleteLeadsDirect: (leadIds: string[]) => Promise<boolean>;
 
   // Preview
   isPreviewEnriching: boolean;
@@ -140,48 +81,35 @@ interface AppContextValue {
   // Functions
   handleSearch: (niche: string, location: string) => Promise<void>;
   handleAnalyze: () => Promise<void>;
-  handleLoadFromHistory: (niche: string, location: string) => Promise<void>;
-  handleDeleteSearch: (searchId: string) => Promise<void>;
-  handleClearAllSearches: () => Promise<void>;
-  handleSignOut: () => Promise<void>;
   handleNewSearch: () => void;
-  handleUpgradeClick: () => void;
-  fetchSavedSearchesList: () => Promise<void>;
-  saveToLibrary: (businesses: (Business | EnrichedBusiness)[], niche: string, location: string) => Promise<void>;
 
   // Computed
   hasResults: boolean;
-  recentSearches: SavedSearch[];
 
   // Refs for analysis worker
   analyzeWorkerRef: React.MutableRefObject<Worker | null>;
 }
 
-const AppContext = createContext<AppContextValue | null>(null);
+const SearchContext = createContext<SearchContextValue | null>(null);
 
-export function useAppContext() {
-  const context = useContext(AppContext);
+export function useSearch() {
+  const context = useContext(SearchContext);
   if (!context) {
-    throw new Error('useAppContext must be used within AppProvider');
+    throw new Error('useSearch must be used within SearchProvider');
   }
   return context;
 }
 
-interface AppProviderProps {
+interface SearchProviderProps {
   children: ReactNode;
 }
 
-export function AppProvider({ children }: AppProviderProps) {
+export function SearchProvider({ children }: SearchProviderProps) {
   const router = useRouter();
+  const { user, subscription, isAuthLoading, credits, isPremium, refreshUser, getCredits } = useAuth();
+  const { setShowAuthModal, setAuthMode, setShowBillingModal, setRateLimitCountdown, setToastMessage } = useUI();
 
-  // Auth state
-  const { user, subscription, isLoading: isAuthLoading, credits, tier, refreshUser, deductCredit, getCredits } = useUser();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-  const [showBillingModal, setShowBillingModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showLookupModal, setShowLookupModal] = useState(false);
-
+  // Search state
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [tableBusinesses, setTableBusinesses] = useState<TableBusiness[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -192,198 +120,29 @@ export function AppProvider({ children }: AppProviderProps) {
   const [selectedBusinesses, setSelectedBusinesses] = useState<Set<number>>(new Set());
   const [isCached, setIsCached] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [sessionId, setSessionId] = useState<string>('');
-  const [savedAnalysesCount, setSavedAnalysesCount] = useState(0);
-  const [isSessionConnected, setIsSessionConnected] = useState(false);
-  const [isLoadingSaved, setIsLoadingSaved] = useState(false);
-  const [wasAnalysisInterrupted, setWasAnalysisInterrupted] = useState(false);
   const [isViewingSavedSearch, setIsViewingSavedSearch] = useState(false);
-
-  // Library state
-  const [savedSearchesList, setSavedSearchesList] = useState<SavedSearch[]>([]);
-  const [isLoadingLibrary, setIsLoadingLibrary] = useState(false);
-
-  // Lead status
-  const [statusFilter, setStatusFilter] = useState<LeadStatus | null>(null);
-
-  // Leads DB state
-  const [allLeads, setAllLeads] = useState<EnrichedBusiness[]>([]);
-  const [isLoadingLeads, setIsLoadingLeads] = useState(false);
-  const [leadsError, setLeadsError] = useState<string | null>(null);
-  const [hasLeadsLoaded, setHasLeadsLoaded] = useState(false);
-  const backfillAttemptedRef = useRef(false);
+  const [wasAnalysisInterrupted, setWasAnalysisInterrupted] = useState(false);
 
   // Preview state
   const [isPreviewEnriching, setIsPreviewEnriching] = useState(false);
   const [previewExhausted, setPreviewExhausted] = useState(false);
 
-  // User is considered premium only if they have a paid subscription (not free tier)
-  const isPremium = !!user && !!subscription && subscription.tier !== 'free';
+  // Analysis progress
+  const [analyzeProgress, setAnalyzeProgress] = useState<AnalyzeProgress | null>(null);
 
-  // Toast message
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
-
-  const leadSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Refs
   const searchControllerRef = useRef<AbortController | null>(null);
   const analyzeControllerRef = useRef<AbortController | null>(null);
   const analyzeWorkerRef = useRef<Worker | null>(null);
   const inFlightSearchRef = useRef<{ niche: string; location: string } | null>(null);
 
-  // Analysis progress
-  const [analyzeProgress, setAnalyzeProgress] = useState<AnalyzeProgress | null>(null);
-
   // Computed values
   const hasResults = businesses.length > 0 || (isViewingSavedSearch && tableBusinesses.length > 0);
-  const recentSearches = savedSearchesList.slice(0, 3);
-
-  // Rate limit countdown timer
-  useEffect(() => {
-    if (rateLimitCountdown === null || rateLimitCountdown <= 0) {
-      if (rateLimitCountdown === 0) {
-        setRateLimitCountdown(null);
-        setToastMessage(null);
-      }
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setRateLimitCountdown(prev => (prev !== null ? prev - 1 : null));
-    }, 1000);
-
-    setToastMessage(`Rate limited. Please wait ${rateLimitCountdown} seconds...`);
-
-    return () => clearTimeout(timer);
-  }, [rateLimitCountdown]);
-
-  // Fetch saved searches count
-  const fetchSavedCount = useCallback(async () => {
-    if (!user) {
-      setSavedAnalysesCount(0);
-      return;
-    }
-    try {
-      const response = await fetch('/api/session');
-      if (response.ok) {
-        const data = await response.json();
-        const analyses = data.analyses || {};
-        const count = Object.keys(analyses).length;
-        setSavedAnalysesCount(count);
-        setIsSessionConnected(true);
-      }
-    } catch {
-      setIsSessionConnected(false);
-    }
-  }, [user]);
-
-  // Fetch saved searches list for Library tab
-  const fetchSavedSearchesList = useCallback(async () => {
-    if (!user) {
-      setSavedSearchesList([]);
-      return;
-    }
-    setIsLoadingLibrary(true);
-    try {
-      const response = await fetch('/api/session');
-      if (response.ok) {
-        const data = await response.json();
-        const analyses = data.analyses || {};
-
-        const searchesList = Object.entries(analyses).map(([key, value]: [string, any]) => {
-          const [niche, location] = key.split('|');
-          return {
-            id: key,
-            niche: niche || '',
-            location: location || '',
-            totalCount: value.businessCount || 0,
-            analyzedCount: value.analyzedCount || 0,
-            createdAt: new Date(value.createdAt || Date.now()),
-            lastAccessed: new Date(value.lastAccessed || Date.now()),
-          };
-        });
-
-        searchesList.sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime());
-
-        setSavedSearchesList(searchesList);
-        setSavedAnalysesCount(searchesList.length);
-      }
-    } catch (error) {
-      console.error('[Library] Failed to fetch saved searches:', error);
-    } finally {
-      setIsLoadingLibrary(false);
-    }
-  }, [user]);
-
-  // Load saved search from library
-  const loadSavedAnalyses = useCallback(async (niche: string, location: string) => {
-    if (!user) return;
-    setIsLoadingSaved(true);
-    try {
-      const response = await fetch(
-        `/api/session?niche=${encodeURIComponent(niche)}&location=${encodeURIComponent(location)}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data.businesses && data.businesses.length > 0) {
-          const allBusinesses = data.businesses as (Business | EnrichedBusiness)[];
-          const enrichedBusinesses = allBusinesses.filter((b: any) => isEnrichedBusiness(b));
-
-          setBusinesses(allBusinesses as Business[]);
-          setTableBusinesses(enrichedBusinesses as EnrichedBusiness[]);
-
-          console.log(`[Session] Loaded saved search: ${allBusinesses.length} total, ${enrichedBusinesses.length} analyzed`);
-
-          if (enrichedBusinesses.length > 0) {
-            setActiveTab('upgraded');
-          } else {
-            setActiveTab('general');
-          }
-        }
-        setIsSessionConnected(true);
-      }
-    } catch (error) {
-      console.error('[Session] Failed to load saved searches:', error);
-      setIsSessionConnected(false);
-    } finally {
-      setIsLoadingSaved(false);
-    }
-  }, [user]);
-
-  // Save businesses to database
-  const saveToLibrary = useCallback(async (
-    businessesToSave: (Business | EnrichedBusiness)[],
-    niche: string,
-    location: string
-  ) => {
-    if (!user) return;
-    try {
-      await fetch('/api/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          niche,
-          location,
-          businesses: businessesToSave,
-        }),
-      });
-      console.log(`[Session] Saved ${businessesToSave.length} businesses to library`);
-      fetchSavedCount();
-      fetchSavedSearchesList();
-    } catch (error) {
-      console.error('[Session] Failed to save to library:', error);
-    }
-  }, [user, fetchSavedCount, fetchSavedSearchesList]);
-
-  // Save analyses to session (legacy wrapper)
-  const saveAnalysesToSession = useCallback(async (businesses: EnrichedBusiness[]) => {
-    if (!searchParams) return;
-    await saveToLibrary(businesses, searchParams.niche, searchParams.location);
-  }, [searchParams, saveToLibrary]);
+  const isPreviewMode = !isPremium && tableBusinesses.length > 0 && tableBusinesses.some(b => !isPendingBusiness(b) && isEnrichedBusiness(b));
 
   // Initialize session ID
   useEffect(() => {
-    const sid = getSessionId();
-    setSessionId(sid);
+    getSessionId();
     setIsInitialized(true);
   }, []);
 
@@ -422,22 +181,11 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isAuthLoading]);
 
-  // Fetch saved count and library list when user is logged in
-  useEffect(() => {
-    if (user) {
-      fetchSavedCount();
-      fetchSavedSearchesList();
-    }
-  }, [user, fetchSavedCount, fetchSavedSearchesList]);
-
-
   // Clear analyzed data for free tier users (but preserve preview data)
   useEffect(() => {
     if (!isAuthLoading && (!subscription || subscription.tier === 'free')) {
-      // Don't clear if we have preview data or are currently enriching preview
       if (!isPreviewEnriching) {
         setTableBusinesses(prev => {
-          // Keep preview businesses (max 3 enriched for free users)
           const enriched = prev.filter(b => !isPendingBusiness(b) && isEnrichedBusiness(b));
           if (enriched.length <= 3 && enriched.length > 0) return prev;
           return [];
@@ -504,49 +252,6 @@ export function AppProvider({ children }: AppProviderProps) {
     };
   }, []);
 
-  // Debounced save after lead status/notes change
-  const debouncedLeadSave = useCallback(() => {
-    if (leadSaveTimerRef.current) clearTimeout(leadSaveTimerRef.current);
-    leadSaveTimerRef.current = setTimeout(() => {
-      if (!searchParams) return;
-      // Get current tableBusinesses to save
-      setTableBusinesses(current => {
-        const enrichedOnly = current.filter((b): b is EnrichedBusiness =>
-          !isPendingBusiness(b) && isEnrichedBusiness(b)
-        );
-        if (enrichedOnly.length > 0) {
-          saveToLibrary(enrichedOnly, searchParams.niche, searchParams.location);
-        }
-        return current;
-      });
-    }, 2000);
-  }, [searchParams, saveToLibrary]);
-
-  // Update lead status for a business
-  const updateLeadStatus = useCallback((businessId: string, status: LeadStatus) => {
-    setTableBusinesses(prev => prev.map(b => {
-      if ((b.placeId || b.name) === businessId && !isPendingBusiness(b) && isEnrichedBusiness(b)) {
-        return { ...b, leadStatus: status };
-      }
-      return b;
-    }));
-    debouncedLeadSave();
-  }, [debouncedLeadSave]);
-
-  // Update lead notes for a business
-  const updateLeadNotes = useCallback((businessId: string, notes: string) => {
-    setTableBusinesses(prev => prev.map(b => {
-      if ((b.placeId || b.name) === businessId && !isPendingBusiness(b) && isEnrichedBusiness(b)) {
-        return { ...b, leadNotes: notes };
-      }
-      return b;
-    }));
-    debouncedLeadSave();
-  }, [debouncedLeadSave]);
-
-  // Computed: is preview mode (free user with enriched table businesses)
-  const isPreviewMode = !isPremium && tableBusinesses.length > 0 && tableBusinesses.some(b => !isPendingBusiness(b) && isEnrichedBusiness(b));
-
   // Trigger free preview enrichment for user-selected businesses (max 3)
   const triggerFreePreview = useCallback(async (previewBusinesses: Business[], niche: string, location: string) => {
     if (isPremium) return;
@@ -567,7 +272,6 @@ export function AppProvider({ children }: AppProviderProps) {
           setActiveTab('upgraded');
         }
       } else if (response.status === 403 || response.status === 429) {
-        // 403 = lifetime cap reached, 429 = rate limit hit — both mean no more previews
         setPreviewExhausted(true);
       }
     } catch (err) {
@@ -577,139 +281,8 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [isPremium]);
 
-  // Fetch all leads from persistent DB
-  const fetchAllLeads = useCallback(async () => {
-    if (!user || !isPremium) return;
-    setIsLoadingLeads(true);
-    setLeadsError(null);
-    try {
-      const response = await fetch('/api/leads');
-      if (response.ok) {
-        const data = await response.json();
-        setAllLeads(data.leads || []);
-        setHasLeadsLoaded(true);
-
-        // Auto-backfill: if no leads but user has saved searches, migrate once
-        if ((data.leads || []).length === 0 && savedSearchesList.length > 0 && !backfillAttemptedRef.current) {
-          backfillAttemptedRef.current = true;
-          try {
-            const backfillRes = await fetch('/api/leads/backfill', { method: 'POST' });
-            if (backfillRes.ok) {
-              const backfillData = await backfillRes.json();
-              if (backfillData.migrated > 0) {
-                // Re-fetch leads after backfill
-                const refreshRes = await fetch('/api/leads');
-                if (refreshRes.ok) {
-                  const refreshData = await refreshRes.json();
-                  setAllLeads(refreshData.leads || []);
-                }
-              }
-            }
-          } catch (err) {
-            console.error('[Leads] Backfill failed:', err);
-          }
-        }
-      } else {
-        setLeadsError('Failed to load leads. Please try again.');
-      }
-    } catch (err) {
-      console.error('[Leads] Failed to fetch:', err);
-      setLeadsError('Could not connect to server. Check your connection and try again.');
-    } finally {
-      setIsLoadingLeads(false);
-    }
-  }, [user, isPremium, savedSearchesList.length]);
-
-  // Update a lead directly in the persistent DB (optimistic)
-  const updateLeadDirect = useCallback(async (leadId: string, updates: { status?: LeadStatus; notes?: string }) => {
-    // Optimistic: update UI immediately
-    const previousLeads = allLeads;
-    setAllLeads(prev => prev.map(lead => {
-      if (lead.leadId === leadId) {
-        return {
-          ...lead,
-          ...(updates.status !== undefined ? { leadStatus: updates.status } : {}),
-          ...(updates.notes !== undefined ? { leadNotes: updates.notes } : {}),
-        };
-      }
-      return lead;
-    }));
-
-    try {
-      const response = await fetch('/api/leads', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId, ...updates }),
-      });
-
-      if (!response.ok) {
-        // Rollback on failure
-        setAllLeads(previousLeads);
-        setToastMessage('Failed to update lead. Change reverted.');
-      }
-    } catch (err) {
-      console.error('[Leads] Failed to update lead:', err);
-      setAllLeads(previousLeads);
-      setToastMessage('Failed to update lead. Change reverted.');
-    }
-  }, [allLeads]);
-
-  // Delete leads from persistent DB (optimistic)
-  const deleteLeadsDirect = useCallback(async (leadIds: string[]): Promise<boolean> => {
-    if (leadIds.length === 0) return false;
-
-    // Optimistic: remove from UI immediately
-    const previousLeads = allLeads;
-    setAllLeads(prev => prev.filter(lead => !leadIds.includes(lead.leadId || '')));
-
-    try {
-      const response = await fetch('/api/leads', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadIds }),
-      });
-
-      if (!response.ok) {
-        setAllLeads(previousLeads);
-        setToastMessage('Failed to delete leads. Changes reverted.');
-        return false;
-      }
-      return true;
-    } catch (err) {
-      console.error('[Leads] Failed to delete leads:', err);
-      setAllLeads(previousLeads);
-      setToastMessage('Failed to delete leads. Changes reverted.');
-      return false;
-    }
-  }, [allLeads]);
-
-  // Multi-tab sync: re-fetch stale data when tab becomes visible again
-  useEffect(() => {
-    if (!user || !isPremium) return;
-    let hiddenAt = 0;
-    const STALE_THRESHOLD = 30_000; // 30 seconds
-
-    const handleVisibility = () => {
-      if (document.visibilityState === 'hidden') {
-        hiddenAt = Date.now();
-      } else if (document.visibilityState === 'visible' && hiddenAt > 0) {
-        const elapsed = Date.now() - hiddenAt;
-        if (elapsed >= STALE_THRESHOLD) {
-          fetchSavedSearchesList();
-          if (hasLeadsLoaded) {
-            fetchAllLeads();
-          }
-        }
-        hiddenAt = 0;
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [user, isPremium, hasLeadsLoaded, fetchSavedSearchesList, fetchAllLeads]);
-
   // Handle search
-  const handleSearch = async (niche: string, location: string) => {
+  const handleSearch = useCallback(async (niche: string, location: string) => {
     const normalizedNiche = niche.toLowerCase().trim();
     const normalizedLocation = location.toLowerCase().trim();
 
@@ -811,7 +384,22 @@ export function AppProvider({ children }: AppProviderProps) {
         refreshUser();
       }
 
-      saveToLibrary(data.businesses, niche, location);
+      // Save to library via API directly (not through LibraryContext to avoid circular dep)
+      if (user) {
+        try {
+          await fetch('/api/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              niche,
+              location,
+              businesses: data.businesses,
+            }),
+          });
+        } catch (saveErr) {
+          console.error('[Search] Failed to save to library:', saveErr);
+        }
+      }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return;
 
@@ -838,90 +426,20 @@ export function AppProvider({ children }: AppProviderProps) {
       setIsSearching(false);
       inFlightSearchRef.current = null;
     }
-  };
-
-  // Handle upgrade click
-  const handleUpgradeClick = () => {
-    if (!user) {
-      setAuthMode('signup');
-      setShowAuthModal(true);
-    } else {
-      setShowBillingModal(true);
-    }
-  };
-
-  // Handle load from history
-  const handleLoadFromHistory = async (niche: string, location: string) => {
-    if (isLoadingSaved) return;
-
-    setSearchParams({ niche, location });
-    setIsViewingSavedSearch(true);
-    setError(null);
-
-    setBusinesses([]);
-    setTableBusinesses([]);
-
-    await loadSavedAnalyses(niche, location);
-  };
-
-  // Handle delete search
-  const handleDeleteSearch = async (searchId: string) => {
-    try {
-      const response = await fetch(`/api/session?key=${encodeURIComponent(searchId)}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        fetchSavedSearchesList();
-      }
-    } catch (error) {
-      console.error('[Library] Failed to delete search:', error);
-    }
-  };
-
-  // Handle clear all searches
-  const handleClearAllSearches = async () => {
-    try {
-      const response = await fetch('/api/session', {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setSavedSearchesList([]);
-        setSavedAnalysesCount(0);
-        setTableBusinesses([]);
-      }
-    } catch (error) {
-      console.error('[Library] Failed to clear all searches:', error);
-    }
-  };
-
-  // Handle sign out
-  const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setBusinesses([]);
-    setTableBusinesses([]);
-    setSearchParams(null);
-    setSavedSearchesList([]);
-    setSavedAnalysesCount(0);
-    setAllLeads([]);
-    setHasLeadsLoaded(false);
-    backfillAttemptedRef.current = false;
-    localStorage.removeItem('packleads_tour_complete');
-    router.replace('/');
-  };
+  }, [user, getCredits, refreshUser, setAuthMode, setShowAuthModal, setShowBillingModal, setRateLimitCountdown]);
 
   // Handle new search
-  const handleNewSearch = () => {
+  const handleNewSearch = useCallback(() => {
     setBusinesses([]);
     setTableBusinesses([]);
     setSearchParams(null);
     setIsViewingSavedSearch(false);
     setError(null);
     router.replace('/dashboard');
-  };
+  }, [router]);
 
-  // Handle analyze (simplified - full implementation would be moved here)
-  const handleAnalyze = async () => {
+  // Handle analyze
+  const handleAnalyze = useCallback(async () => {
     if (!searchParams || businesses.length === 0) return;
 
     if (!user) {
@@ -1000,6 +518,24 @@ export function AppProvider({ children }: AppProviderProps) {
     analyzeWorkerRef.current = worker;
 
     let serverDeductedCredits = false;
+
+    // Save analyses to session helper
+    const saveAnalysesToSession = async (enrichedBusinesses: EnrichedBusiness[]) => {
+      if (!searchParams) return;
+      try {
+        await fetch('/api/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            niche: searchParams.niche,
+            location: searchParams.location,
+            businesses: enrichedBusinesses,
+          }),
+        });
+      } catch (err) {
+        console.error('[Session] Failed to save analyses:', err);
+      }
+    };
 
     const cleanup = async () => {
       setIsAnalyzing(false);
@@ -1080,7 +616,7 @@ export function AppProvider({ children }: AppProviderProps) {
           });
           break;
 
-        case 'BUSINESS_COMPLETE':
+        case 'BUSINESS_COMPLETE': {
           const enrichedBusiness: EnrichedBusiness = {
             ...payload.business,
             isEnriching: false,
@@ -1105,6 +641,7 @@ export function AppProvider({ children }: AppProviderProps) {
             firstPageComplete: prev?.firstPageComplete || false,
           }));
           break;
+        }
 
         case 'STREAM_ERROR':
           setError(payload.message || 'Analysis encountered an error');
@@ -1162,32 +699,9 @@ export function AppProvider({ children }: AppProviderProps) {
         location: searchParams.location,
       },
     });
-  };
+  }, [searchParams, businesses, selectedBusinesses, tableBusinesses, user, subscription, isPremium, getCredits, refreshUser, setAuthMode, setShowAuthModal, setShowBillingModal]);
 
-  const value: AppContextValue = {
-    // User & Auth
-    user,
-    subscription,
-    isAuthLoading,
-    credits,
-    tier,
-    isPremium,
-    refreshUser,
-    getCredits,
-
-    // Modals
-    showAuthModal,
-    setShowAuthModal,
-    authMode,
-    setAuthMode,
-    showBillingModal,
-    setShowBillingModal,
-    showSettingsModal,
-    setShowSettingsModal,
-    showLookupModal,
-    setShowLookupModal,
-
-    // Search State
+  const value: SearchContextValue = {
     businesses,
     setBusinesses,
     tableBusinesses,
@@ -1208,69 +722,24 @@ export function AppProvider({ children }: AppProviderProps) {
     setIsCached,
     isViewingSavedSearch,
     setIsViewingSavedSearch,
-
-    // Library State
-    savedSearchesList,
-    setSavedSearchesList,
-    savedAnalysesCount,
-    isLoadingLibrary,
-    isLoadingSaved,
-
-    // Analysis State
     analyzeProgress,
     setAnalyzeProgress,
     wasAnalysisInterrupted,
     setWasAnalysisInterrupted,
-
-    // Toast
-    toastMessage,
-    setToastMessage,
-    rateLimitCountdown,
-    setRateLimitCountdown,
-
-    // Lead Status
-    updateLeadStatus,
-    updateLeadNotes,
-    statusFilter,
-    setStatusFilter,
-
-    // Leads DB
-    allLeads,
-    isLoadingLeads,
-    leadsError,
-    fetchAllLeads,
-    updateLeadDirect,
-    deleteLeadsDirect,
-
-    // Preview
     isPreviewEnriching,
     isPreviewMode,
     previewExhausted,
     triggerFreePreview,
-
-    // Functions
     handleSearch,
     handleAnalyze,
-    handleLoadFromHistory,
-    handleDeleteSearch,
-    handleClearAllSearches,
-    handleSignOut,
     handleNewSearch,
-    handleUpgradeClick,
-    fetchSavedSearchesList,
-    saveToLibrary,
-
-    // Computed
     hasResults,
-    recentSearches,
-
-    // Refs
     analyzeWorkerRef,
   };
 
   return (
-    <AppContext.Provider value={value}>
+    <SearchContext.Provider value={value}>
       {children}
-    </AppContext.Provider>
+    </SearchContext.Provider>
   );
 }

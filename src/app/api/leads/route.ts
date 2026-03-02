@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { EnrichedBusiness } from '@/lib/types';
+import { leadsDeleteSchema, leadsUpdateSchema } from '@/lib/validations';
+import { leadsLogger } from '@/lib/logger';
 
 interface LeadRow {
   id: string;
@@ -88,7 +90,7 @@ export async function GET() {
     .order('updated_at', { ascending: false });
 
   if (error) {
-    console.error('[Leads API] GET error:', error);
+    leadsLogger.error({ err: error }, 'GET leads error');
     return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
   }
 
@@ -109,15 +111,15 @@ export async function DELETE(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { leadIds } = body as { leadIds: string[] };
 
-  if (!leadIds || !Array.isArray(leadIds) || leadIds.length === 0) {
-    return NextResponse.json({ error: 'leadIds array is required' }, { status: 400 });
+  const parsed = leadsDeleteSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
   }
-
-  if (leadIds.length > 100) {
-    return NextResponse.json({ error: 'Maximum 100 leads per delete request' }, { status: 400 });
-  }
+  const { leadIds } = parsed.data;
 
   const { error } = await supabase
     .from('leads')
@@ -125,7 +127,7 @@ export async function DELETE(request: NextRequest) {
     .in('id', leadIds);
 
   if (error) {
-    console.error('[Leads API] DELETE error:', error);
+    leadsLogger.error({ err: error }, 'DELETE leads error');
     return NextResponse.json({ error: 'Failed to delete leads' }, { status: 500 });
   }
 
@@ -144,23 +146,19 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { leadId, status, notes } = body as {
-    leadId: string;
-    status?: string;
-    notes?: string;
-  };
 
-  if (!leadId) {
-    return NextResponse.json({ error: 'leadId is required' }, { status: 400 });
+  const parsed = leadsUpdateSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
   }
+  const { leadId, status, notes } = parsed.data;
 
   const updates: Record<string, any> = {};
   if (status !== undefined) updates.lead_status = status;
   if (notes !== undefined) updates.lead_notes = notes;
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: 'No updates provided' }, { status: 400 });
-  }
 
   const { error } = await supabase
     .from('leads')
@@ -168,7 +166,7 @@ export async function PATCH(request: NextRequest) {
     .eq('id', leadId);
 
   if (error) {
-    console.error('[Leads API] PATCH error:', error);
+    leadsLogger.error({ err: error }, 'PATCH leads error');
     return NextResponse.json({ error: 'Failed to update lead' }, { status: 500 });
   }
 

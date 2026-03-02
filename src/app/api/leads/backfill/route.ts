@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { EnrichedBusiness, isEnrichedBusiness } from '@/lib/types';
 import { upsertLead } from '@/lib/leads';
+import { leadsLogger } from '@/lib/logger';
 
 /**
  * POST /api/leads/backfill - Migrate saved_analyses JSONB to leads table
@@ -32,7 +33,7 @@ export async function POST() {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('[Backfill] Failed to fetch saved_analyses:', error);
+      leadsLogger.error({ err: error }, 'Backfill: failed to fetch saved_analyses');
       return NextResponse.json({ error: 'Failed to read saved analyses' }, { status: 500 });
     }
 
@@ -54,17 +55,17 @@ export async function POST() {
           await upsertLead(user.id, business as EnrichedBusiness, niche, location);
           migrated++;
         } catch (err) {
-          console.error(`[Backfill] Failed to upsert ${business.name}:`, err);
+          leadsLogger.error({ businessName: business.name, err }, 'Backfill: failed to upsert');
           skipped++;
         }
       }
     }
 
-    console.log(`[Backfill] User ${user.id.slice(0, 8)}: migrated=${migrated}, skipped=${skipped}`);
+    leadsLogger.info({ userId: user.id.slice(0, 8), migrated, skipped }, 'Backfill complete');
 
     return NextResponse.json({ migrated, skipped });
   } catch (error) {
-    console.error('[Backfill] Error:', error);
+    leadsLogger.error({ err: error }, 'Backfill error');
     return NextResponse.json({ error: 'Backfill failed' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { stripeLogger } from '@/lib/logger';
 
 const FREE_SIGNUP_CREDITS = 5;
 
@@ -88,7 +89,7 @@ export async function POST() {
       }
     }
 
-    console.error('[Init Subscription] Error creating subscription:', error);
+    stripeLogger.error({ err: error }, 'Error creating subscription');
     return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 });
   }
 
@@ -101,7 +102,7 @@ export async function POST() {
         .upsert({ email: userEmail }, { onConflict: 'email', ignoreDuplicates: true });
     }
 
-    console.log(`[Init Subscription] Created subscription with ${grantCredits} credits for user ${user.id.slice(0, 8)}...`);
+    stripeLogger.info({ userId: user.id.slice(0, 8), credits: grantCredits }, 'Created subscription');
     return NextResponse.json({
       success: true,
       message: 'Subscription created',

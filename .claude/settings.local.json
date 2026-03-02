@@ -72,7 +72,8 @@
       "WebFetch(domain:css-tricks.com)",
       "WebFetch(domain:web.dev)",
       "WebFetch(domain:camlittle.com)",
-      "WebFetch(domain:nextjs-forum.com)"
+      "WebFetch(domain:nextjs-forum.com)",
+      "Bash(tail:*)"
     ]
   }
 }
