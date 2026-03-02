@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getJobWithResults } from '@/lib/jobs';
-import { checkRateLimit } from '@/lib/api-rate-limit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
-  // Light rate limit for polling (higher threshold)
-  const rateLimitResponse = await checkRateLimit(request, 'search');
-  if (rateLimitResponse) return rateLimitResponse;
+  // No rate limit — this is polled every 2s during analysis, already auth-protected
 
   // Auth check
   const supabase = await createClient();

@@ -8,7 +8,7 @@ import { upsertLeadFireAndForget } from '@/lib/leads';
 import { refundCredits } from '@/lib/credits';
 import { analysisLogger } from '@/lib/logger';
 
-const BATCH_SIZE = 5;
+const BATCH_SIZE = 3;
 
 interface EnrichPayload {
   jobId: string;

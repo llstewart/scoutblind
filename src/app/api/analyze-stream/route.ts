@@ -102,7 +102,10 @@ export async function POST(request: NextRequest) {
     );
 
     // Trigger QStash workflow for background processing
-    const qstashClient = new Client({ token: process.env.QSTASH_TOKEN! });
+    const qstashClient = new Client({
+      token: process.env.QSTASH_TOKEN!,
+      ...(process.env.QSTASH_URL && { baseUrl: process.env.QSTASH_URL }),
+    });
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
 
     await qstashClient.publishJSON({
