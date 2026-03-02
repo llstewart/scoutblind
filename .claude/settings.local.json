@@ -73,7 +73,8 @@
       "WebFetch(domain:web.dev)",
       "WebFetch(domain:camlittle.com)",
       "WebFetch(domain:nextjs-forum.com)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "WebFetch(domain:upstash.com)"
     ]
   }
 }

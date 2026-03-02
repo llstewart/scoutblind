@@ -233,7 +233,7 @@ export function SearchProvider({ children }: SearchProviderProps) {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isAnalyzing) {
         e.preventDefault();
-        e.returnValue = 'Analysis is in progress. Your progress will be saved, but the analysis will stop. Are you sure you want to leave?';
+        e.returnValue = 'Analysis is running in the background. You can safely leave — results will be available when you return.';
         return e.returnValue;
       }
     };
@@ -602,18 +602,6 @@ export function SearchProvider({ children }: SearchProviderProps) {
             isBackground: payload.hasMore || prev?.isBackground || false,
             firstPageComplete: prev?.firstPageComplete || false,
           }));
-          break;
-
-        case 'FIRST_PAGE_COMPLETE':
-          setAnalyzeProgress({
-            completed: payload.completed,
-            total: payload.total,
-            phase: 3,
-            totalPhases: 3,
-            message: payload.message,
-            isBackground: payload.hasMore,
-            firstPageComplete: true,
-          });
           break;
 
         case 'BUSINESS_COMPLETE': {

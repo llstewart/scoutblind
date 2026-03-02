@@ -1,37 +1,45 @@
 /**
  * Web Worker for Lead Intel Analysis
- * Runs in a background thread to survive tab switches better than main thread
+ * Uses polling against /api/jobs/[jobId] to track background enrichment progress.
+ * Maintains the same message interface (STARTED, STATUS, PROGRESS, BUSINESS_COMPLETE, COMPLETE, ERROR)
+ * so SearchContext requires no changes.
  */
+
+let aborted = false;
 
 // Handle messages from main thread
 self.onmessage = async function(e) {
   const { type, payload } = e.data;
 
   if (type === 'START_ANALYSIS') {
+    aborted = false;
     await runAnalysis(payload);
   } else if (type === 'ABORT') {
-    // Worker will be terminated by main thread
+    aborted = true;
     self.close();
   }
 };
 
 async function runAnalysis({ endpoint, businesses, niche, location }) {
   try {
-    // Note: We don't send STARTED here anymore - we wait for the server's 'started' event
-    // which includes serverSideDeduction info for proper credit tracking
+    // Phase 1: POST to create job (server does credit deduction + visibility check + job creation)
+    self.postMessage({
+      type: 'STATUS',
+      payload: {
+        phase: 1,
+        totalPhases: 3,
+        message: 'Checking search visibility...',
+        isBackground: false,
+      }
+    });
 
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        businesses,
-        niche,
-        location,
-      }),
+      body: JSON.stringify({ businesses, niche, location }),
     });
 
     if (!response.ok) {
-      // Try to parse error response
       try {
         const errorData = await response.json();
         self.postMessage({ type: 'ERROR', payload: errorData });
@@ -41,106 +49,34 @@ async function runAnalysis({ endpoint, businesses, niche, location }) {
       return;
     }
 
-    // Process streaming response
-    const reader = response.body?.getReader();
-    if (!reader) {
-      self.postMessage({ type: 'ERROR', payload: { error: 'No response body' } });
-      return;
-    }
+    const { jobId, creditsDeducted, creditsRemaining, totalBusinesses } = await response.json();
 
-    const decoder = new TextDecoder();
-    let buffer = '';
-    let completeSent = false; // Track if we already sent COMPLETE
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          try {
-            const data = JSON.parse(line.slice(6));
-
-            if (data.type === 'started') {
-              // Forward server's started event with credit deduction info
-              self.postMessage({
-                type: 'STARTED',
-                payload: {
-                  total: data.total,
-                  creditsDeducted: data.creditsDeducted,
-                  creditsRemaining: data.creditsRemaining,
-                  serverSideDeduction: data.serverSideDeduction,
-                  message: data.message,
-                }
-              });
-            } else if (data.type === 'status') {
-              self.postMessage({
-                type: 'STATUS',
-                payload: {
-                  phase: data.phase,
-                  totalPhases: data.totalPhases,
-                  message: data.message,
-                  isBackground: data.isBackground || false,
-                }
-              });
-            } else if (data.type === 'progress') {
-              self.postMessage({
-                type: 'PROGRESS',
-                payload: {
-                  completed: data.completed,
-                  total: data.total,
-                  message: data.message,
-                  phase: data.phase,
-                  hasMore: data.hasMore,
-                }
-              });
-            } else if (data.type === 'first_page_complete') {
-              self.postMessage({
-                type: 'FIRST_PAGE_COMPLETE',
-                payload: {
-                  completed: data.completed,
-                  total: data.total,
-                  message: data.message,
-                  hasMore: data.hasMore,
-                }
-              });
-            } else if (data.type === 'business') {
-              self.postMessage({
-                type: 'BUSINESS_COMPLETE',
-                payload: {
-                  business: data.business,
-                  progress: data.progress,
-                }
-              });
-            } else if (data.type === 'error') {
-              self.postMessage({
-                type: 'STREAM_ERROR',
-                payload: { message: data.message }
-              });
-            } else if (data.type === 'complete') {
-              if (!completeSent) {
-                self.postMessage({ type: 'COMPLETE' });
-                completeSent = true;
-              }
-            }
-          } catch (parseError) {
-            console.error('[Worker] Failed to parse SSE data:', parseError);
-          }
-        }
+    // Notify client that job was created and credits deducted
+    self.postMessage({
+      type: 'STARTED',
+      payload: {
+        total: totalBusinesses,
+        creditsDeducted,
+        creditsRemaining,
+        serverSideDeduction: true,
+        message: `Starting analysis of ${totalBusinesses} businesses (${creditsDeducted} credits charged)`
       }
-    }
+    });
 
-    // Only send COMPLETE if we haven't already (fallback for streams without explicit complete)
-    if (!completeSent) {
-      self.postMessage({ type: 'COMPLETE' });
-    }
+    // Phase 2: Poll for results
+    self.postMessage({
+      type: 'STATUS',
+      payload: {
+        phase: 2,
+        totalPhases: 3,
+        message: 'Processing businesses in background...',
+        isBackground: false,
+      }
+    });
+
+    await pollForResults({ jobId, totalBusinesses });
 
   } catch (error) {
-    // Provide more specific error messages based on error type
     let errorMessage = 'Analysis failed';
 
     if (error.name === 'TypeError' && error.message?.includes('fetch')) {
@@ -155,5 +91,132 @@ async function runAnalysis({ endpoint, businesses, niche, location }) {
       type: 'ERROR',
       payload: { error: errorMessage }
     });
+  }
+}
+
+async function pollForResults({ jobId, totalBusinesses }) {
+  let lastIndex = -1;
+  let lastCompletedCount = 0;
+  let consecutiveErrors = 0;
+  const MAX_CONSECUTIVE_ERRORS = 10;
+  const POLL_INTERVAL = 2000; // 2 seconds
+  const ERROR_RETRY_INTERVAL = 3000; // 3 seconds on network error
+
+  while (!aborted) {
+    try {
+      const response = await fetch(`/api/jobs/${jobId}?after=${lastIndex}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          self.postMessage({
+            type: 'STREAM_ERROR',
+            payload: { message: 'Analysis job not found. It may have expired.' }
+          });
+          self.postMessage({ type: 'COMPLETE' });
+          return;
+        }
+        if (response.status === 401) {
+          self.postMessage({
+            type: 'ERROR',
+            payload: { requiresAuth: true, error: 'Session expired. Please sign in again.' }
+          });
+          return;
+        }
+
+        consecutiveErrors++;
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          self.postMessage({
+            type: 'STREAM_ERROR',
+            payload: { message: 'Lost connection to analysis server. Results processed so far have been saved.' }
+          });
+          self.postMessage({ type: 'COMPLETE' });
+          return;
+        }
+        await new Promise(r => setTimeout(r, ERROR_RETRY_INTERVAL));
+        continue;
+      }
+
+      // Reset error counter on success
+      consecutiveErrors = 0;
+
+      const data = await response.json();
+
+      // Send new results to main thread
+      if (data.results && data.results.length > 0) {
+        for (const result of data.results) {
+          self.postMessage({
+            type: 'BUSINESS_COMPLETE',
+            payload: {
+              business: result.enrichedData,
+              progress: { completed: data.completedCount, total: data.totalCount },
+            }
+          });
+          lastIndex = Math.max(lastIndex, result.businessIndex);
+        }
+      }
+
+      // Update progress
+      if (data.completedCount > lastCompletedCount) {
+        lastCompletedCount = data.completedCount;
+        self.postMessage({
+          type: 'PROGRESS',
+          payload: {
+            completed: data.completedCount,
+            total: data.totalCount,
+            message: `Analyzing ${data.completedCount}/${data.totalCount}`,
+            phase: 3,
+          }
+        });
+
+        // Send status update for phase transition
+        if (lastCompletedCount === 1) {
+          self.postMessage({
+            type: 'STATUS',
+            payload: {
+              phase: 3,
+              totalPhases: 3,
+              message: 'Analyzing websites and reviews...',
+              isBackground: false,
+            }
+          });
+        }
+      }
+
+      // Check for completion
+      if (data.status === 'completed') {
+        self.postMessage({
+          type: 'COMPLETE',
+          payload: {
+            serverSideDeduction: true,
+          }
+        });
+        return;
+      }
+
+      if (data.status === 'failed') {
+        self.postMessage({
+          type: 'STREAM_ERROR',
+          payload: { message: data.error || 'Analysis failed in background. Unprocessed credits have been refunded.' }
+        });
+        self.postMessage({ type: 'COMPLETE' });
+        return;
+      }
+
+      // Wait before next poll
+      await new Promise(r => setTimeout(r, POLL_INTERVAL));
+
+    } catch (error) {
+      // Network error during poll
+      consecutiveErrors++;
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        self.postMessage({
+          type: 'STREAM_ERROR',
+          payload: { message: 'Lost connection. Your analysis is still running in the background. Results will be available when you reload.' }
+        });
+        self.postMessage({ type: 'COMPLETE' });
+        return;
+      }
+      await new Promise(r => setTimeout(r, ERROR_RETRY_INTERVAL));
+    }
   }
 }
