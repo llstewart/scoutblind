@@ -358,6 +358,175 @@ async function fetchReviewsInternal(
 }
 
 /**
+ * Parse a single place's review data from Outscraper response format
+ */
+function parseReviewData(place: OutscraperReviewsResponse | null): ReviewData {
+  const defaultResult: ReviewData = {
+    lastReviewDate: null,
+    lastOwnerActivity: null,
+    responseRate: 0,
+    reviewCount: 0,
+  };
+
+  if (!place) return defaultResult;
+
+  const reviews = place.reviews_data || [];
+  if (reviews.length === 0) return defaultResult;
+
+  let lastReviewDate: Date | null = null;
+  for (const review of reviews) {
+    if (review.review_datetime_utc) {
+      const reviewDate = new Date(review.review_datetime_utc);
+      if (!lastReviewDate || reviewDate > lastReviewDate) {
+        lastReviewDate = reviewDate;
+      }
+    } else if (review.review_timestamp) {
+      const reviewDate = new Date(review.review_timestamp * 1000);
+      if (!lastReviewDate || reviewDate > lastReviewDate) {
+        lastReviewDate = reviewDate;
+      }
+    }
+  }
+
+  let lastOwnerActivity: Date | null = null;
+  let repliedCount = 0;
+
+  for (const review of reviews) {
+    if (review.owner_answer && review.owner_answer.trim().length > 0) {
+      repliedCount++;
+      if (review.owner_answer_timestamp_datetime_utc) {
+        const replyDate = new Date(review.owner_answer_timestamp_datetime_utc);
+        if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
+          lastOwnerActivity = replyDate;
+        }
+      } else if (review.owner_answer_timestamp) {
+        const replyDate = new Date(review.owner_answer_timestamp * 1000);
+        if (!lastOwnerActivity || replyDate > lastOwnerActivity) {
+          lastOwnerActivity = replyDate;
+        }
+      }
+    }
+  }
+
+  const responseRate = reviews.length > 0
+    ? Math.round((repliedCount / reviews.length) * 100)
+    : 0;
+
+  return { lastReviewDate, lastOwnerActivity, responseRate, reviewCount: reviews.length };
+}
+
+const ASYNC_API_BASE = 'https://api.app.outscraper.com';
+const ASYNC_BATCH_LIMIT = 25; // Outscraper max queries per async request
+
+/**
+ * Submit an async batch review request to Outscraper.
+ * Returns request ID(s) for polling.
+ */
+export async function submitAsyncBatchReviews(
+  queries: string[],
+  reviewsLimit: number = 5,
+): Promise<string[]> {
+  const apiKey = process.env.OUTSCRAPER_API_KEY;
+  if (!apiKey) throw new Error('OUTSCRAPER_API_KEY is not configured');
+
+  const requestIds: string[] = [];
+
+  // Split into chunks of 25 (Outscraper batch limit)
+  for (let i = 0; i < queries.length; i += ASYNC_BATCH_LIMIT) {
+    const chunk = queries.slice(i, i + ASYNC_BATCH_LIMIT);
+
+    const params = new URLSearchParams();
+    for (const q of chunk) {
+      params.append('query', q);
+    }
+    params.set('reviewsLimit', reviewsLimit.toString());
+    params.set('sort', 'newest');
+    params.set('async', 'true');
+
+    const url = `${ASYNC_API_BASE}${REVIEWS_ENDPOINT}?${params}`;
+
+    outscrapterLogger.info({ chunkSize: chunk.length, chunkStart: i }, 'Submitting async review batch');
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-API-KEY': apiKey,
+        'client': 'Packleads',
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Outscraper async submit failed: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (!data.id) {
+      throw new Error('Outscraper async response missing request ID');
+    }
+
+    requestIds.push(data.id);
+    outscrapterLogger.info({ requestId: data.id, chunkSize: chunk.length }, 'Async batch submitted');
+  }
+
+  return requestIds;
+}
+
+/**
+ * Poll Outscraper for async batch results.
+ * Returns null if still processing, or the parsed review data if complete.
+ */
+export async function fetchAsyncReviewResults(
+  requestId: string,
+): Promise<{ status: string; results: ReviewData[] } | null> {
+  const apiKey = process.env.OUTSCRAPER_API_KEY;
+  if (!apiKey) throw new Error('OUTSCRAPER_API_KEY is not configured');
+
+  const url = `${ASYNC_API_BASE}/requests/${requestId}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-API-KEY': apiKey,
+      'client': 'Packleads',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Outscraper poll failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (data.status !== 'Success') {
+    outscrapterLogger.info({ requestId, status: data.status }, 'Async reviews still processing');
+    return null;
+  }
+
+  outscrapterLogger.info({ requestId, resultCount: data.data?.length }, 'Async reviews complete');
+
+  // Parse each place's review data
+  // data.data is an array of arrays: [[place1_reviews], [place2_reviews], ...]
+  const results: ReviewData[] = [];
+  const places = data.data || [];
+
+  for (const placeData of places) {
+    // Each entry can be an array of place objects or a single place object
+    let place: OutscraperReviewsResponse | null = null;
+
+    if (Array.isArray(placeData) && placeData.length > 0) {
+      place = placeData[0];
+    } else if (placeData && !Array.isArray(placeData)) {
+      place = placeData;
+    }
+
+    results.push(parseReviewData(place));
+  }
+
+  return { status: 'Success', results };
+}
+
+/**
  * Fetch reviews for a single business with retry logic and rate limiting
  */
 export async function fetchBusinessReviews(
