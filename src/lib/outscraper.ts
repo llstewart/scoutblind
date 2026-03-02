@@ -39,7 +39,7 @@ const searchCircuitBreaker = new CircuitBreaker('outscraper-search', 5, 60000, 2
 const reviewsCircuitBreaker = new CircuitBreaker('outscraper-reviews', 5, 60000, 2);
 
 // Global semaphore to limit concurrent reviews API calls
-const reviewsApiSemaphore = new Semaphore(3); // Max 3 concurrent reviews requests
+const reviewsApiSemaphore = new Semaphore(5); // Max 5 concurrent reviews requests
 
 interface OutscraperRawPlace {
   name?: string;
@@ -464,7 +464,7 @@ export async function fetchBatchReviews(
 
       // Throttle between requests within semaphore
       await sleep(500 + Math.random() * 500); // 500-1000ms between requests
-    }, 25000);
+    }, 55000);
   });
 
   await Promise.all(promises);
